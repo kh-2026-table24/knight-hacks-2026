@@ -15,8 +15,8 @@ To resume: read PLAN.md (Part A), this file, AGENTS.md and `git log --oneline -2
 - [x] 1.3 src/shared/constants.ts; Player/Door/Room/Sprite import it  (7c6e1c4)
 
 ## M2 Contract and parser
-- [x] 2.1 spec.ts
-- [ ] 2.2 reader.ts
+- [x] 2.1 spec.ts  (2d4b8df)
+- [x] 2.2 reader.ts (+ issues.ts)
 - [ ] 2.3 parseSpec.ts
 - [ ] 2.4 fixtures/games/haunted.json
 - [ ] 2.5 check-specs.ts + spec-cases.ts + npm scripts
