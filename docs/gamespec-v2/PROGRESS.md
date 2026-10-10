@@ -10,8 +10,8 @@ To resume: read PLAN.md (Part A), this file, AGENTS.md and `git log --oneline -2
 - [x] 0.5 PLAN.md and PROGRESS.md added
 
 ## M1 Hygiene and shared constants
-- [x] 1.1 Remove key literals, delete src/character.ts, drop envPrefix, --env-file for dev:server
-- [ ] 1.2 strict in tsconfig.json
+- [x] 1.1 Remove key literals, delete src/character.ts, drop envPrefix, --env-file for dev:server  (06cf839)
+- [x] 1.2 strict in tsconfig.json
 - [ ] 1.3 src/shared/constants.ts; Player/Door/Room/Sprite import it
 
 ## M2 Contract and parser
