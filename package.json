@@ -11,12 +11,12 @@
     "server": "tsx scripts/server.ts"
   },
   "devDependencies": {
-    "@types/node": "^26.6.5",
-    "tsx": "^4.23.15",
+    "@types/three": "^0.186.0",
     "typescript": "~6.0.2",
     "vite": "^8.3.0"
   },
   "dependencies": {
-    "@anthropic-ai/claude-agent-sdk": "^0.3.296"
+    "@dimforge/rapier3d-compat": "^0.21.0",
+    "three": "^0.186.1"
   }
 }
