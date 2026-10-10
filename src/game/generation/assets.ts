@@ -143,6 +143,9 @@ function surfacePrompt(prompt: string) {
     STYLE,
     `A seamless tileable texture of ${prompt}.`,
     "Viewed straight on, filling the entire image edge to edge with even flat lighting.",
+    // Busy surfaces make walls, floors and props blur into one noise pattern; keep them calm so
+    // cutouts and the room's contrast read, and keep the stated color so rooms aren't all one hue.
+    "Simple and low in detail: one material with a subtle repeating pattern and a narrow range of tones, in the color described.",
     "No single objects, no border, no frame, no text, no perspective.",
   ].join(" ");
 }

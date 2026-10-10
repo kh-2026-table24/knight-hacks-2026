@@ -12,6 +12,8 @@ export interface PartPlan {
   rotation: Vector3Tuple;
   scale: Vector3Tuple;
   collisionsEnabled: boolean;
+  /** Overrides the item's material for this part (the cake on a workbench). */
+  material?: string;
 }
 
 export interface ItemPlan {
@@ -20,6 +22,8 @@ export interface ItemPlan {
   position: Vector3Tuple;
   rotationY: number;
   parts: PartPlan[];
+  /** What its box and wedge surfaces are made of; becomes their tileable texture. */
+  material?: string;
 }
 
 /** Where along its wall a door goes; the wall itself comes from the map grid. */
@@ -46,6 +50,7 @@ const TYPES = new Set<unknown>(Object.values(ObjectType));
 type Fields = Record<string, unknown>;
 const isFields = (v: unknown): v is Fields => typeof v === "object" && v !== null && !Array.isArray(v);
 const isNumber = (v: unknown): v is number => typeof v === "number" && Number.isFinite(v);
+const optionalText = (v: unknown) => (typeof v === "string" && v.trim() ? v.trim() : undefined);
 
 function vec3(value: unknown, path: string, errors: string[]): Vector3Tuple | null {
   if (Array.isArray(value) && value.length === 3 && value.every(isNumber)) return [value[0], value[1], value[2]];
@@ -77,7 +82,7 @@ function parsePart(value: unknown, path: string, errors: string[]): PartPlan | n
   }
 
   if (errors.length > before || !position || !scale || !rotation) return null;
-  return { type: type as ObjectType, position, rotation: rotation as Vector3Tuple, scale, collisionsEnabled: collisions as boolean };
+  return { type: type as ObjectType, position, rotation: rotation as Vector3Tuple, scale, collisionsEnabled: collisions as boolean, material: optionalText(value.material) };
 }
 
 function parseItem(value: unknown, index: number, errors: string[]): ItemPlan | null {
@@ -108,7 +113,7 @@ function parseItem(value: unknown, index: number, errors: string[]): ItemPlan | 
   }
 
   if (errors.length > before || !name || !position) return null;
-  return { name, position, rotationY: rotationY as number, parts };
+  return { name, position, rotationY: rotationY as number, parts, material: optionalText(value.material) };
 }
 
 function parseDoors(value: unknown, errors: string[]): DoorPlan[] {

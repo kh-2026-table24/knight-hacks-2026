@@ -3,9 +3,13 @@ import { ConvexGeometry } from "three/examples/jsm/geometries/ConvexGeometry.js"
 import { ColliderDesc, RigidBodyDesc, type Collider, type RigidBody, type World } from "@dimforge/rapier3d-compat";
 import { ObjectType, type Object as ObjectOutput } from "./generation/output/output";
 import type { TextureLibrary } from "./TextureLibrary";
+import { applyWorldUVs } from "./worldUVs";
 
 // Planes have no depth, so their collider gets some to stop the player clipping through.
 const PLANE_COLLIDER_DEPTH = 0.3;
+// Meters covered by one repeat of a box or ramp's surface texture, so pixels are the same size on
+// every face instead of one texture stretched across each face whatever its size.
+const SURFACE_TILE_SIZE = 2;
 
 // Rapier collision groups are (membership << 16) | filter. Dynamic objects (dropped items)
 // land on everything except the player, so they don't get shoved around or block movement.
@@ -47,6 +51,7 @@ export class Object {
     switch (output.type) {
       case ObjectType.RectPrism:
         geometry = new BoxGeometry(w, h, d).translate(0, h / 2, 0);
+        applyWorldUVs(geometry, SURFACE_TILE_SIZE);
         colliderDesc = ColliderDesc.cuboid(w / 2, h / 2, d / 2).setTranslation(0, h / 2, 0);
         break;
       case ObjectType.RightTriPrism: {
@@ -58,7 +63,9 @@ export class Object {
         ]);
         const vectors: Vector3[] = [];
         for (let i = 0; i < points.length; i += 3) vectors.push(new Vector3().fromArray(points, i));
+        // ConvexGeometry has no UVs at all, so without this the ramp can't show its texture.
         geometry = new ConvexGeometry(vectors);
+        applyWorldUVs(geometry, SURFACE_TILE_SIZE);
         colliderDesc = ColliderDesc.convexHull(points);
         break;
       }

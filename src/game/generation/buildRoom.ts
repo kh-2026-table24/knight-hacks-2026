@@ -95,14 +95,32 @@ export function buildRoom(plan: RoomPlan, brief: RoomBrief): { room: Room; textu
 
   const objects = wallItems(plan, brief.outdoor).map((wall) => toObject(wall.parts[0], `${id}-${slug(wall.name)}`, wallTexture));
 
+  // Boxes and wedges are tiled with a material texture (assets.ts draws them as surfaces), so they
+  // need what they're made of, not the item's name: a tiled picture of a whole workbench is noise.
+  // Items made of the same material share one texture. Flat panels are drawn as cutouts of the item.
+  const materials = new Map<string, string>();
+  const materialTexture = (material: string) => {
+    let textureId = materials.get(material);
+    if (!textureId) {
+      textureId = texture(`material-${materials.size}-${slug(material)}`, material);
+      materials.set(material, textureId);
+    }
+    return textureId;
+  };
+
   const groups: Group[] = plan.items.map((item, i) => {
     const groupId = `${id}-${i}-${slug(item.name)}`;
-    const textureId = texture(`${i}-${slug(item.name)}`, item.name);
+    let cutoutTexture: string | undefined;
+    const textureFor = (part: PartPlan) => {
+      if (part.type !== ObjectType.Plane) return materialTexture(part.material ?? item.material ?? item.name);
+      cutoutTexture ??= texture(`${i}-${slug(item.name)}`, item.name);
+      return cutoutTexture;
+    };
     return {
       id: groupId,
       position: [...item.position],
       rotation: [0, item.rotationY, 0],
-      objects: item.parts.map((part, j) => toObject(part, `${groupId}-${j}`, textureId)),
+      objects: item.parts.map((part, j) => toObject(part, `${groupId}-${j}`, textureFor(part))),
     };
   });
 

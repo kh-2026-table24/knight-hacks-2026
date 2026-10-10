@@ -77,7 +77,8 @@ Part types:
 
 Part fields: "type"; "position" [x, y, z] of the part's bottom-center relative to the item's
 origin; "scale" [width, height, depth] (panels use depth 0); optional "rotation" [rx, ry, rz] in
-radians; optional "collisions" (default true; set false for rugs and wall panels).
+radians; optional "collisions" (default true; set false for rugs and wall panels); optional
+"material" to give one part a different surface than the rest of its item.
 
 Item fields:
 - "name": specific and evocative, because art will be generated from it. "music box with a tiny
@@ -86,15 +87,18 @@ Item fields:
   y is 0 for things on the ground; raise it for things on platforms or mounted on walls.
 - "rotationY": radians. An item's front faces south (+z) by default. Use 1.5708 against the west
   wall and -1.5708 against the east wall; that also swaps its width and depth.
-- "parts": the 1 to 3 primitives.
+- "material": what its boxes and wedges are made of, as a surface: "scarred dark oak planks",
+  "rusted riveted iron", "cracked white porcelain". Art for boxes is a tiled material texture, so
+  describe the material, not the object. Required whenever the item has a box or wedge part.
+- "parts": the 1 to 3 primitives. Panels are drawn as a picture of the item from its name.
 
 Examples (only the shape of the data matters):
-{"name": "stone stage with worn steps", "position": [8, 0, 1.6], "rotationY": 0, "parts": [
+{"name": "stone stage with worn steps", "material": "worn grey limestone blocks", "position": [8, 0, 1.6], "rotationY": 0, "parts": [
   {"type": "rectPrism", "position": [0, 0, 0], "scale": [6, 0.9, 2.5]},
   {"type": "rightTriPrism", "position": [0, 0, 2], "scale": [2, 0.9, 1.5]}]}
-{"name": "marble pedestal holding a music box, lid open", "position": [13, 0, 2], "rotationY": 0, "parts": [
+{"name": "marble pedestal holding a music box, lid open", "material": "veined white marble", "position": [13, 0, 2], "rotationY": 0, "parts": [
   {"type": "rectPrism", "position": [0, 0, 0], "scale": [0.5, 1, 0.5]},
-  {"type": "rectPrism", "position": [0, 1, 0], "scale": [0.4, 0.25, 0.3]}]}
+  {"type": "rectPrism", "position": [0, 1, 0], "scale": [0.4, 0.25, 0.3], "material": "red lacquered wood with gold trim"}]}
 {"name": "tall arched window streaked with grime", "position": [3, 1.2, 0.31], "rotationY": 0, "parts": [
   {"type": "plane", "position": [0, 0, 0], "scale": [1.2, 2, 0], "collisions": false}]}
 </building_blocks>
@@ -113,6 +117,14 @@ Composition:
 - Put windows and paintings on walls as panels; they're cheap and carry the theme.
 - Place props with intent, each one something a player would want to walk up to and inspect.
 
+Art (every surface becomes a small pixel-art texture, so contrast is what makes things readable):
+- wallDescription and floorDescription name only the base material and its color, nothing lying
+  on it or hanging from it ("damp green-black fieldstone", not "stone walls strewn with petals").
+- Make the floor, the walls and the props clearly different from each other in color and
+  brightness, for example a dark floor, mid-tone walls, and props that are lighter or in an
+  accent color. Give the focal point the most striking material.
+- Neighboring props should not share a material unless they're a matched set.
+
 Theme:
 - Every object is evidence of what this room is for and what happened in it.
 - Include 2 to 4 signature props that only make sense for this room in this story.
@@ -127,7 +139,7 @@ don't overlap.
 
 Then write the room as JSON inside <room> tags, with nothing else inside the tags and no comments:
 <room>
-{"title": "...", "wallDescription": "what the walls look like", "floorDescription": "what the floor looks like",
+{"title": "...", "wallDescription": "base wall material and color", "floorDescription": "base floor material and color",
  "dimensions": [W, H, D], "startPosition": [x, 0, z],
  "doors": [{"connectionId": "...", "offset": 0}],
  "items": [...]}
