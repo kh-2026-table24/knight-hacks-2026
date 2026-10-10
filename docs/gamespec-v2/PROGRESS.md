@@ -18,8 +18,8 @@ To resume: read PLAN.md (Part A), this file, AGENTS.md and `git log --oneline -2
 - [x] 2.1 spec.ts  (2d4b8df)
 - [x] 2.2 reader.ts (+ issues.ts)  (8b8907d)
 - [x] 2.3 parseSpec.ts (+ parseFeatures.ts, split to stay under 300 lines)  (6ef87c6)
-- [x] 2.4 fixtures/games/haunted.json
-- [ ] 2.5 check-specs.ts + spec-cases.ts + npm scripts
+- [x] 2.4 fixtures/games/haunted.json  (569d0ca)
+- [x] 2.5 check-specs.ts + spec-cases.ts + npm scripts
 
 ## M3 Geometry and validators
 - [ ] 3.1 geometry.ts
