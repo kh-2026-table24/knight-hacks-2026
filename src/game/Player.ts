@@ -1,4 +1,4 @@
-import { DoubleSide, Mesh, MeshBasicMaterial, PlaneGeometry, Vector3 } from "three";
+import { DoubleSide, Mesh, MeshBasicMaterial, NearestFilter, PlaneGeometry, SRGBColorSpace, TextureLoader, Vector3, type Texture } from "three";
 import {
   Capsule,
   ColliderDesc,
@@ -11,18 +11,38 @@ import {
 } from "@dimforge/rapier3d-compat";
 import { CHARACTER_STRETCH, characterBrightness, createCharacterGlow } from "./characters";
 import { PLAYER_COLLISION_GROUPS } from "./Part";
-import { PLAYER } from "../shared/constants";
+import { FRAME_SECONDS, PLAYER } from "../shared/constants";
 
 const MOVE_KEYS = new Set(["w", "a", "s", "d"]);
-const WIDTH = 1;
+// The sprites are square, with the figure filling their height.
+const WIDTH = PLAYER.height;
 const { height: HEIGHT, radius: RADIUS, gravity: GRAVITY, stepHeight: MAX_STEP_HEIGHT, touchMargin: TOUCH_MARGIN } = PLAYER;
 const MAX_SLOPE = (PLAYER.maxSlopeDeg * Math.PI) / 180;
 const NO_ROTATION = { x: 0, y: 0, z: 0, w: 1 };
 // Gap the character controller keeps from surfaces. Spawning closer than this counts as stuck in the floor.
 const CONTROLLER_OFFSET = 0.02;
 const SPAWN_LIFT = 0.05;
-// Placeholder color until the player has a sprite.
+// Placeholder color until the sprites load.
 const COLOR = 0xd0d0d0;
+
+// The same protagonist in every game, so her sprites ship with the client (public/sprites/girl/) rather
+// than being generated per game. Side frames face right; facing left flips the mesh.
+type View = "front" | "side" | "back";
+const VIEWS: View[] = ["front", "side", "back"];
+const POSES = ["stand", "walk-1", "walk-2"];
+// Indexes into POSES. Standing is the passing pose between steps, so the walk loop reuses it.
+const WALK_CYCLE = [0, 1, 0, 2];
+const SPRITE_URL = (name: string) => `/sprites/girl/${name}.png`;
+
+const textureLoader = new TextureLoader();
+function loadSprite(name: string, onLoad: () => void): Texture {
+  const texture = textureLoader.load(SPRITE_URL(name), onLoad);
+  texture.colorSpace = SRGBColorSpace;
+  texture.magFilter = NearestFilter;
+  texture.minFilter = NearestFilter;
+  texture.generateMipmaps = false;
+  return texture;
+}
 
 /**
  * The protagonist: an upright 2D plane facing the camera, moved with WASD on the ground (XZ) plane.
@@ -42,14 +62,29 @@ export class Player {
   private readonly collider: Collider;
   private readonly controller: KinematicCharacterController;
   private readonly touchShape = new Capsule(HEIGHT / 2 - RADIUS, RADIUS + TOUCH_MARGIN);
+  /** Each view's frames, in POSES order. */
+  private readonly sprites: Record<View, Texture[]>;
+  private spritesLoaded = false;
+  private brightness = 1;
+  private view: View = "front";
+  private frame = 0;
+  private frameTime = 0;
 
   constructor(world: World) {
     // Shift geometry up so the mesh origin sits at the character's feet, and stretch it so the
     // camera's downward angle doesn't squash it.
     const geometry = new PlaneGeometry(WIDTH, HEIGHT).translate(0, HEIGHT / 2, 0).scale(1, CHARACTER_STRETCH, 1);
-    this.material = new MeshBasicMaterial({ color: COLOR, side: DoubleSide });
+    this.material = new MeshBasicMaterial({ color: COLOR, side: DoubleSide, alphaTest: 0.5 });
     this.mesh = new Mesh(geometry, this.material);
     this.mesh.add(createCharacterGlow(HEIGHT));
+
+    // Keep the placeholder until every frame is in, so walking never flashes an empty frame.
+    let pending = VIEWS.length * POSES.length;
+    const onLoad = () => {
+      if (--pending === 0) this.showSprites();
+    };
+    const load = (view: View) => POSES.map((pose) => loadSprite(`${view}-${pose}`, onLoad));
+    this.sprites = { front: load("front"), side: load("side"), back: load("back") };
 
     // Body origin is also at the feet; the capsule sits above it.
     this.body = world.createRigidBody(RigidBodyDesc.kinematicPositionBased());
@@ -87,7 +122,33 @@ export class Player {
 
   /** Draws the player at the brightness characters have in a room with this lightLevel. */
   setRoomLight(lightLevel: number) {
-    this.material.color.set(COLOR).multiplyScalar(characterBrightness(lightLevel));
+    this.brightness = characterBrightness(lightLevel);
+    this.material.color.set(this.spritesLoaded ? 0xffffff : COLOR).multiplyScalar(this.brightness);
+  }
+
+  private showSprites() {
+    this.spritesLoaded = true;
+    this.material.map = this.sprites.front[0];
+    this.material.color.set(0xffffff).multiplyScalar(this.brightness);
+    this.material.needsUpdate = true;
+  }
+
+  // Faces the way she's walking (horizontal wins on diagonals) and steps through the walk loop; stands when still.
+  private animate(dt: number, dx: number, dz: number) {
+    const walking = dx !== 0 || dz !== 0;
+    if (walking) {
+      this.view = dx !== 0 ? "side" : dz < 0 ? "back" : "front";
+      this.mesh.scale.x = dx < 0 ? -1 : 1;
+      this.frameTime += dt;
+      if (this.frameTime >= FRAME_SECONDS) {
+        this.frameTime = 0;
+        this.frame = (this.frame + 1) % WALK_CYCLE.length;
+      }
+    } else {
+      this.frame = 0;
+      this.frameTime = 0;
+    }
+    if (this.spritesLoaded) this.material.map = this.sprites[this.view][WALK_CYCLE[this.frame]];
   }
 
   /** False during the blinking grace period after a hit, when further hits don't land. */
@@ -119,6 +180,7 @@ export class Player {
     if (this.keys.has("s")) m.z += 1;
     if (this.keys.has("a")) m.x -= 1;
     if (this.keys.has("d")) m.x += 1;
+    this.animate(dt, m.x, m.z);
     if (m.lengthSq() > 0) m.normalize().multiplyScalar(this.speed * dt);
 
     this.verticalVelocity -= GRAVITY * dt;
