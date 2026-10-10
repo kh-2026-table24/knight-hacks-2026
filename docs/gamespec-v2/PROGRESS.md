@@ -23,8 +23,8 @@ To resume: read PLAN.md (Part A), this file, AGENTS.md and `git log --oneline -2
 
 ## M3 Geometry and validators
 - [x] 3.1 geometry.ts  (411323b)
-- [x] 3.2 walkGrid.ts
-- [ ] 3.3 checkRoom.ts
+- [x] 3.2 walkGrid.ts  (03a5906)
+- [x] 3.3 checkRoom.ts
 - [ ] 3.4 checkGame.ts
 - [ ] 3.5 validate.ts
 - [ ] 3.6 room and game cases
