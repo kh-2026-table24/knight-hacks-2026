@@ -1,7 +1,15 @@
 import type { Texture } from "three";
 import { Object } from "./Object";
 import type { TextureLibrary } from "./TextureLibrary";
-import type { Animations, CollisionAction, EmitAction, Item, Sprite as SpriteOutput } from "./generation/output/output";
+import type {
+  Animations,
+  CollisionAction,
+  Dialogue,
+  EmitAction,
+  Item,
+  Movement,
+  Sprite as SpriteOutput,
+} from "./generation/output/output";
 
 export type AnimationState = keyof Animations;
 
@@ -11,6 +19,8 @@ export class Sprite extends Object {
   readonly collision: CollisionAction | undefined;
   readonly emit: EmitAction | undefined;
   readonly item: Item | undefined;
+  readonly movement: Movement | undefined;
+  readonly dialogue: Dialogue | undefined;
 
   constructor(output: SpriteOutput, textures: TextureLibrary) {
     super(output, textures);
@@ -25,9 +35,16 @@ export class Sprite extends Object {
     this.collision = output.actions?.collision;
     this.emit = output.actions?.emit;
     this.item = output.item;
+    this.movement = output.movement;
+    this.dialogue = output.dialogue?.lines.length ? output.dialogue : undefined;
   }
 
   override get touchable() {
-    return this.item !== undefined || this.collision !== undefined || this.emit?.when.type === "collision";
+    return (
+      this.item !== undefined ||
+      this.collision !== undefined ||
+      this.dialogue !== undefined ||
+      this.emit?.when.type === "collision"
+    );
   }
 }

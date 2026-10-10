@@ -34,6 +34,8 @@ export class Group {
 
 // The output has no explicit kind field, so tell sprites apart by the fields only they have.
 function createObject(output: ObjectOutput | SpriteOutput, textures: TextureLibrary) {
-  if ("animations" in output || "actions" in output || "item" in output) return new Sprite(output, textures);
+  if (["animations", "actions", "item", "movement", "dialogue"].some((key) => key in output)) {
+    return new Sprite(output as SpriteOutput, textures);
+  }
   return new Object(output, textures);
 }

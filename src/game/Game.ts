@@ -1,16 +1,18 @@
 import { Connection } from "./Connection";
 import { Room } from "./Room";
 import { TextureLibrary } from "./TextureLibrary";
-import type { Game as GameOutput } from "./generation/output/output";
+import type { SavedGame } from "./generation/output/output";
 
 export class Game {
+  readonly id: string;
   readonly textures: TextureLibrary;
   readonly connections: Map<string, Connection>;
   readonly rooms: Map<string, Room>;
   readonly startRoom: Room;
 
-  constructor(output: GameOutput) {
+  constructor(output: SavedGame) {
     if (output.rooms.length === 0) throw new Error("Game has no rooms");
+    this.id = output.id;
     this.textures = new TextureLibrary(output.textures);
 
     const grid = new Map(output.rooms.map((r) => [r.id, r.gridPosition]));

@@ -49,6 +49,24 @@ export type EmitTrigger =
     | { type: "interval", seconds: number }
     | { type: "collision" }
     | { type: "random", chancePerSecond: number }
+    /** After the player finishes this sprite's dialogue, e.g. an NPC handing over an item. */
+    | { type: "dialogueEnd" }
+
+/** How a sprite moves on its own. Speeds are meters per second; the player walks at 5. */
+export type Movement =
+    /** Drifts randomly within `radius` of where it was placed. */
+    | { type: "wander", speed: number, radius: number }
+    /** Walks between room-space points in order, looping. */
+    | { type: "patrol", speed: number, points: Vector3Tuple[] }
+    /** Heads for the player once they come within `detectRadius`. */
+    | { type: "chase", speed: number, detectRadius: number }
+
+/** What a sprite says when the player talks to it. */
+export interface Dialogue {
+    speaker: string
+    /** Shown one at a time. */
+    lines: string[]
+}
 
 /**
  * Spawns a new sprite at this sprite's position: projectiles, dripping blood, or an
@@ -64,7 +82,11 @@ export interface EmitAction {
     when: EmitTrigger
 }
 
-/** An animated and/or interactive object. Always a plane. `animations` overrides `textureId`. */
+/**
+ * An animated and/or interactive object. Always a plane. `animations` overrides `textureId`.
+ * NPCs are sprites: a hostile one typically has `movement` (chase) and a collision action that
+ * damages "player"; a friendly one has `dialogue`, optionally emitting an item on "dialogueEnd".
+ */
 export interface Sprite extends Object {
     type: ObjectType.Plane
     animations?: Animations
@@ -74,6 +96,9 @@ export interface Sprite extends Object {
     }
     /** Makes this sprite a pickup. Its texture doubles as the inventory icon. */
     item?: Item
+    /** Moving sprites must be placed at room level, not inside a group. */
+    movement?: Movement
+    dialogue?: Dialogue
 }
 
 /** Moves and rotates its children together. */
@@ -134,4 +159,10 @@ export interface Game {
     connections: Connection[]
     /** rooms[0] is where the game starts. */
     rooms: Room[]
+}
+
+/** A game as the server saves and serves it. The id is assigned by the server, not generated. */
+export interface SavedGame extends Game {
+    /** server/games/<id>/ holds the game and its generated assets. */
+    id: string
 }

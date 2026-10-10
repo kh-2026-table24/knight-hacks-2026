@@ -23,7 +23,8 @@ export const testOutput = () => {
     { "id": "stone-wall",   "prompt": "damp cellar stone wall with moss, tileable" },
     { "id": "stone-floor",  "prompt": "cracked wet cellar flagstones, top-down, tileable" },
     { "id": "rat-1",        "prompt": "mangy black rat with red eyes, side view, frame 1 of 2, transparent background" },
-    { "id": "rat-2",        "prompt": "mangy black rat with red eyes, side view, mid-step, frame 2 of 2, transparent background" }
+    { "id": "rat-2",        "prompt": "mangy black rat with red eyes, side view, mid-step, frame 2 of 2, transparent background" },
+    { "id": "caretaker",    "prompt": "hunched elderly caretaker in a stained apron holding a dim lantern, front view, transparent background" }
   ],
   "connections": [
     { "id": "foyer-cellar", "roomIds": ["foyer", "cellar"], "locked": true },
@@ -57,6 +58,7 @@ export const testOutput = () => {
 
         { "id": "ghost", "type": "plane", "position": [3, 0, 12], "rotation": [0, 0, 0], "scale": [1, 2, 0], "collisionsEnabled": false,
           "animations": { "idle": ["ghost-idle-1", "ghost-idle-2"] },
+          "movement": { "type": "chase", "speed": 2, "detectRadius": 5 },
           "actions": { "collision": { "hostileToIds": ["player"], "damage": 10 } } },
 
         { "id": "mantel-candle", "type": "plane", "position": [4, 1.4, 1.0], "rotation": [0, 0, 0], "scale": [0.3, 0.6, 0], "collisionsEnabled": false,
@@ -134,6 +136,7 @@ export const testOutput = () => {
 
         { "id": "rat", "type": "plane", "position": [9, 0, 7], "rotation": [0, 0, 0], "scale": [0.6, 0.3, 0], "collisionsEnabled": false,
           "animations": { "idle": ["rat-1"], "moving": ["rat-1", "rat-2"] },
+          "movement": { "type": "wander", "speed": 1.5, "radius": 2 },
           "actions": { "collision": { "hostileToIds": ["player"], "damage": 2 } } }
       ],
       "doors": [
@@ -153,7 +156,12 @@ export const testOutput = () => {
         { "id": "bookshelf",        "type": "rectPrism", "position": [8, 0, 0.7],    "rotation": [0, 0, 0],   "scale": [3, 3.2, 0.8],    "collisionsEnabled": true, "textureId": "wood" },
         { "id": "desk",             "type": "rectPrism", "position": [5, 0, 4],      "rotation": [0, 0.15, 0], "scale": [2.2, 0.9, 1.1], "collisionsEnabled": true, "textureId": "wood" },
         { "id": "desk-chair",       "type": "rectPrism", "position": [5.2, 0, 5.3],  "rotation": [0, 0.4, 0], "scale": [0.6, 0.5, 0.6],  "collisionsEnabled": true, "textureId": "wood" },
-        { "id": "study-portrait",   "type": "plane",     "position": [3, 1.8, 0.32], "rotation": [0, 0, 0],   "scale": [1, 1.3, 0],      "collisionsEnabled": false, "textureId": "painting" }
+        { "id": "study-portrait",   "type": "plane",     "position": [3, 1.8, 0.32], "rotation": [0, 0, 0],   "scale": [1, 1.3, 0],      "collisionsEnabled": false, "textureId": "painting" },
+        { "id": "caretaker", "type": "plane", "position": [9, 0, 5.5], "rotation": [0, 0, 0], "scale": [1, 1.9, 0], "collisionsEnabled": true, "textureId": "caretaker",
+          "dialogue": { "speaker": "Caretaker", "lines": [
+            "You shouldn't have come back here.",
+            "The cellar's locked. Has been since the butler... well.",
+            "He always kept the key on him. Still does, I expect." ] } }
       ],
       "doors": [
         { "id": "study-to-foyer", "connectionId": "foyer-study", "offset": 5, "type": "plane", "scale": [1.6, 3, 0], "collisionsEnabled": true, "textureId": "door" }
