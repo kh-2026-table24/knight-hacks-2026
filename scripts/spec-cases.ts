@@ -76,4 +76,115 @@ export const CASES: SpecCase[] = [
     expect: ['kind must be one of "key"'],
     mutate: (g) => (prop(g, "foyer", "butler-corpse").contains.kind = "potion"),
   },
+
+  // Room layout (R rules) ---------------------------------------------------------------------
+  {
+    name: "prop pushed out of the room",
+    expect: ["props[4](couch) sticks out of the room"],
+    room: "foyer",
+    mutate: (g) => (prop(g, "foyer", "couch").position = [19.5, 0, 6]),
+  },
+  {
+    name: "props intersect",
+    expect: ["(hearth) and", "(couch) intersect"],
+    room: "foyer",
+    mutate: (g) => (prop(g, "foyer", "couch").position = [5, 0, 1.5]),
+  },
+  {
+    name: "start inside the couch",
+    expect: ["rooms[0](foyer).start [5, 6] is not open floor"],
+    room: "foyer",
+    mutate: (g) => (room(g, "foyer").start = [5, 6]),
+  },
+  {
+    name: "missing door",
+    expect: ['must contain exactly one door with connection "foyer-study"'],
+    room: "foyer",
+    mutate: (g) => (room(g, "foyer").doors = room(g, "foyer").doors.filter((d: RawGame) => d.connection !== "foyer-study")),
+  },
+  {
+    name: "door to a room it doesn't connect",
+    expect: ['uses connection "cellar-study", which doesn\'t join this room'],
+    mutate: (g) => room(g, "cellar").doors.push({ connection: "cellar-study", offset: 3 }),
+  },
+  {
+    name: "door blocked",
+    expect: ["is blocked", "blocking-crate"],
+    room: "foyer",
+    mutate: (g) =>
+      room(g, "foyer").props.push({
+        id: "blocking-crate", name: "crate", material: "rough pine planks", position: [11.5, 0, 1.3],
+        parts: [{ shape: "box", position: [0, 0, 0], size: [1.2, 1, 1.2] }],
+      }),
+  },
+  {
+    name: "character inside the bookshelf",
+    expect: ["characters[0](caretaker) can't stand at"],
+    room: "study",
+    mutate: (g) => (character(g, "study", "caretaker").position = [8, 0, 0.7]),
+  },
+  {
+    name: "patrol point inside the desk",
+    expect: ["movement.points[1] [5, 4] can't be walked to"],
+    room: "study",
+    mutate: (g) => (character(g, "study", "caretaker").movement.points[1] = [5, 4]),
+  },
+  {
+    name: "pickup out of reach on top of the bookshelf",
+    expect: ["pickups[0](spare-key) can't be picked up"],
+    room: "study",
+    mutate: (g) =>
+      (room(g, "study").pickups = [
+        { id: "spare-key", item: { kind: "key", name: "Spare Key", art: "small iron key", unlocks: "foyer-cellar" }, position: [8, 3.2, 0.7] },
+      ]),
+  },
+  {
+    name: "examine text out of reach",
+    expect: ["props[6](portrait) can't be examined"],
+    room: "foyer",
+    mutate: (g) => (prop(g, "foyer", "portrait").position = [2.2, 2.5, 0.32]),
+  },
+
+  // Whole game (G rules) ----------------------------------------------------------------------
+  {
+    name: "duplicate room id",
+    expect: ['"cellar" is used by another room too'],
+    mutate: (g) => (room(g, "study").id = "cellar"),
+  },
+  {
+    name: "rooms that aren't neighbors",
+    expect: ["are not in neighboring grid cells"],
+    mutate: (g) => (room(g, "study").grid = [2, 0]),
+  },
+  {
+    name: "unreachable room",
+    expect: ["rooms[2](study) can't be reached from foyer"],
+    mutate: (g) => (g.connections = g.connections.filter((c: RawGame) => c.id !== "foyer-study")),
+  },
+  {
+    name: "locked door with no key",
+    expect: ["is locked but nothing opens it"],
+    mutate: (g) => delete prop(g, "foyer", "butler-corpse").contains,
+  },
+  {
+    name: "key behind its own lock",
+    expect: ["connections[0](foyer-cellar) can never be opened"],
+    mutate: (g) => {
+      delete prop(g, "foyer", "butler-corpse").contains;
+      room(g, "cellar").pickups = [
+        { id: "brass-key", item: { kind: "key", name: "Brass Key", art: "old ornate brass key", unlocks: "foyer-cellar" }, position: [7, 0, 6] },
+      ];
+    },
+  },
+  {
+    name: "key for a connection that doesn't exist",
+    expect: ['unlocks "foyer-attic", but there is no connection with that id'],
+    mutate: (g) => (prop(g, "foyer", "butler-corpse").contains.unlocks = "foyer-attic"),
+  },
+  {
+    name: "duplicate id within a room",
+    expect: ['uses the id "hearth"'],
+    room: "foyer",
+    mutate: (g) => (prop(g, "foyer", "couch").id = "hearth"),
+  },
 ];

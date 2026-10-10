@@ -26,8 +26,8 @@ To resume: read PLAN.md (Part A), this file, AGENTS.md and `git log --oneline -2
 - [x] 3.2 walkGrid.ts  (03a5906)
 - [x] 3.3 checkRoom.ts  (dc525eb)
 - [x] 3.4 checkGame.ts  (261944e)
-- [x] 3.5 validate.ts
-- [ ] 3.6 room and game cases
+- [x] 3.5 validate.ts  (852c1ce)
+- [x] 3.6 room and game cases
 
 ## M4 Engine on the spec (CHECKPOINT)
 - [ ] 4.1 art.ts
