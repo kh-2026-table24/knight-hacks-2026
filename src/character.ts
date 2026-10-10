@@ -6,8 +6,9 @@ import { GoogleGenAI } from "@google/genai";
 const SERVER_URL = "http://localhost:3001/api/claude";
 const MODEL = "gemini-nano-banana-2.1";
 
-// Image generation needs the billed project's key. Hardcoded so it works for everyone without a .env.local.
-const GEMINI_IMAGE_KEY = "AQ.Ab8RN6JjAh5PSt7pfmSDeO0wQtZvkWAlF6jdxuO6H0d9unzJrA";
+// Image generation needs the billed project's key: GEMINI_IMAGE_KEY in .env.local (vite.config.ts exposes it here).
+// Never hardcode it: anything in this file ships to the browser.
+const GEMINI_IMAGE_KEY = import.meta.env.GEMINI_IMAGE_KEY as string | undefined;
 const ai = new GoogleGenAI({ apiKey: GEMINI_IMAGE_KEY });
 
 async function askClaude(prompt: string): Promise<string> {

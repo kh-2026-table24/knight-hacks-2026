@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "concurrently -k -n server,web -c blue,green \"npm:dev:server\" \"npm:dev:web\"",
     "dev:server": "tsx watch server/index.ts",
@@ -12,21 +15,23 @@
     "claude": "tsx scripts/claude.ts",
     "server": "tsx scripts/server.ts",
     "sprite": "tsx --env-file=.env.local scripts/gemini.ts",
-    "gemini-text": "tsx --env-file=.env.local scripts/gemini-text.ts"
+    "gemini-text": "tsx --env-file=.env.local scripts/gemini-text.ts",
+    "start": "tsx server/index.ts"
   },
   "devDependencies": {
     "@types/node": "^26.6.5",
     "@types/three": "^0.186.0",
     "concurrently": "^10.0.6",
-    "tsx": "^4.23.15",
     "typescript": "~6.0.2",
     "vite": "^8.3.0"
   },
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.3.296",
     "@dimforge/rapier3d-compat": "^0.21.0",
+    "@google-cloud/secret-manager": "^7.1.1",
     "@google/genai": "^2.28.0",
     "sharp": "^0.35.5",
-    "three": "^0.186.1"
+    "three": "^0.186.1",
+    "tsx": "^4.23.15"
   }
 }

@@ -4,8 +4,10 @@ import { join } from "node:path";
 import sharp from "sharp";
 import { ObjectType, type Game, type Group, type Object as ObjectOutput, type SavedGame, type Sprite } from "../src/game/generation/output/output";
 import { gameDir } from "./games";
+import { getSecret } from "./secrets";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_IMAGE_KEY ?? "AQ.Ab8RN6JjAh5PSt7pfmSDeO0wQtZvkWAlF6jdxuO6H0d9unzJrA" });
+// The key comes from .env.local locally and from Secret Manager on Cloud Run (see secrets.ts).
+const gemini = async () => new GoogleGenAI({ apiKey: await getSecret("GEMINI_IMAGE_KEY", "gemini-image-key") });
 const MODEL = "gemini-nano-banana-2.1";
 const MAX_CONCURRENT = 6; // Gemini calls in flight at once
 
@@ -75,7 +77,7 @@ function original(game: SavedGame, job: AssetJob): Promise<Buffer> {
 }
 
 async function askGemini(prompt: string, reference: string | undefined, aspectRatio: string): Promise<string> {
-  const interaction = await ai.interactions.create({
+  const interaction = await (await gemini()).interactions.create({
     model: MODEL,
     input: reference
       ? [
