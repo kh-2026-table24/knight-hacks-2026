@@ -12,6 +12,9 @@ async function askClaude(prompt: string): Promise<string> {
     options: {
       tools: [], // plain text in, text out: no file/bash access
       maxTurns: 1,
+      // Room generation is one long structured response; Sonnet at medium effort keeps it fast.
+      model: "claude-sonnet-5-5",
+      effort: "medium",
       env: subscriptionEnv,
     },
   })) {
