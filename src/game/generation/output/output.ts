@@ -64,6 +64,7 @@ export interface Animations {
 export interface CollisionAction {
     /** Object ids, or "player" for the protagonist. */
     hostileToIds: string[]
+    /** Hearts taken per hit. The player has 4. */
     damage: number
 }
 
@@ -80,10 +81,13 @@ export type Movement =
     | { type: "wander", speed: number, radius: number }
     /** Walks between room-space points in order, looping. */
     | { type: "patrol", speed: number, points: Vector3Tuple[] }
-    /** Heads for the player once they come within `detectRadius`. */
+    /**
+     * Heads for the player once they come within `detectRadius`, and walks back to where it was
+     * placed when they get well beyond it. Keep `speed` below the player's 5 so they can escape.
+     */
     | { type: "chase", speed: number, detectRadius: number }
 
-/** What a sprite says when the player talks to it. */
+/** One conversation: what a sprite says when the player talks to it. */
 export interface Dialogue {
     speaker: string
     /** Shown one at a time. */
@@ -106,8 +110,9 @@ export interface EmitAction {
 
 /**
  * An animated and/or interactive object. Always a plane. `animations` overrides `textureId`.
- * NPCs are sprites: a hostile one typically has `movement` (chase) and a collision action that
- * damages "player"; a friendly one has `dialogue`, optionally emitting an item on "dialogueEnd".
+ * NPCs are sprites with `movement` and/or `dialogues`, and always carry a soft glow like the player.
+ * A hostile one has a collision action that damages "player"; a friendly one talks, optionally
+ * emitting an item on "dialogueEnd".
  */
 export interface Sprite extends Object {
     type: ObjectType.Plane
@@ -120,7 +125,8 @@ export interface Sprite extends Object {
     item?: Item
     /** Moving sprites must be placed at room level, not inside a group. */
     movement?: Movement
-    dialogue?: Dialogue
+    /** Each time the player talks to it, it plays the next one; the last repeats. */
+    dialogues?: Dialogue[]
 }
 
 /** Moves and rotates its children together. */

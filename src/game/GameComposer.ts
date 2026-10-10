@@ -1,17 +1,16 @@
-import { AmbientLight, Color, Fog, PerspectiveCamera, Scene, Timer, Vector3, WebGLRenderer } from "three";
+import { AmbientLight, Color, Fog, PerspectiveCamera, Scene, Timer, WebGLRenderer } from "three";
 import { World } from "@dimforge/rapier3d-compat";
-import { Player } from "./Player";
+import { CAMERA_OFFSET } from "./camera";
+import { MAX_HEARTS, Player } from "./Player";
 import { RetroFilter } from "./RetroFilter";
+import { Hud } from "./ui/Hud";
 import { Door } from "./Door";
 import { Sprite } from "./Sprite";
-import { ItemType } from "./generation/output/output";
+import { ItemType, type Dialogue } from "./generation/output/output";
 import type { Game } from "./Game";
 import type { Object } from "./Object";
 import type { Room } from "./Room";
 
-// Fixed camera offset from the player. The camera's orientation is set once
-// from this and never changes; only its position follows the player.
-const CAMERA_OFFSET = new Vector3(0, 6, 9);
 // Fill light at a room's lightLevel of 1, tinted cold like moonlight. Placed lights do the rest.
 const AMBIENT_COLOR = 0xb8c4ff;
 const AMBIENT_AT_FULL = 3;
@@ -29,6 +28,7 @@ export class GameComposer {
   private readonly timer = new Timer();
   private readonly ambient = new AmbientLight(AMBIENT_COLOR, 0);
   private readonly retro: RetroFilter;
+  readonly hud = new Hud();
   private game: Game | null = null;
   private room: Room | null = null;
   /** Objects the player was touching last frame, so touches only trigger once on contact. */
@@ -49,6 +49,12 @@ export class GameComposer {
 
     this.player = new Player(this.world);
     this.scene.add(this.player.mesh);
+    this.hud.setHearts(this.player.hearts, MAX_HEARTS);
+
+    window.addEventListener("keydown", (e) => {
+      // defaultPrevented: the dialogue box already used this press (e.g. to close the last line).
+      if (e.key.toLowerCase() === "e" && !e.repeat && !e.defaultPrevented && !this.hud.dialogue.isOpen) void this.talk();
+    });
 
     window.addEventListener("resize", this.resize);
     this.resize();
@@ -72,6 +78,7 @@ export class GameComposer {
     room.addTo(this.scene, this.world);
     this.room = room;
     this.ambient.intensity = AMBIENT_AT_FULL * room.lightLevel;
+    this.player.setRoomLight(room.lightLevel);
     this.touching.clear();
     this.player.reset(arrivalConnectionId ? room.arrivalPoint(arrivalConnectionId) : room.startPosition, this.world);
   }
@@ -93,8 +100,9 @@ export class GameComposer {
       this.player.update(dt);
       this.world.timestep = dt;
       this.world.step();
-      this.room?.update(dt);
-      this.handleTouches();
+      this.room?.update(dt, this.hud.dialogue.isOpen, this.player.position);
+      // Nothing happens to the player, and NPCs stand still, while they're reading.
+      if (!this.hud.dialogue.isOpen) this.handleTouches();
     }
     this.camera.position.copy(this.player.position).add(CAMERA_OFFSET);
 
@@ -113,40 +121,80 @@ export class GameComposer {
     const started = [...now].filter((obj) => !this.touching.has(obj));
     this.touching = now;
 
-    // Items are checked every frame, since a dropped item may not be ready on first contact.
+    // Items and damage are checked every frame: a dropped item may not be ready on first contact,
+    // and something hostile keeps hurting while you stay in contact (after the invulnerability window).
     for (const obj of now) {
-      if (obj instanceof Sprite && obj.item && room.isPickupReady(obj)) {
+      if (!(obj instanceof Sprite)) continue;
+      if (obj.item && room.isPickupReady(obj)) {
         this.player.inventory.push(obj.item);
+        this.hud.setItems(this.player.inventory);
         room.removeObject(obj);
-        console.log(`Picked up ${obj.item.name}`);
+      } else if (obj.collision?.hostileToIds.includes("player") && this.player.hurt(obj.collision.damage)) {
+        this.hud.setHearts(this.player.hearts, MAX_HEARTS);
+        if (this.player.hearts === 0) void this.die();
       }
     }
+    this.hud.setHint(this.talkTarget() ? "[E] Talk" : null);
 
     for (const obj of started) {
-      if (obj instanceof Door) this.useDoor(obj);
+      if (obj instanceof Door) void this.useDoor(obj);
       else if (obj instanceof Sprite && obj.emit?.when.type === "collision") room.emitFrom(obj);
       if (this.room !== room) return; // went through a door
     }
   }
 
-  private useDoor(door: Door) {
+  private async useDoor(door: Door) {
     const connection = this.game?.connections.get(door.connectionId);
-    if (!connection || !this.room) return;
+    const room = this.room;
+    if (!connection || !room) return;
 
     if (connection.locked) {
       const key = this.player.inventory.find((i) => i.type === ItemType.Key && i.unlocksId === connection.id);
       if (!key) {
-        console.log(`${connection.id} is locked`);
+        await this.showDialogue({ speaker: "", lines: ["It's locked."] });
         return;
       }
       connection.locked = false;
-      console.log(`Unlocked ${connection.id} with ${key.name}`);
+      await this.showDialogue({ speaker: "", lines: [`You unlock it with the ${key.name}.`] });
     }
 
-    const next = this.game?.rooms.get(connection.otherRoom(this.room.id));
-    if (!next) return;
-    console.log(`${this.room.id} (${door.side}) -> ${next.id}`);
+    const next = this.game?.rooms.get(connection.otherRoom(room.id));
+    if (!next || this.room !== room) return;
     this.swapRooms(next, connection.id);
+  }
+
+  /** The NPC with something to say that the player is touching, if any. */
+  private talkTarget() {
+    for (const obj of this.touching) if (obj instanceof Sprite && obj.dialogues.length > 0) return obj;
+    return undefined;
+  }
+
+  private async talk() {
+    const npc = this.talkTarget();
+    const dialogue = npc?.nextDialogue();
+    const room = this.room;
+    if (!npc || !dialogue || !room) return;
+    await this.showDialogue(dialogue);
+    if (npc.emit?.when.type === "dialogueEnd" && this.room === room) room.emitFrom(npc);
+  }
+
+  /** Shows a dialogue with the player held still until it's read. */
+  private async showDialogue(dialogue: Dialogue) {
+    this.player.frozen = true;
+    this.hud.setHint(null);
+    try {
+      await this.hud.dialogue.play(dialogue);
+    } finally {
+      this.player.frozen = false;
+    }
+  }
+
+  // Placeholder until the game's states are designed: back to the room's start with full hearts.
+  private async die() {
+    await this.showDialogue({ speaker: "", lines: ["Everything goes dark..."] });
+    this.player.heal();
+    this.hud.setHearts(this.player.hearts, MAX_HEARTS);
+    if (this.room) this.swapRooms(this.room);
   }
 
   private resize = () => {

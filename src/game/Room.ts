@@ -49,6 +49,8 @@ export class Room {
   private readonly emitters: Emitter[];
   /** Objects with flickering or pulsing lights. */
   private readonly animatedLights: Object[];
+  /** Sprites placed in the room, which may move and animate. */
+  private readonly sprites: Sprite[];
   /** Sprites created by emitters. Kept while the room is unloaded so dropped items stay put. */
   private readonly spawned: Spawned[] = [];
   private readonly byCollider = new Map<number, Object>();
@@ -75,6 +77,7 @@ export class Room {
       return [new Door(door, textures, side, this.dimensions)];
     });
     this.animatedLights = [...allObjects(this.contents), ...this.doors].filter((o) => hasAnimatedLight(o));
+    this.sprites = allObjects(this.contents).filter((o) => o instanceof Sprite);
     this.emitters = allObjects(this.contents)
       .filter((o): o is Sprite => o instanceof Sprite && o.emit !== undefined)
       .map((sprite) => ({ sprite, count: 0, timer: 0 }));
@@ -110,6 +113,7 @@ export class Room {
       for (const desc of this.colliderDescs) world.createCollider(desc, this.body);
     }
     this.contents.addTo(scene, world);
+    for (const sprite of this.sprites) sprite.setRoomLight(this.lightLevel);
     for (const door of this.doors) door.addTo(scene, world);
     for (const { sprite } of this.spawned) sprite.addTo(scene, world);
 
@@ -143,9 +147,14 @@ export class Room {
     return door ? door.arrivalPoint() : this.startPosition.clone();
   }
 
-  update(dt: number) {
+  /**
+   * `paused` holds NPCs still (e.g. while a dialogue is open); everything else keeps going.
+   * `player` is where the player is, for NPCs that chase them.
+   */
+  update(dt: number, paused: boolean, player: Vector3) {
     this.time += dt;
     for (const obj of this.animatedLights) obj.updateLight(this.time);
+    for (const sprite of this.sprites) sprite.update(dt, paused, player);
 
     for (const emitter of this.emitters) {
       const when = emitter.sprite.emit!.when;
@@ -165,6 +174,7 @@ export class Room {
       else {
         sprite.syncFromPhysics();
         sprite.updateLight(this.time);
+        sprite.update(dt, paused, player);
       }
     }
   }

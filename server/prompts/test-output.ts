@@ -60,7 +60,7 @@ export const testOutput = () => {
         { "id": "ghost", "light": { "type": "glow", "color": "#9fd8ff", "intensity": 1.5, "range": 3, "effect": "pulse" }, "type": "plane", "position": [3, 0, 12], "rotation": [0, 0, 0], "scale": [1, 2, 0], "collisionsEnabled": false,
           "animations": { "idle": ["ghost-idle-1", "ghost-idle-2"] },
           "movement": { "type": "chase", "speed": 2, "detectRadius": 5 },
-          "actions": { "collision": { "hostileToIds": ["player"], "damage": 10 } } },
+          "actions": { "collision": { "hostileToIds": ["player"], "damage": 1 } } },
 
         { "id": "mantel-candle", "light": { "type": "glow", "color": "#ffb060", "intensity": 1.5, "range": 3, "effect": "flicker" }, "type": "plane", "position": [4, 1.4, 1.0], "rotation": [0, 0, 0], "scale": [0.3, 0.6, 0], "collisionsEnabled": false,
           "animations": { "idle": ["candle-1", "candle-2"] },
@@ -139,7 +139,7 @@ export const testOutput = () => {
         { "id": "rat", "type": "plane", "position": [9, 0, 7], "rotation": [0, 0, 0], "scale": [0.6, 0.3, 0], "collisionsEnabled": false,
           "animations": { "idle": ["rat-1"], "moving": ["rat-1", "rat-2"] },
           "movement": { "type": "wander", "speed": 1.5, "radius": 2 },
-          "actions": { "collision": { "hostileToIds": ["player"], "damage": 2 } } }
+          "actions": { "collision": { "hostileToIds": ["player"], "damage": 1 } } }
       ],
       "doors": [
         { "id": "cellar-to-foyer", "connectionId": "foyer-cellar", "offset": 7, "type": "plane", "scale": [1.6, 3, 0], "collisionsEnabled": true, "textureId": "door" }
@@ -161,10 +161,11 @@ export const testOutput = () => {
         { "id": "desk-chair",       "type": "rectPrism", "position": [5.2, 0, 5.3],  "rotation": [0, 0.4, 0], "scale": [0.6, 0.5, 0.6],  "collisionsEnabled": true, "textureId": "wood" },
         { "id": "study-portrait",   "type": "plane",     "position": [3, 1.8, 0.32], "rotation": [0, 0, 0],   "scale": [1, 1.3, 0],      "collisionsEnabled": false, "textureId": "painting" },
         { "id": "caretaker", "light": { "type": "glow", "color": "#ffc070", "intensity": 3, "range": 5, "effect": "flicker" }, "type": "plane", "position": [9, 0, 5.5], "rotation": [0, 0, 0], "scale": [1, 1.9, 0], "collisionsEnabled": true, "textureId": "caretaker",
-          "dialogue": { "speaker": "Caretaker", "lines": [
+          "movement": { "type": "patrol", "speed": 0.8, "points": [[9, 0, 5.5], [10.5, 0, 8], [7, 0, 8.5]] },
+          "dialogues": [{ "speaker": "Caretaker", "lines": [
             "You shouldn't have come back here.",
             "The cellar's locked. Has been since the butler... well.",
-            "He always kept the key on him. Still does, I expect." ] } }
+            "He always kept the key on him. Still does, I expect." ] }] }
       ],
       "doors": [
         { "id": "study-to-foyer", "connectionId": "foyer-study", "offset": 5, "type": "plane", "scale": [1.6, 3, 0], "collisionsEnabled": true, "textureId": "door" }

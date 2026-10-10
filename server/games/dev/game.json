@@ -453,7 +453,7 @@
               "hostileToIds": [
                 "player"
               ],
-              "damage": 10
+              "damage": 1
             }
           }
         },
@@ -1217,7 +1217,7 @@
               "hostileToIds": [
                 "player"
               ],
-              "damage": 2
+              "damage": 1
             }
           }
         }
@@ -1431,14 +1431,37 @@
           ],
           "collisionsEnabled": true,
           "textureId": "caretaker",
-          "dialogue": {
-            "speaker": "Caretaker",
-            "lines": [
-              "You shouldn't have come back here.",
-              "The cellar's locked. Has been since the butler... well.",
-              "He always kept the key on him. Still does, I expect."
+          "movement": {
+            "type": "patrol",
+            "speed": 0.8,
+            "points": [
+              [
+                9,
+                0,
+                5.5
+              ],
+              [
+                10.5,
+                0,
+                8
+              ],
+              [
+                7,
+                0,
+                8.5
+              ]
             ]
-          }
+          },
+          "dialogues": [
+            {
+              "speaker": "Caretaker",
+              "lines": [
+                "You shouldn't have come back here.",
+                "The cellar's locked. Has been since the butler... well.",
+                "He always kept the key on him. Still does, I expect."
+              ]
+            }
+          ]
         }
       ],
       "doors": [

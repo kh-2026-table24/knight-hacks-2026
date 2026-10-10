@@ -13,10 +13,14 @@ const SURFACE_TILE_SIZE = 2;
 
 // Rapier collision groups are (membership << 16) | filter. Dynamic objects (dropped items)
 // land on everything except the player, so they don't get shoved around or block movement.
-const PLAYER_GROUP = 0x0002;
+export const PLAYER_GROUP = 0x0002;
 const DYNAMIC_GROUP = 0x0004;
 export const PLAYER_COLLISION_GROUPS = (PLAYER_GROUP << 16) | (0xffff & ~DYNAMIC_GROUP);
 const DYNAMIC_COLLISION_GROUPS = (DYNAMIC_GROUP << 16) | (0xffff & ~PLAYER_GROUP);
+
+// Colliders of things that move themselves sit this far off the floor: resting exactly on it counts
+// as stuck to a character controller, which then won't slide sideways.
+const MOVER_LIFT = 0.05;
 
 // Output light intensities are on a friendly scale (1 = a candle); this converts to three.js candela.
 const LIGHT_CANDELA = 6;
@@ -52,9 +56,11 @@ export class Object {
   readonly solid: boolean;
   /** Simulated by physics (falls under gravity) instead of fixed in place. */
   dynamic = false;
+  /** Moves under its own control (NPCs) instead of being fixed in place. */
+  private kinematic = false;
   private readonly colliderDesc: ColliderDesc | null;
-  private body: RigidBody | null = null;
-  private collider: Collider | null = null;
+  protected body: RigidBody | null = null;
+  protected collider: Collider | null = null;
   readonly lightSpec: Light | undefined;
   private light: PointLight | SpotLight | null = null;
   private readonly lightPhase = Math.random() * 100;
@@ -139,7 +145,11 @@ export class Object {
     // Use the world transform so objects inside groups collide where they appear.
     const position = this.mesh.getWorldPosition(new Vector3());
     const quaternion = this.mesh.getWorldQuaternion(new Quaternion());
-    const bodyDesc = this.dynamic ? RigidBodyDesc.dynamic().lockRotations() : RigidBodyDesc.fixed();
+    const bodyDesc = this.dynamic
+      ? RigidBodyDesc.dynamic().lockRotations()
+      : this.kinematic
+        ? RigidBodyDesc.kinematicPositionBased()
+        : RigidBodyDesc.fixed();
     this.body = world.createRigidBody(bodyDesc.setTranslation(position.x, position.y, position.z).setRotation(quaternion));
     this.colliderDesc.setSensor(!solid);
     if (this.dynamic) this.colliderDesc.setCollisionGroups(DYNAMIC_COLLISION_GROUPS);
@@ -153,6 +163,14 @@ export class Object {
       this.body = null;
       this.collider = null;
     }
+  }
+
+  /** For things that move themselves: a kinematic body, with the collider lifted off the floor. */
+  protected makeKinematic() {
+    if (this.kinematic) return;
+    this.kinematic = true;
+    const t = this.colliderDesc?.translation;
+    if (t) this.colliderDesc!.setTranslation(t.x, t.y + MOVER_LIFT, t.z);
   }
 
   /** Animates flickering and pulsing lights. `time` is in seconds. */

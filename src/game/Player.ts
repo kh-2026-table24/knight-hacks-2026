@@ -1,4 +1,4 @@
-import { DoubleSide, Mesh, MeshBasicMaterial, PlaneGeometry, PointLight, Vector3 } from "three";
+import { DoubleSide, Mesh, MeshBasicMaterial, PlaneGeometry, Vector3 } from "three";
 import {
   Capsule,
   ColliderDesc,
@@ -9,6 +9,7 @@ import {
   type RigidBody,
   type World,
 } from "@dimforge/rapier3d-compat";
+import { CHARACTER_STRETCH, characterBrightness, createCharacterGlow } from "./characters";
 import { PLAYER_COLLISION_GROUPS } from "./Object";
 import type { Item } from "./generation/output/output";
 
@@ -25,16 +26,22 @@ const NO_ROTATION = { x: 0, y: 0, z: 0, w: 1 };
 // Gap the character controller keeps from surfaces. Spawning closer than this counts as stuck in the floor.
 const CONTROLLER_OFFSET = 0.02;
 const SPAWN_LIFT = 0.05;
-// The player always carries a soft warm glow that lights the floor around them.
-const GLOW_COLOR = 0xffe2c4;
-const GLOW_INTENSITY = 10;
-const GLOW_RANGE = 6;
+export const MAX_HEARTS = 4;
+// After a hit the player can't be hurt again for this long, and blinks to show it.
+const INVULNERABLE_SECONDS = 1.2;
+// Placeholder color until the player has a sprite.
+const COLOR = 0xd0d0d0;
 
 /** The protagonist: an upright 2D plane facing the camera, moved with WASD on the ground (XZ) plane. */
 export class Player {
   readonly mesh: Mesh;
   readonly inventory: Item[] = [];
   speed = 5;
+  hearts = MAX_HEARTS;
+  /** Ignores movement keys, e.g. while a dialogue is open. */
+  frozen = false;
+  private invulnerableFor = 0;
+  private readonly material: MeshBasicMaterial;
   private readonly keys = new Set<string>();
   private readonly movement = new Vector3();
   private verticalVelocity = 0;
@@ -44,13 +51,12 @@ export class Player {
   private readonly touchShape = new Capsule(HEIGHT / 2 - RADIUS, RADIUS + TOUCH_MARGIN);
 
   constructor(world: World) {
-    // Shift geometry up so the mesh origin sits at the character's feet.
-    const geometry = new PlaneGeometry(WIDTH, HEIGHT).translate(0, HEIGHT / 2, 0);
-    this.mesh = new Mesh(geometry, new MeshBasicMaterial({ color: 0xd0d0d0, side: DoubleSide }));
-    // Chest height and a little toward the camera, so it lights the floor in front as well as behind.
-    const glow = new PointLight(GLOW_COLOR, GLOW_INTENSITY, GLOW_RANGE, 2);
-    glow.position.set(0, HEIGHT * 0.6, 0.4);
-    this.mesh.add(glow);
+    // Shift geometry up so the mesh origin sits at the character's feet, and stretch it so the
+    // camera's downward angle doesn't squash it.
+    const geometry = new PlaneGeometry(WIDTH, HEIGHT).translate(0, HEIGHT / 2, 0).scale(1, CHARACTER_STRETCH, 1);
+    this.material = new MeshBasicMaterial({ color: COLOR, side: DoubleSide });
+    this.mesh = new Mesh(geometry, this.material);
+    this.mesh.add(createCharacterGlow(HEIGHT));
 
     // Body origin is also at the feet; the capsule sits above it.
     this.body = world.createRigidBody(RigidBodyDesc.kinematicPositionBased());
@@ -86,7 +92,33 @@ export class Player {
     this.keys.clear();
   }
 
+  /** Draws the player at the brightness characters have in a room with this lightLevel. */
+  setRoomLight(lightLevel: number) {
+    this.material.color.set(COLOR).multiplyScalar(characterBrightness(lightLevel));
+  }
+
+  /** Takes `amount` hearts unless recently hit. Returns whether it landed. */
+  hurt(amount: number) {
+    if (this.invulnerableFor > 0 || this.hearts === 0) return false;
+    this.hearts = Math.max(0, this.hearts - amount);
+    this.invulnerableFor = INVULNERABLE_SECONDS;
+    return true;
+  }
+
+  heal() {
+    this.hearts = MAX_HEARTS;
+    this.invulnerableFor = 0;
+    this.material.visible = true;
+  }
+
   update(dt: number) {
+    if (this.invulnerableFor > 0) {
+      this.invulnerableFor = Math.max(0, this.invulnerableFor - dt);
+      // Blink the material, not the mesh: hiding the mesh would also switch off the glow it carries.
+      this.material.visible = this.invulnerableFor === 0 || Math.floor(this.invulnerableFor * 10) % 2 === 0;
+    }
+    if (this.frozen) this.keys.clear();
+
     const m = this.movement.set(0, 0, 0);
     if (this.keys.has("w")) m.z -= 1;
     if (this.keys.has("s")) m.z += 1;

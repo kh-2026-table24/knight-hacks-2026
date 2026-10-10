@@ -13,3 +13,119 @@ body {
   width: 100%;
   height: 100%;
 }
+
+/* HUD (src/game/ui/Hud.ts). Art in public/ui/ is pixel art, so it's scaled without smoothing. */
+.hud {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  font-family: "IM Fell English", Georgia, serif;
+  color: #e8e2d6;
+  text-shadow: 0 2px 0 #000;
+}
+
+.hud img {
+  image-rendering: pixelated;
+}
+
+/* The shared dialogue frame, stretched as a border so its corners keep their shape at any size. */
+.hud-frame {
+  border-style: solid;
+  border-width: 20px 22px;
+  border-image: url("/ui/frame.png") 40 44 fill / 20px 22px stretch;
+  image-rendering: pixelated;
+}
+
+.hud-hearts {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  display: flex;
+  gap: 4px;
+}
+
+.hud-heart {
+  width: 40px;
+  height: 40px;
+}
+
+.hud-heart-empty {
+  filter: grayscale(1) brightness(0.35);
+}
+
+.hud-items {
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  display: flex;
+  gap: 18px;
+  padding: 0 6px;
+}
+
+.hud-items[hidden],
+.hud-hint[hidden],
+.hud-dialogue[hidden] {
+  display: none;
+}
+
+.hud-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+}
+
+.hud-item-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.hud-hint {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 20px;
+  letter-spacing: 0.04em;
+  opacity: 0.85;
+}
+
+.hud-dialogue {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(880px, calc(100vw - 48px));
+  min-height: 120px;
+  box-sizing: border-box;
+  padding: 6px 14px;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.hud-dialogue-speaker {
+  font-size: 18px;
+  color: #c9a96b;
+  margin-bottom: 6px;
+  letter-spacing: 0.05em;
+}
+
+.hud-dialogue-text {
+  font-size: 24px;
+  line-height: 1.35;
+  min-height: 2.7em;
+}
+
+.hud-dialogue-more {
+  position: absolute;
+  right: 8px;
+  bottom: 2px;
+  font-size: 14px;
+  animation: hud-blink 1s steps(2) infinite;
+}
+
+@keyframes hud-blink {
+  50% {
+    opacity: 0;
+  }
+}
