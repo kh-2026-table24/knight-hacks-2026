@@ -6,7 +6,7 @@
 //   npx tsx scripts/gen-house.ts 2 "a lighthouse where the keeper vanished"
 import { mkdir, writeFile } from "node:fs/promises";
 import { join, relative } from "node:path";
-import { askClaude } from "../src/game/generation/askClaude";
+import { askClaude, ROOM_MODEL } from "../src/game/generation/askClaude";
 import { generateHouse, toSavedHouse } from "../src/game/generation/generateHouse";
 import { rollTheme } from "../src/game/generation/theme";
 
@@ -30,6 +30,7 @@ console.log(`Theme\n${indent(theme)}\n\nPlanning ${roomCount ?? "4-6"} rooms...`
 
 try {
   const house = await generateHouse(askClaude, {
+    askRoom: (prompt) => askClaude(prompt, ROOM_MODEL),
     theme,
     roomCount,
     onPlan(plan, notes) {

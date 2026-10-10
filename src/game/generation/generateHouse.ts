@@ -12,6 +12,8 @@ export interface HouseOptions {
   theme?: string;
   /** Exact number of rooms; omit to let the planner choose (4 to 6). */
   roomCount?: number;
+  /** Used for room layout calls instead of `ask`, e.g. to send them to a stronger model. */
+  askRoom?: AskFn;
   onPlan?: (plan: HousePlan, notes: string) => void;
   onRoom?: (room: GeneratedRoom) => void;
 }
@@ -80,7 +82,7 @@ export async function generateHouse(ask: AskFn, options: HouseOptions = {}): Pro
   // allSettled, so one failed room doesn't hide the others' results from onRoom.
   const results = await Promise.allSettled(
     plan.rooms.map(async (room) => {
-      const generated = await generateRoom(ask, {
+      const generated = await generateRoom(options.askRoom ?? ask, {
         theme,
         house: plan,
         room,
