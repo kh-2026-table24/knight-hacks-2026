@@ -33,8 +33,8 @@ To resume: read PLAN.md (Part A), this file, AGENTS.md and `git log --oneline -2
 - [x] 4.1 art.ts (+ G8 art budget in validate.ts)  (b8b41f6)
 - [x] 4.2 server onto the spec + retire the old pipeline  (d5d064e)
 - [x] 4.3 renames (Part, Prop, Character)  (5b30992)
-- [x] 4.4 engine rework onto GameSpec
-- [ ] 4.5 regenerate haunted art, delete old game dirs, gitignore
+- [x] 4.4 engine rework onto GameSpec  (c10817f)
+- [~] 4.5 old game dirs deleted and .gitignore updated; generating haunted art is BLOCKED (see Blockers)
 
 ## M5 Engine hardening
 - [ ] 5.1 fixed timestep + interpolation
@@ -96,4 +96,5 @@ To resume: read PLAN.md (Part A), this file, AGENTS.md and `git log --oneline -2
 - 4.4: Two M5/M6 items landed early because the rework needed them: moving characters always get a collider (5.5), and the HUD accepts an item icon URL (6.4 only has to pass it).
 
 ## Blockers
-- (none)
+- 2026-10-10, 4.5: Gemini returns 402 Payment Required for every image with the GEMINI_IMAGE_KEY in .env.local, so that key isn't billed. The dev server only generated art before because it fell back to the hardcoded billed key, removed in 1.1. Needs the developer: rotate the leaked billed key, put the new one in .env.local as GEMINI_IMAGE_KEY, and restart npm run dev. Then load ?game=haunted once (or rerun the art script) and commit server/games/haunted/assets/. The game plays with grey placeholders until then.
+- M4 checkpoint: waiting for the parity playtest P1-P12 (PLAN.md Part J). npm run check:play already covers most of it headlessly.

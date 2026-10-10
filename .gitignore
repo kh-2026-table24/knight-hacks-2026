@@ -25,3 +25,7 @@ dist-ssr
 
 # Houses written by scripts/gen-house.ts
 generated/houses/
+
+# Generated games and their art. The haunted fixture's art is committed so demos work without Gemini.
+server/games/*
+!server/games/haunted/
