@@ -5,11 +5,11 @@
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { errorsIn, formatIssues, type Issue } from "../src/shared/issues";
-import { parseGameSpec } from "../src/shared/parseSpec";
+import { validateGame } from "../src/shared/validate";
 import { CASES } from "./spec-cases";
 
 const FIXTURES = join(import.meta.dirname, "..", "fixtures", "games");
-const validate = (value: unknown): Issue[] => parseGameSpec(value).issues;
+const validate = (value: unknown): Issue[] => validateGame(value).issues;
 
 let failures = 0;
 const fail = (message: string) => {

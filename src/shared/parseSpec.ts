@@ -18,20 +18,45 @@ import {
 // would otherwise be silently ignored), and defaults. Layout and cross-room rules are checked later,
 // by checkRoom and checkGame. Characters, items, lights and the like are in parseFeatures.ts.
 
-export function parseGameSpec(value: unknown): { spec: GameSpec | undefined; issues: Issue[] } {
+export interface ParsedGame {
+  /** Only set when there were no errors. */
+  spec: GameSpec | undefined;
+  issues: Issue[];
+  /** The rooms that parsed, with their index in the input, so their layout can be checked even if others failed. */
+  rooms: { index: number; room: RoomSpec }[];
+  connections: ConnectionSpec[];
+  /** Every room and connection parsed (other fields may still have errors). */
+  complete: boolean;
+}
+
+export function parseGameSpec(value: unknown): ParsedGame {
   const r = new Reader();
+  const parsedRooms: ParsedGame["rooms"] = [];
   const game = r.object(value, "", ["version", "title", "summary", "rooms", "connections"]);
-  if (!game) return { spec: undefined, issues: r.issues };
+  if (!game) return { spec: undefined, issues: r.issues, rooms: parsedRooms, connections: [], complete: false };
 
   const version = game.num("version");
   if (version !== undefined && version !== 1) game.error("version", `must be 1, got ${version}`);
   const title = game.text("title", { max: 120 });
   const summary = game.text("summary", { max: 1500 });
-  const rooms = game.array("rooms", (v, path) => tagRoom(r, v, () => parseRoom(r, v, path)), { min: 1, max: LIMITS.rooms });
+  let index = 0;
+  const rooms = game.array(
+    "rooms",
+    (v, path) => {
+      const i = index++;
+      const room = tagRoom(r, v, () => parseRoom(r, v, path));
+      if (room) parsedRooms.push({ index: i, room });
+      return room;
+    },
+    { min: 1, max: LIMITS.rooms },
+  );
   const connections = game.array("connections", (v, path) => parseConnection(r, v, path), { optional: true }) ?? [];
+  const [rawRooms, rawConnections] = [game.raw("rooms"), game.raw("connections") ?? []];
+  const complete =
+    Array.isArray(rawRooms) && parsedRooms.length === rawRooms.length && Array.isArray(rawConnections) && connections.length === rawConnections.length;
 
-  if (r.errorCount > 0 || !title || !summary || !rooms) return { spec: undefined, issues: r.issues };
-  return { spec: { version: 1, title, summary, rooms, connections }, issues: r.issues };
+  const spec = r.errorCount === 0 && title && summary && rooms ? { version: 1 as const, title, summary, rooms, connections } : undefined;
+  return { spec, issues: r.issues, rooms: parsedRooms, connections, complete };
 }
 
 /** Marks every issue found while parsing one room with that room's id, so it can be repaired on its own. */
