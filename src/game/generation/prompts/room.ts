@@ -62,8 +62,10 @@ exit strip), so that spot, and a path from the start to it, must be open floor a
 </doors>
 
 <building_blocks>
-Every object is an item made of 1 to 3 parts. Most items are a single box. Do not model legs,
-drawers, handles, trim or clutter: a table is one box, a bookshelf is one box, a bed is one box.
+Every object is an item made of 1 to 5 parts. Use just enough parts to give it a recognizable
+silhouette: a table is a top on legs, a chair a seat and a back, a bed a frame and a headboard, a
+statue a plinth, a body and a head, a lamp post a base, a pole and a lamp. Simple things (a crate,
+a bookshelf, a hedge) stay one box. Skip small details: no handles, drawers, trim or clutter.
 
 Part types:
 - "rectPrism": box.
@@ -90,7 +92,7 @@ Item fields:
 - "material": what its boxes and wedges are made of, as a surface: "scarred dark oak planks",
   "rusted riveted iron", "cracked white porcelain". Art for boxes is a tiled material texture, so
   describe the material, not the object. Required whenever the item has a box or wedge part.
-- "parts": the 1 to 3 primitives. Panels are drawn as a picture of the item from its name.
+- "parts": the 1 to 5 primitives. Panels are drawn as a picture of the item from its name.
 
 Examples (only the shape of the data matters):
 {"name": "stone stage with worn steps", "material": "worn grey limestone blocks", "position": [8, 0, 1.6], "rotationY": 0, "parts": [
@@ -99,6 +101,12 @@ Examples (only the shape of the data matters):
 {"name": "marble pedestal holding a music box, lid open", "material": "veined white marble", "position": [13, 0, 2], "rotationY": 0, "parts": [
   {"type": "rectPrism", "position": [0, 0, 0], "scale": [0.5, 1, 0.5]},
   {"type": "rectPrism", "position": [0, 1, 0], "scale": [0.4, 0.25, 0.3], "material": "red lacquered wood with gold trim"}]}
+{"name": "scarred oak supper table", "material": "scarred dark oak planks", "position": [6, 0, 5], "rotationY": 0, "parts": [
+  {"type": "rectPrism", "position": [0, 0.7, 0], "scale": [1.6, 0.1, 0.9]},
+  {"type": "rectPrism", "position": [-0.7, 0, -0.35], "scale": [0.1, 0.7, 0.1]},
+  {"type": "rectPrism", "position": [0.7, 0, -0.35], "scale": [0.1, 0.7, 0.1]},
+  {"type": "rectPrism", "position": [-0.7, 0, 0.35], "scale": [0.1, 0.7, 0.1]},
+  {"type": "rectPrism", "position": [0.7, 0, 0.35], "scale": [0.1, 0.7, 0.1]}]}
 {"name": "tall arched window streaked with grime", "position": [3, 1.2, 0.31], "rotationY": 0, "parts": [
   {"type": "plane", "position": [0, 0, 0], "scale": [1.2, 2, 0], "collisions": false}]}
 </building_blocks>
