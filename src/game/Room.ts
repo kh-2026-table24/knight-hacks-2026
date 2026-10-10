@@ -13,6 +13,8 @@ const FLOOR_THICKNESS = 0.2;
 const FLOOR_TILE_SIZE = 4;
 // Emitted sprites spawn this far in front of their emitter (toward the camera) so they fall out of it.
 const SPAWN_OFFSET = 0.5;
+// Base brightness of a room that doesn't say: dim, so placed lights carry the scene.
+const DEFAULT_LIGHT_LEVEL = 0.25;
 // Seconds before a dropped item can be picked up, so it's seen falling out first.
 const PICKUP_DELAY = 0.75;
 
@@ -34,6 +36,8 @@ export class Room {
   readonly id: string;
   readonly dimensions: Vector3;
   readonly startPosition: Vector3;
+  /** Base brightness before any lights, 0 to 1. */
+  readonly lightLevel: number;
   /** Everything in the room except doors, as a group at the origin. */
   readonly contents: Group;
   readonly doors: Door[];
@@ -43,6 +47,8 @@ export class Room {
   private body: RigidBody | null = null;
 
   private readonly emitters: Emitter[];
+  /** Objects with flickering or pulsing lights. */
+  private readonly animatedLights: Object[];
   /** Sprites created by emitters. Kept while the room is unloaded so dropped items stay put. */
   private readonly spawned: Spawned[] = [];
   private readonly byCollider = new Map<number, Object>();
@@ -55,6 +61,7 @@ export class Room {
     this.textures = textures;
     this.dimensions = new Vector3().fromArray(output.dimensions);
     this.startPosition = new Vector3().fromArray(output.startPosition);
+    this.lightLevel = Math.min(1, Math.max(0, output.lightLevel ?? DEFAULT_LIGHT_LEVEL));
     this.contents = new Group(
       { id: output.id, position: [0, 0, 0], rotation: [0, 0, 0], objects: output.objects, groups: output.groups },
       textures,
@@ -67,6 +74,7 @@ export class Room {
       }
       return [new Door(door, textures, side, this.dimensions)];
     });
+    this.animatedLights = [...allObjects(this.contents), ...this.doors].filter((o) => hasAnimatedLight(o));
     this.emitters = allObjects(this.contents)
       .filter((o): o is Sprite => o instanceof Sprite && o.emit !== undefined)
       .map((sprite) => ({ sprite, count: 0, timer: 0 }));
@@ -137,6 +145,7 @@ export class Room {
 
   update(dt: number) {
     this.time += dt;
+    for (const obj of this.animatedLights) obj.updateLight(this.time);
 
     for (const emitter of this.emitters) {
       const when = emitter.sprite.emit!.when;
@@ -153,7 +162,10 @@ export class Room {
 
     for (const { sprite, expiresAt } of [...this.spawned]) {
       if (expiresAt !== null && this.time >= expiresAt) this.removeObject(sprite);
-      else sprite.syncFromPhysics();
+      else {
+        sprite.syncFromPhysics();
+        sprite.updateLight(this.time);
+      }
     }
   }
 
@@ -198,6 +210,8 @@ export class Room {
     if (handle !== undefined) this.byCollider.set(handle, obj);
   }
 }
+
+const hasAnimatedLight = (obj: Object) => obj.lightSpec?.effect !== undefined && obj.lightSpec.effect !== "steady";
 
 function allObjects(group: Group): Object[] {
   return [...group.objects, ...group.groups.flatMap(allObjects)];

@@ -1,6 +1,7 @@
-import { AmbientLight, DirectionalLight, PerspectiveCamera, Scene, Timer, Vector3, WebGLRenderer } from "three";
+import { AmbientLight, Color, Fog, PerspectiveCamera, Scene, Timer, Vector3, WebGLRenderer } from "three";
 import { World } from "@dimforge/rapier3d-compat";
 import { Player } from "./Player";
+import { RetroFilter } from "./RetroFilter";
 import { Door } from "./Door";
 import { Sprite } from "./Sprite";
 import { ItemType } from "./generation/output/output";
@@ -11,6 +12,13 @@ import type { Room } from "./Room";
 // Fixed camera offset from the player. The camera's orientation is set once
 // from this and never changes; only its position follows the player.
 const CAMERA_OFFSET = new Vector3(0, 6, 9);
+// Fill light at a room's lightLevel of 1, tinted cold like moonlight. Placed lights do the rest.
+const AMBIENT_COLOR = 0xb8c4ff;
+const AMBIENT_AT_FULL = 3;
+// Things beyond the player fade to black: fog starts a little past the player (who is about 11 m
+// from the camera) and is solid black by the far end of a large room.
+const FOG_NEAR = 13;
+const FOG_FAR = 30;
 
 export class GameComposer {
   readonly renderer: WebGLRenderer;
@@ -19,21 +27,25 @@ export class GameComposer {
   readonly world = new World({ x: 0, y: -9.81, z: 0 });
   readonly player: Player;
   private readonly timer = new Timer();
+  private readonly ambient = new AmbientLight(AMBIENT_COLOR, 0);
+  private readonly retro: RetroFilter;
   private game: Game | null = null;
   private room: Room | null = null;
   /** Objects the player was touching last frame, so touches only trigger once on contact. */
   private touching = new Set<Object>();
 
   constructor(canvas: HTMLCanvasElement) {
-    this.renderer = new WebGLRenderer({ canvas, antialias: true });
+    // No antialiasing: the scene is drawn at low resolution and upscaled with hard pixel edges.
+    this.renderer = new WebGLRenderer({ canvas, antialias: false });
     this.renderer.setPixelRatio(window.devicePixelRatio);
+    this.retro = new RetroFilter(this.renderer);
 
     this.camera.position.copy(CAMERA_OFFSET);
     this.camera.lookAt(0, 0, 0);
 
-    const sun = new DirectionalLight(0xffffff, 1.5);
-    sun.position.set(5, 10, 7);
-    this.scene.add(new AmbientLight(0xffffff, 0.5), sun);
+    this.scene.background = new Color(0x000000);
+    this.scene.fog = new Fog(0x000000, FOG_NEAR, FOG_FAR);
+    this.scene.add(this.ambient);
 
     this.player = new Player(this.world);
     this.scene.add(this.player.mesh);
@@ -59,6 +71,7 @@ export class GameComposer {
     this.clearRoom();
     room.addTo(this.scene, this.world);
     this.room = room;
+    this.ambient.intensity = AMBIENT_AT_FULL * room.lightLevel;
     this.touching.clear();
     this.player.reset(arrivalConnectionId ? room.arrivalPoint(arrivalConnectionId) : room.startPosition, this.world);
   }
@@ -85,7 +98,7 @@ export class GameComposer {
     }
     this.camera.position.copy(this.player.position).add(CAMERA_OFFSET);
 
-    this.renderer.render(this.scene, this.camera);
+    this.retro.render(this.scene, this.camera);
   }
 
   private handleTouches() {
@@ -140,6 +153,7 @@ export class GameComposer {
     const w = window.innerWidth;
     const h = window.innerHeight;
     this.renderer.setSize(w, h, false);
+    this.retro.setSize(w, h);
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
   };

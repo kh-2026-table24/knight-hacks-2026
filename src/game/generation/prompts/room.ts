@@ -93,6 +93,14 @@ Item fields:
   "rusted riveted iron", "cracked white porcelain". Art for boxes is a tiled material texture, so
   describe the material, not the object. Required whenever the item has a box or wedge part.
 - "parts": the 1 to 5 primitives. Panels are drawn as a picture of the item from its name.
+- "light" (optional): makes the item give off light, from its tallest part.
+  {"type": "glow" | "spot", "color": "#rrggbb", "intensity": 1-10, "range": meters, "effect": "steady" | "flicker" | "pulse"}
+  "glow" shines in every direction from near the item's top, and the item glows itself: candles,
+  lanterns, a fireplace, a lit window, something unnatural. "spot" shines straight down onto the
+  item from above and leaves a pool of light around it: a hanging lamp over a table, moonlight
+  through a skylight onto an altar. intensity: 1 a candle, 3 a lantern, 6 a fireplace or overhead
+  lamp. range: how far a glow reaches, or the radius of a spot's pool (2 to 6 is typical).
+  "flicker" for flames, "pulse" for something alive or wrong.
 
 Examples (only the shape of the data matters):
 {"name": "stone stage with worn steps", "material": "worn grey limestone blocks", "position": [8, 0, 1.6], "rotationY": 0, "parts": [
@@ -109,6 +117,10 @@ Examples (only the shape of the data matters):
   {"type": "rectPrism", "position": [0.7, 0, 0.35], "scale": [0.1, 0.7, 0.1]}]}
 {"name": "tall arched window streaked with grime", "position": [3, 1.2, 0.31], "rotationY": 0, "parts": [
   {"type": "plane", "position": [0, 0, 0], "scale": [1.2, 2, 0], "collisions": false}]}
+{"name": "iron candelabra with three guttering candles", "material": "blackened wrought iron", "position": [10, 0, 3], "rotationY": 0,
+ "light": {"type": "glow", "color": "#ffb060", "intensity": 2, "range": 4, "effect": "flicker"}, "parts": [
+  {"type": "rectPrism", "position": [0, 0, 0], "scale": [0.15, 1.4, 0.15]},
+  {"type": "plane", "position": [0, 1.4, 0], "scale": [0.6, 0.4, 0], "collisions": false}]}
 </building_blocks>
 
 <rules>
@@ -124,6 +136,14 @@ Composition:
 - Give the room one clear focal point and place it where the camera sees it best.
 - Put windows and paintings on walls as panels; they're cheap and carry the theme.
 - Place props with intent, each one something a player would want to walk up to and inspect.
+
+Light (the game is dark; the player carries a small glow of their own):
+- Set "lightLevel" (0 pitch black to 1 fully lit) for the room's base brightness. Most rooms sit
+  between 0.1 and 0.35; go brighter only outdoors in daylight.
+- Give the room 1 to 5 light sources. Light the focal point most strongly so it reads from the
+  door, add a few accents, and leave corners and the edges of the room in shadow.
+- Make light part of the story: a candle left burning, a lamp swinging over an empty chair, a
+  cold glow from something that shouldn't glow.
 
 Art (every surface becomes a small pixel-art texture, so contrast is what makes things readable):
 - wallDescription and floorDescription name only the base material and its color, nothing lying
@@ -148,7 +168,7 @@ don't overlap.
 Then write the room as JSON inside <room> tags, with nothing else inside the tags and no comments:
 <room>
 {"title": "...", "wallDescription": "base wall material and color", "floorDescription": "base floor material and color",
- "dimensions": [W, H, D], "startPosition": [x, 0, z],
+ "dimensions": [W, H, D], "startPosition": [x, 0, z], "lightLevel": 0.2,
  "doors": [{"connectionId": "...", "offset": 0}],
  "items": [...]}
 </room>

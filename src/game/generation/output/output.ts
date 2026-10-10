@@ -27,6 +27,28 @@ export interface Object {
     collisionsEnabled: boolean
     /** Falls back to a flat color when omitted. */
     textureId?: string
+    light?: Light
+}
+
+/**
+ * Makes an object give off light. Rooms are dark, so light is what draws the eye: use it on the
+ * focal point and a few accents, and leave corners in shadow.
+ */
+export interface Light {
+    /**
+     * "glow": shines in every direction from near the top of the object, which glows itself
+     * (candles, lanterns, fireplaces, a ghost). "spot": a cone shining down onto the object from
+     * above, leaving a pool of light around it (a hanging lamp, moonlight through a skylight).
+     */
+    type: "glow" | "spot"
+    /** Hex color, e.g. "#ffb060" firelight, "#a8c0ff" moonlight, "#7dff9a" something wrong. */
+    color: string
+    /** 1 = a candle, 3 = a lantern, 6 = a fireplace or overhead lamp. */
+    intensity: number
+    /** Meters the glow reaches, or the radius of a spot's pool of light. */
+    range: number
+    /** Defaults to "steady". */
+    effect?: "steady" | "flicker" | "pulse"
 }
 
 /** Each state is a list of texture ids played in order, looping. */
@@ -148,6 +170,8 @@ export interface Room {
     dimensions: Vector3Tuple
     startPosition: Vector3Tuple
     floorTextureId?: string
+    /** Base brightness before any lights: 0 is pitch black, 1 fully lit. Defaults to 0.25. */
+    lightLevel?: number
     objects: (Object | Sprite)[]
     groups?: Group[]
     doors?: Door[]

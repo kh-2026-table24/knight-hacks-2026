@@ -1,7 +1,7 @@
-import { BoxGeometry, DoubleSide, Mesh, MeshStandardMaterial, PlaneGeometry, Quaternion, Vector3, type BufferGeometry, type Object3D, type Texture, type Vector3Tuple } from "three";
+import { BoxGeometry, DoubleSide, Mesh, MeshStandardMaterial, PlaneGeometry, PointLight, Quaternion, SpotLight, Vector3, type BufferGeometry, type Object3D, type Texture, type Vector3Tuple } from "three";
 import { ConvexGeometry } from "three/examples/jsm/geometries/ConvexGeometry.js";
 import { ColliderDesc, RigidBodyDesc, type Collider, type RigidBody, type World } from "@dimforge/rapier3d-compat";
-import { ObjectType, type Object as ObjectOutput } from "./generation/output/output";
+import { ObjectType, type Light, type Object as ObjectOutput } from "./generation/output/output";
 import type { TextureLibrary } from "./TextureLibrary";
 import { applyWorldUVs } from "./worldUVs";
 
@@ -17,6 +17,22 @@ const PLAYER_GROUP = 0x0002;
 const DYNAMIC_GROUP = 0x0004;
 export const PLAYER_COLLISION_GROUPS = (PLAYER_GROUP << 16) | (0xffff & ~DYNAMIC_GROUP);
 const DYNAMIC_COLLISION_GROUPS = (DYNAMIC_GROUP << 16) | (0xffff & ~PLAYER_GROUP);
+
+// Output light intensities are on a friendly scale (1 = a candle); this converts to three.js candela.
+const LIGHT_CANDELA = 6;
+// A glow sits this far up the object (near its top) and this far in front of it, so the object
+// and the floor in front of it catch the light instead of it hiding inside a box.
+const GLOW_HEIGHT = 0.8;
+const GLOW_FORWARD = 0.3;
+// Spots shine down from this far above the object's top.
+const SPOT_HEIGHT = 4;
+// How much a glowing object lights up its own surface. Strong for flat cutouts (a candle, a ghost);
+// faint for boxes and wedges, which otherwise turn into flat blocks of color.
+const SELF_GLOW: Record<ObjectType, number> = {
+  [ObjectType.RectPrism]: 0.15,
+  [ObjectType.RightTriPrism]: 0.15,
+  [ObjectType.Plane]: 0.7,
+};
 
 const COLORS: Record<ObjectType, number> = {
   [ObjectType.RectPrism]: 0x5a5048,
@@ -39,6 +55,9 @@ export class Object {
   private readonly colliderDesc: ColliderDesc | null;
   private body: RigidBody | null = null;
   private collider: Collider | null = null;
+  readonly lightSpec: Light | undefined;
+  private light: PointLight | SpotLight | null = null;
+  private readonly lightPhase = Math.random() * 100;
 
   constructor(output: ObjectOutput, textures: TextureLibrary) {
     this.id = output.id;
@@ -82,6 +101,11 @@ export class Object {
     this.mesh.rotation.fromArray(output.rotation);
     this.solid = output.collisionsEnabled;
     this.colliderDesc = colliderDesc;
+    this.lightSpec = output.light;
+    if (this.lightSpec?.type === "glow") {
+      this.mesh.material.emissive.set(this.lightSpec.color);
+      this.mesh.material.emissiveIntensity = SELF_GLOW[output.type];
+    }
     this.setTexture(textures.get(output.textureId));
   }
 
@@ -100,11 +124,14 @@ export class Object {
     material.map = texture;
     material.color.set(0xffffff);
     material.alphaTest = 0.5;
+    // A glowing object lights up its own picture rather than a flat block of color.
+    if (this.lightSpec?.type === "glow") material.emissiveMap = texture;
     material.needsUpdate = true;
   }
 
   addTo(parent: Object3D, world: World) {
     parent.add(this.mesh);
+    if (this.lightSpec && !this.light) this.light = this.createLight(this.lightSpec);
     // Dynamic objects always collide with the world so they can land on things.
     const solid = this.solid || this.dynamic;
     if (!this.colliderDesc || this.body || (!solid && !this.touchable)) return;
@@ -126,6 +153,44 @@ export class Object {
       this.body = null;
       this.collider = null;
     }
+  }
+
+  /** Animates flickering and pulsing lights. `time` is in seconds. */
+  updateLight(time: number) {
+    const light = this.light;
+    const effect = this.lightSpec?.effect;
+    if (!light || !effect || effect === "steady") return;
+    const t = time + this.lightPhase;
+    const base = light.userData.baseIntensity as number;
+    light.intensity =
+      effect === "flicker"
+        ? base * (0.8 + 0.1 * Math.sin(t * 11) + 0.06 * Math.sin(t * 23.7) + 0.04 * Math.sin(t * 41.3))
+        : base * (0.55 + 0.45 * Math.sin(t * 2.2));
+  }
+
+  // The light is a child of the mesh so it moves with it (moving sprites carry their light), but
+  // it's placed in world terms (above, in front) so rotated or grouped objects still light correctly.
+  private createLight({ type, color, intensity, range }: Light) {
+    this.mesh.updateWorldMatrix(true, false);
+    const base = this.mesh.getWorldPosition(new Vector3());
+    const top = base.y + this.size.y;
+    let light: PointLight | SpotLight;
+    let at: Vector3;
+
+    if (type === "spot") {
+      // Brightness falls off with distance squared, so scale by height² to keep the pool as bright as `intensity` says.
+      const spot = new SpotLight(color, intensity * LIGHT_CANDELA * SPOT_HEIGHT ** 2, 0, Math.atan(range / SPOT_HEIGHT), 0.5, 2);
+      spot.target = this.mesh;
+      light = spot;
+      at = new Vector3(base.x, top + SPOT_HEIGHT, base.z);
+    } else {
+      light = new PointLight(color, intensity * LIGHT_CANDELA, range, 2);
+      at = new Vector3(base.x, base.y + this.size.y * GLOW_HEIGHT, base.z + GLOW_FORWARD);
+    }
+    light.userData.baseIntensity = light.intensity;
+    light.position.copy(this.mesh.worldToLocal(at));
+    this.mesh.add(light);
+    return light;
   }
 
   setVelocity(velocity: Vector3Tuple) {

@@ -1,4 +1,4 @@
-import { DoubleSide, Mesh, MeshBasicMaterial, PlaneGeometry, Vector3 } from "three";
+import { DoubleSide, Mesh, MeshBasicMaterial, PlaneGeometry, PointLight, Vector3 } from "three";
 import {
   Capsule,
   ColliderDesc,
@@ -25,6 +25,10 @@ const NO_ROTATION = { x: 0, y: 0, z: 0, w: 1 };
 // Gap the character controller keeps from surfaces. Spawning closer than this counts as stuck in the floor.
 const CONTROLLER_OFFSET = 0.02;
 const SPAWN_LIFT = 0.05;
+// The player always carries a soft warm glow that lights the floor around them.
+const GLOW_COLOR = 0xffe2c4;
+const GLOW_INTENSITY = 10;
+const GLOW_RANGE = 6;
 
 /** The protagonist: an upright 2D plane facing the camera, moved with WASD on the ground (XZ) plane. */
 export class Player {
@@ -43,6 +47,10 @@ export class Player {
     // Shift geometry up so the mesh origin sits at the character's feet.
     const geometry = new PlaneGeometry(WIDTH, HEIGHT).translate(0, HEIGHT / 2, 0);
     this.mesh = new Mesh(geometry, new MeshBasicMaterial({ color: 0xd0d0d0, side: DoubleSide }));
+    // Chest height and a little toward the camera, so it lights the floor in front as well as behind.
+    const glow = new PointLight(GLOW_COLOR, GLOW_INTENSITY, GLOW_RANGE, 2);
+    glow.position.set(0, HEIGHT * 0.6, 0.4);
+    this.mesh.add(glow);
 
     // Body origin is also at the feet; the capsule sits above it.
     this.body = world.createRigidBody(RigidBodyDesc.kinematicPositionBased());

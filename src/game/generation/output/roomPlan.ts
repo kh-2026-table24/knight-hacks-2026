@@ -1,5 +1,5 @@
 import type { Vector3Tuple } from "three";
-import { ObjectType } from "./output";
+import { ObjectType, type Light } from "./output";
 
 // What Claude writes for one room: named items, each built from primitives in the item's own
 // local frame. buildRoom.ts turns each item into a Group in the engine's Room format. Keeping
@@ -24,6 +24,8 @@ export interface ItemPlan {
   parts: PartPlan[];
   /** What its box and wedge surfaces are made of; becomes their tileable texture. */
   material?: string;
+  /** Light the item gives off; buildRoom puts it on the item's tallest part. */
+  light?: Light;
 }
 
 /** Where along its wall a door goes; the wall itself comes from the map grid. */
@@ -38,14 +40,18 @@ export interface RoomPlan {
   floorDescription: string;
   dimensions: Vector3Tuple;
   startPosition: Vector3Tuple;
+  /** Base brightness before any lights, 0 to 1. */
+  lightLevel?: number;
   items: ItemPlan[];
   doors: DoorPlan[];
 }
 
 // Looser than what the prompt asks for, so reasonable output isn't rejected over small misses.
-export const PLAN_LIMITS = { minSide: 6, maxSide: 30, minHeight: 3, maxHeight: 10, maxItems: 60, maxParts: 16 };
+export const PLAN_LIMITS = { minSide: 6, maxSide: 30, minHeight: 3, maxHeight: 10, maxItems: 60, maxParts: 16, maxLights: 8 };
 
 const TYPES = new Set<unknown>(Object.values(ObjectType));
+const LIGHT_TYPES = new Set<unknown>(["glow", "spot"]);
+const LIGHT_EFFECTS = new Set<unknown>(["steady", "flicker", "pulse"]);
 
 type Fields = Record<string, unknown>;
 const isFields = (v: unknown): v is Fields => typeof v === "object" && v !== null && !Array.isArray(v);
@@ -85,6 +91,23 @@ function parsePart(value: unknown, path: string, errors: string[]): PartPlan | n
   return { type: type as ObjectType, position, rotation: rotation as Vector3Tuple, scale, collisionsEnabled: collisions as boolean, material: optionalText(value.material) };
 }
 
+function parseLight(value: unknown, path: string, errors: string[]): Light | undefined {
+  if (value === undefined) return undefined;
+  if (!isFields(value)) {
+    errors.push(`${path} must be an object`);
+    return undefined;
+  }
+  const before = errors.length;
+  const { type, color, intensity, range, effect } = value;
+  if (!LIGHT_TYPES.has(type)) errors.push(`${path}.type must be "glow" or "spot"`);
+  if (typeof color !== "string" || !/^#[0-9a-fA-F]{6}$/.test(color)) errors.push(`${path}.color must be a hex color like "#ffb060"`);
+  if (!isNumber(intensity) || intensity <= 0 || intensity > 10) errors.push(`${path}.intensity must be a number above 0 and at most 10`);
+  if (!isNumber(range) || range <= 0 || range > 20) errors.push(`${path}.range must be a number above 0 and at most 20`);
+  if (effect !== undefined && !LIGHT_EFFECTS.has(effect)) errors.push(`${path}.effect must be "steady", "flicker" or "pulse"`);
+  if (errors.length > before) return undefined;
+  return { type: type as Light["type"], color: color as string, intensity: intensity as number, range: range as number, effect: effect as Light["effect"] };
+}
+
 function parseItem(value: unknown, index: number, errors: string[]): ItemPlan | null {
   if (!isFields(value)) {
     errors.push(`items[${index}] must be an object`);
@@ -112,8 +135,10 @@ function parseItem(value: unknown, index: number, errors: string[]): ItemPlan | 
     });
   }
 
+  const light = parseLight(value.light, `${path}.light`, errors);
+
   if (errors.length > before || !name || !position) return null;
-  return { name, position, rotationY: rotationY as number, parts, material: optionalText(value.material) };
+  return { name, position, rotationY: rotationY as number, parts, material: optionalText(value.material), light };
 }
 
 function parseDoors(value: unknown, errors: string[]): DoorPlan[] {
@@ -154,6 +179,10 @@ export function parseRoomPlan(value: unknown): { plan: RoomPlan | null; errors: 
     if (h < minHeight || h > maxHeight) errors.push(`dimensions [W, H, D]: H must be between ${minHeight} and ${maxHeight}, got ${h}`);
   }
   const startPosition = vec3(value.startPosition, "startPosition", errors);
+  const lightLevel = value.lightLevel;
+  if (lightLevel !== undefined && (!isNumber(lightLevel) || lightLevel < 0 || lightLevel > 1)) {
+    errors.push("lightLevel must be a number from 0 to 1");
+  }
 
   const items: ItemPlan[] = [];
   if (!Array.isArray(value.items) || value.items.length === 0) {
@@ -166,8 +195,13 @@ export function parseRoomPlan(value: unknown): { plan: RoomPlan | null; errors: 
       if (parsed) items.push(parsed);
     });
   }
+  const lights = items.filter((item) => item.light).length;
+  if (lights > PLAN_LIMITS.maxLights) errors.push(`${lights} items give off light; the limit is ${PLAN_LIMITS.maxLights}`);
   const doors = parseDoors(value.doors, errors);
 
   if (errors.length > 0 || !dimensions || !startPosition) return { plan: null, errors };
-  return { plan: { title, wallDescription, floorDescription, dimensions, startPosition, items, doors }, errors };
+  return {
+    plan: { title, wallDescription, floorDescription, dimensions, startPosition, lightLevel: lightLevel as number | undefined, items, doors },
+    errors,
+  };
 }

@@ -33,6 +33,7 @@ export const testOutput = () => {
   "rooms": [
     {
       "id": "foyer",
+      "lightLevel": 0.2,
       "gridPosition": [0, 0],
       "dimensions": [20, 6, 16],
       "startPosition": [8, 0, 14],
@@ -47,7 +48,7 @@ export const testOutput = () => {
         { "id": "balcony-pillar-1", "type": "rectPrism", "position": [13.8, 0, 5.4],   "rotation": [0, 0, 0], "scale": [0.35, 2.7, 0.35],  "collisionsEnabled": true, "textureId": "wood" },
         { "id": "balcony-pillar-2", "type": "rectPrism", "position": [13.8, 0, 0.6],   "rotation": [0, 0, 0], "scale": [0.35, 2.7, 0.35],  "collisionsEnabled": true, "textureId": "wood" },
 
-        { "id": "hearth",     "type": "rectPrism", "position": [5, 0, 0.8],   "rotation": [0, 0, 0], "scale": [3, 1.4, 1.0],   "collisionsEnabled": true },
+        { "id": "hearth", "light": { "type": "glow", "color": "#ff8a3c", "intensity": 5, "range": 7, "effect": "flicker" },     "type": "rectPrism", "position": [5, 0, 0.8],   "rotation": [0, 0, 0], "scale": [3, 1.4, 1.0],   "collisionsEnabled": true },
         { "id": "chimney",    "type": "rectPrism", "position": [5, 1.4, 0.6], "rotation": [0, 0, 0], "scale": [2, 3.6, 0.6],   "collisionsEnabled": true },
         { "id": "couch-seat", "type": "rectPrism", "position": [5, 0, 6],     "rotation": [0, 0, 0], "scale": [3.5, 0.9, 1.2], "collisionsEnabled": true },
         { "id": "couch-back", "type": "rectPrism", "position": [5, 0, 6.75],  "rotation": [0, 0, 0], "scale": [3.5, 1.6, 0.3], "collisionsEnabled": true },
@@ -56,12 +57,12 @@ export const testOutput = () => {
         { "id": "painting", "type": "plane", "position": [2.2, 2, 0.32], "rotation": [0, 0, 0],       "scale": [1.2, 1.4, 0], "collisionsEnabled": false, "textureId": "painting" },
         { "id": "rug",      "type": "plane", "position": [8, 0.01, 9.5], "rotation": [-1.5708, 0, 0], "scale": [4, 3, 0],     "collisionsEnabled": false, "textureId": "rug" },
 
-        { "id": "ghost", "type": "plane", "position": [3, 0, 12], "rotation": [0, 0, 0], "scale": [1, 2, 0], "collisionsEnabled": false,
+        { "id": "ghost", "light": { "type": "glow", "color": "#9fd8ff", "intensity": 1.5, "range": 3, "effect": "pulse" }, "type": "plane", "position": [3, 0, 12], "rotation": [0, 0, 0], "scale": [1, 2, 0], "collisionsEnabled": false,
           "animations": { "idle": ["ghost-idle-1", "ghost-idle-2"] },
           "movement": { "type": "chase", "speed": 2, "detectRadius": 5 },
           "actions": { "collision": { "hostileToIds": ["player"], "damage": 10 } } },
 
-        { "id": "mantel-candle", "type": "plane", "position": [4, 1.4, 1.0], "rotation": [0, 0, 0], "scale": [0.3, 0.6, 0], "collisionsEnabled": false,
+        { "id": "mantel-candle", "light": { "type": "glow", "color": "#ffb060", "intensity": 1.5, "range": 3, "effect": "flicker" }, "type": "plane", "position": [4, 1.4, 1.0], "rotation": [0, 0, 0], "scale": [0.3, 0.6, 0], "collisionsEnabled": false,
           "animations": { "idle": ["candle-1", "candle-2"] },
           "actions": { "emit": {
             "sprite": { "type": "plane", "rotation": [0, 0, 0], "scale": [0.08, 0.12, 0], "collisionsEnabled": false, "textureId": "wax-drip" },
@@ -94,7 +95,7 @@ export const testOutput = () => {
         {
           "id": "parlor-set", "position": [9.5, 0, 9], "rotation": [0, 0.3, 0],
           "objects": [
-            { "id": "parlor-table", "type": "rectPrism", "position": [0, 0, 0], "rotation": [0, 0, 0], "scale": [1.6, 0.8, 1.0], "collisionsEnabled": true, "textureId": "wood" }
+            { "id": "parlor-table", "light": { "type": "spot", "color": "#ffd9a0", "intensity": 3, "range": 2.5 }, "type": "rectPrism", "position": [0, 0, 0], "rotation": [0, 0, 0], "scale": [1.6, 0.8, 1.0], "collisionsEnabled": true, "textureId": "wood" }
           ],
           "groups": [
             {
@@ -121,6 +122,7 @@ export const testOutput = () => {
     },
     {
       "id": "cellar",
+      "lightLevel": 0.08,
       "gridPosition": [0, -1],
       "dimensions": [14, 4, 12],
       "startPosition": [7, 0, 10],
@@ -132,7 +134,7 @@ export const testOutput = () => {
 
         { "id": "barrel-1", "type": "rectPrism", "position": [2, 0, 2],     "rotation": [0, 0.4, 0], "scale": [1, 1.3, 1],   "collisionsEnabled": true, "textureId": "wood" },
         { "id": "barrel-2", "type": "rectPrism", "position": [3.2, 0, 1.6], "rotation": [0, 0.1, 0], "scale": [1, 1.3, 1],   "collisionsEnabled": true, "textureId": "wood" },
-        { "id": "crate",    "type": "rectPrism", "position": [11, 0, 3],    "rotation": [0, 0.7, 0], "scale": [1.2, 1, 1.2], "collisionsEnabled": true, "textureId": "wood" },
+        { "id": "crate", "light": { "type": "spot", "color": "#a8c0ff", "intensity": 2, "range": 2.5 },    "type": "rectPrism", "position": [11, 0, 3],    "rotation": [0, 0.7, 0], "scale": [1.2, 1, 1.2], "collisionsEnabled": true, "textureId": "wood" },
 
         { "id": "rat", "type": "plane", "position": [9, 0, 7], "rotation": [0, 0, 0], "scale": [0.6, 0.3, 0], "collisionsEnabled": false,
           "animations": { "idle": ["rat-1"], "moving": ["rat-1", "rat-2"] },
@@ -145,6 +147,7 @@ export const testOutput = () => {
     },
     {
       "id": "study",
+      "lightLevel": 0.25,
       "gridPosition": [1, 0],
       "dimensions": [12, 5, 10],
       "startPosition": [6, 0, 8],
@@ -157,7 +160,7 @@ export const testOutput = () => {
         { "id": "desk",             "type": "rectPrism", "position": [5, 0, 4],      "rotation": [0, 0.15, 0], "scale": [2.2, 0.9, 1.1], "collisionsEnabled": true, "textureId": "wood" },
         { "id": "desk-chair",       "type": "rectPrism", "position": [5.2, 0, 5.3],  "rotation": [0, 0.4, 0], "scale": [0.6, 0.5, 0.6],  "collisionsEnabled": true, "textureId": "wood" },
         { "id": "study-portrait",   "type": "plane",     "position": [3, 1.8, 0.32], "rotation": [0, 0, 0],   "scale": [1, 1.3, 0],      "collisionsEnabled": false, "textureId": "painting" },
-        { "id": "caretaker", "type": "plane", "position": [9, 0, 5.5], "rotation": [0, 0, 0], "scale": [1, 1.9, 0], "collisionsEnabled": true, "textureId": "caretaker",
+        { "id": "caretaker", "light": { "type": "glow", "color": "#ffc070", "intensity": 3, "range": 5, "effect": "flicker" }, "type": "plane", "position": [9, 0, 5.5], "rotation": [0, 0, 0], "scale": [1, 1.9, 0], "collisionsEnabled": true, "textureId": "caretaker",
           "dialogue": { "speaker": "Caretaker", "lines": [
             "You shouldn't have come back here.",
             "The cellar's locked. Has been since the butler... well.",

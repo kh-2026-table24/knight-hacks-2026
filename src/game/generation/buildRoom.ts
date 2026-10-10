@@ -1,5 +1,5 @@
 import { Box3, Euler, Quaternion, Vector3 } from "three";
-import { ObjectType, type Door, type Group, type Object as ObjectOutput, type Room, type Texture } from "./output/output";
+import { ObjectType, type Door, type Group, type Light, type Object as ObjectOutput, type Room, type Texture } from "./output/output";
 import type { RoomBrief } from "./output/housePlan";
 import type { ItemPlan, PartPlan, RoomPlan } from "./output/roomPlan";
 
@@ -64,7 +64,7 @@ function slug(text: string) {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "item";
 }
 
-function toObject(part: PartPlan, id: string, textureId: string): ObjectOutput {
+function toObject(part: PartPlan, id: string, textureId: string, light?: Light): ObjectOutput {
   return {
     id,
     type: part.type,
@@ -73,7 +73,14 @@ function toObject(part: PartPlan, id: string, textureId: string): ObjectOutput {
     scale: [...part.scale],
     collisionsEnabled: part.collisionsEnabled,
     textureId,
+    ...(light && { light }),
   };
+}
+
+/** An item's light comes from its tallest part: the lamp on a lamp post, the flame on a candlestick. */
+function lightPartIndex(item: ItemPlan) {
+  const top = (part: PartPlan) => part.position[1] + part.scale[1];
+  return item.parts.reduce((best, part, i) => (top(part) > top(item.parts[best]) ? i : best), 0);
 }
 
 /**
@@ -116,11 +123,12 @@ export function buildRoom(plan: RoomPlan, brief: RoomBrief): { room: Room; textu
       cutoutTexture ??= texture(`${i}-${slug(item.name)}`, item.name);
       return cutoutTexture;
     };
+    const lightPart = item.light ? lightPartIndex(item) : -1;
     return {
       id: groupId,
       position: [...item.position],
       rotation: [0, item.rotationY, 0],
-      objects: item.parts.map((part, j) => toObject(part, `${groupId}-${j}`, textureFor(part))),
+      objects: item.parts.map((part, j) => toObject(part, `${groupId}-${j}`, textureFor(part), j === lightPart ? item.light : undefined)),
     };
   });
 
@@ -140,6 +148,7 @@ export function buildRoom(plan: RoomPlan, brief: RoomBrief): { room: Room; textu
       gridPosition: brief.gridPosition,
       dimensions: plan.dimensions,
       startPosition: plan.startPosition,
+      lightLevel: plan.lightLevel,
       floorTextureId,
       objects,
       groups,

@@ -147,6 +147,10 @@ function removeGreenScreen(data: Buffer, width: number, height: number) {
     const i = p * 4;
     data[i + 1] = Math.min(data[i + 1], Math.max(data[i], data[i + 2]));
   }
+
+  // Transparent pixels keep their color, and the GPU blends it into the edges when the texture is
+  // drawn small (mipmaps), outlining everything in green at a distance. Black blends in as a dark edge.
+  for (let p = 0; p < px; p++) if (transparent(p)) data.fill(0, p * 4, p * 4 + 3);
 }
 
 // Planning ------------------------------------------------------------------------------------

@@ -1,5 +1,4 @@
 {
-  "id": "dev",
   "textures": [
     {
       "id": "wallpaper",
@@ -98,6 +97,7 @@
   "rooms": [
     {
       "id": "foyer",
+      "lightLevel": 0.2,
       "gridPosition": [
         0,
         0
@@ -263,6 +263,13 @@
         },
         {
           "id": "hearth",
+          "light": {
+            "type": "glow",
+            "color": "#ff8a3c",
+            "intensity": 5,
+            "range": 7,
+            "effect": "flicker"
+          },
           "type": "rectPrism",
           "position": [
             5,
@@ -406,6 +413,13 @@
         },
         {
           "id": "ghost",
+          "light": {
+            "type": "glow",
+            "color": "#9fd8ff",
+            "intensity": 1.5,
+            "range": 3,
+            "effect": "pulse"
+          },
           "type": "plane",
           "position": [
             3,
@@ -445,6 +459,13 @@
         },
         {
           "id": "mantel-candle",
+          "light": {
+            "type": "glow",
+            "color": "#ffb060",
+            "intensity": 1.5,
+            "range": 3,
+            "effect": "flicker"
+          },
           "type": "plane",
           "position": [
             4,
@@ -834,6 +855,12 @@
           "objects": [
             {
               "id": "parlor-table",
+              "light": {
+                "type": "spot",
+                "color": "#ffd9a0",
+                "intensity": 3,
+                "range": 2.5
+              },
               "type": "rectPrism",
               "position": [
                 0,
@@ -1003,6 +1030,7 @@
     },
     {
       "id": "cellar",
+      "lightLevel": 0.08,
       "gridPosition": [
         0,
         -1
@@ -1126,6 +1154,12 @@
         },
         {
           "id": "crate",
+          "light": {
+            "type": "spot",
+            "color": "#a8c0ff",
+            "intensity": 2,
+            "range": 2.5
+          },
           "type": "rectPrism",
           "position": [
             11,
@@ -1206,6 +1240,7 @@
     },
     {
       "id": "study",
+      "lightLevel": 0.25,
       "gridPosition": [
         1,
         0
@@ -1371,6 +1406,13 @@
         },
         {
           "id": "caretaker",
+          "light": {
+            "type": "glow",
+            "color": "#ffc070",
+            "intensity": 3,
+            "range": 5,
+            "effect": "flicker"
+          },
           "type": "plane",
           "position": [
             9,
@@ -1415,5 +1457,6 @@
         }
       ]
     }
-  ]
+  ],
+  "id": "dev"
 }
