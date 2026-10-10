@@ -1,5 +1,5 @@
 import { Vector3 } from "three";
-import { Object } from "./Object";
+import { Part } from "./Part";
 import type { Side } from "./Connection";
 import type { TextureLibrary } from "./TextureLibrary";
 import { DOOR } from "../shared/constants";
@@ -14,7 +14,7 @@ const INWARD: Record<Side, Vector3> = {
   west: new Vector3(1, 0, 0),
 };
 
-export class Door extends Object {
+export class Door extends Part {
   readonly connectionId: string;
   readonly side: Side;
 

@@ -1,7 +1,7 @@
 import { Vector3, type Object3D, type Texture } from "three";
 import { QueryFilterFlags, type KinematicCharacterController, type World } from "@dimforge/rapier3d-compat";
 import { CHARACTER_STRETCH, characterBrightness, createCharacterGlow } from "./characters";
-import { Object, PLAYER_GROUP } from "./Object";
+import { Part, PLAYER_GROUP } from "./Part";
 import { FRAME_SECONDS } from "../shared/constants";
 import type { TextureLibrary } from "./TextureLibrary";
 import type {
@@ -24,7 +24,7 @@ const CHASE_GIVE_UP = 1.5;
 // NPCs walk through the player rather than getting blocked by them: their movement ignores colliders in the player's group.
 const NPC_QUERY_GROUPS = (0xffff << 16) | (0xffff & ~PLAYER_GROUP);
 
-export class Sprite extends Object {
+export class Character extends Part {
   /** Frames per state, with unknown texture ids dropped. */
   readonly animations: Partial<Record<AnimationState, Texture[]>> = {};
   readonly collision: CollisionAction | undefined;

@@ -31,8 +31,8 @@ To resume: read PLAN.md (Part A), this file, AGENTS.md and `git log --oneline -2
 
 ## M4 Engine on the spec (CHECKPOINT)
 - [x] 4.1 art.ts (+ G8 art budget in validate.ts)  (b8b41f6)
-- [x] 4.2 server onto the spec + retire the old pipeline
-- [ ] 4.3 renames (Part, Prop, Character)
+- [x] 4.2 server onto the spec + retire the old pipeline  (d5d064e)
+- [x] 4.3 renames (Part, Prop, Character)
 - [ ] 4.4 engine rework onto GameSpec
 - [ ] 4.5 regenerate haunted art, delete old game dirs, gitignore
 

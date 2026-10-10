@@ -1,10 +1,10 @@
 import { BoxGeometry, Mesh, MeshStandardMaterial, Vector3, type Scene } from "three";
 import { ColliderDesc, RigidBodyDesc, type RigidBody, type World } from "@dimforge/rapier3d-compat";
-import { Group } from "./Group";
+import { Prop } from "./Prop";
 import { Door } from "./Door";
-import { Sprite } from "./Sprite";
+import { Character } from "./Character";
 import type { Side } from "./Connection";
-import type { Object } from "./Object";
+import type { Part } from "./Part";
 import type { TextureLibrary } from "./TextureLibrary";
 import { PICKUP } from "../shared/constants";
 import type { Room as RoomOutput } from "./generation/output/output";
@@ -19,13 +19,13 @@ const DEFAULT_LIGHT_LEVEL = 0.25;
 const PICKUP_DELAY = PICKUP.delaySeconds;
 
 interface Emitter {
-  sprite: Sprite;
+  sprite: Character;
   count: number;
   timer: number;
 }
 
 interface Spawned {
-  sprite: Sprite;
+  sprite: Character;
   spawnedAt: number;
   expiresAt: number | null;
 }
@@ -39,7 +39,7 @@ export class Room {
   /** Base brightness before any lights, 0 to 1. */
   readonly lightLevel: number;
   /** Everything in the room except doors, as a group at the origin. */
-  readonly contents: Group;
+  readonly contents: Prop;
   readonly doors: Door[];
   private readonly textures: TextureLibrary;
   private readonly floor: Mesh;
@@ -48,12 +48,12 @@ export class Room {
 
   private readonly emitters: Emitter[];
   /** Objects with flickering or pulsing lights. */
-  private readonly animatedLights: Object[];
+  private readonly animatedLights: Part[];
   /** Sprites placed in the room, which may move and animate. */
-  private readonly sprites: Sprite[];
+  private readonly sprites: Character[];
   /** Sprites created by emitters. Kept while the room is unloaded so dropped items stay put. */
   private readonly spawned: Spawned[] = [];
-  private readonly byCollider = new Map<number, Object>();
+  private readonly byCollider = new Map<number, Part>();
   private mounted: { scene: Scene; world: World } | null = null;
   private time = 0;
 
@@ -64,7 +64,7 @@ export class Room {
     this.dimensions = new Vector3().fromArray(output.dimensions);
     this.startPosition = new Vector3().fromArray(output.startPosition);
     this.lightLevel = Math.min(1, Math.max(0, output.lightLevel ?? DEFAULT_LIGHT_LEVEL));
-    this.contents = new Group(
+    this.contents = new Prop(
       { id: output.id, position: [0, 0, 0], rotation: [0, 0, 0], objects: output.objects, groups: output.groups },
       textures,
     );
@@ -77,9 +77,9 @@ export class Room {
       return [new Door(door, textures, side, this.dimensions)];
     });
     this.animatedLights = [...allObjects(this.contents), ...this.doors].filter((o) => hasAnimatedLight(o));
-    this.sprites = allObjects(this.contents).filter((o) => o instanceof Sprite);
+    this.sprites = allObjects(this.contents).filter((o) => o instanceof Character);
     this.emitters = allObjects(this.contents)
-      .filter((o): o is Sprite => o instanceof Sprite && o.emit !== undefined)
+      .filter((o): o is Character => o instanceof Character && o.emit !== undefined)
       .map((sprite) => ({ sprite, count: 0, timer: 0 }));
 
     const { x: w, y: h, z: d } = this.dimensions;
@@ -180,7 +180,7 @@ export class Room {
   }
 
   /** Spawn the sprite's emitted sprite, if it hasn't hit its maxCount. */
-  emitFrom(sprite: Sprite) {
+  emitFrom(sprite: Character) {
     const emitter = this.emitters.find((e) => e.sprite === sprite);
     const emit = sprite.emit;
     if (!this.mounted || !emitter || !emit) return;
@@ -188,7 +188,7 @@ export class Room {
     emitter.count++;
 
     const origin = sprite.mesh.getWorldPosition(new Vector3()).add(new Vector3(0, sprite.size.y / 2, SPAWN_OFFSET));
-    const spawned = new Sprite({ ...emit.sprite, id: `${sprite.id}-${emitter.count}`, position: origin.toArray() }, this.textures);
+    const spawned = new Character({ ...emit.sprite, id: `${sprite.id}-${emitter.count}`, position: origin.toArray() }, this.textures);
     spawned.dynamic = true;
     spawned.addTo(this.mounted.scene, this.mounted.world);
     spawned.setVelocity(emit.velocity);
@@ -201,12 +201,12 @@ export class Room {
   }
 
   /** False for items that were dropped too recently to pick up. */
-  isPickupReady(obj: Object) {
+  isPickupReady(obj: Part) {
     const spawned = this.spawned.find((s) => s.sprite === obj);
     return !spawned || this.time - spawned.spawnedAt >= PICKUP_DELAY;
   }
 
-  removeObject(obj: Object) {
+  removeObject(obj: Part) {
     if (!this.mounted) return;
     const handle = obj.colliderHandle;
     if (handle !== undefined) this.byCollider.delete(handle);
@@ -215,14 +215,14 @@ export class Room {
     if (i >= 0) this.spawned.splice(i, 1);
   }
 
-  private register(obj: Object) {
+  private register(obj: Part) {
     const handle = obj.colliderHandle;
     if (handle !== undefined) this.byCollider.set(handle, obj);
   }
 }
 
-const hasAnimatedLight = (obj: Object) => obj.lightSpec?.effect !== undefined && obj.lightSpec.effect !== "steady";
+const hasAnimatedLight = (obj: Part) => obj.lightSpec?.effect !== undefined && obj.lightSpec.effect !== "steady";
 
-function allObjects(group: Group): Object[] {
+function allObjects(group: Prop): Part[] {
   return [...group.objects, ...group.groups.flatMap(allObjects)];
 }

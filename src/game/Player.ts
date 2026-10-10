@@ -10,7 +10,7 @@ import {
   type World,
 } from "@dimforge/rapier3d-compat";
 import { CHARACTER_STRETCH, characterBrightness, createCharacterGlow } from "./characters";
-import { PLAYER_COLLISION_GROUPS } from "./Object";
+import { PLAYER_COLLISION_GROUPS } from "./Part";
 import { PLAYER } from "../shared/constants";
 import type { Item } from "./generation/output/output";
 

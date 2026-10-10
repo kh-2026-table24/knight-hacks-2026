@@ -46,7 +46,7 @@ const COLORS: Record<ObjectType, number> = {
 
 // position: bottom-center of the object. rotation: Euler radians. scale: size [width, height, depth].
 // RightTriPrism (unrotated) is a ramp: low at +z and rises to full height at -z. Plane (unrotated) faces +z and ignores depth.
-export class Object {
+export class Part {
   readonly id: string;
   readonly type: ObjectType;
   /** [width, height, depth] from the output's scale. */

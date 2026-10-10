@@ -5,10 +5,10 @@ import { MAX_HEARTS, Player } from "./Player";
 import { RetroFilter } from "./RetroFilter";
 import { Hud } from "./ui/Hud";
 import { Door } from "./Door";
-import { Sprite } from "./Sprite";
+import { Character } from "./Character";
 import { ItemType, type Dialogue } from "./generation/output/output";
 import type { Game } from "./Game";
-import type { Object } from "./Object";
+import type { Part } from "./Part";
 import type { Room } from "./Room";
 
 // Fill light at a room's lightLevel of 1, tinted cold like moonlight. Placed lights do the rest.
@@ -32,7 +32,7 @@ export class GameComposer {
   private game: Game | null = null;
   private room: Room | null = null;
   /** Objects the player was touching last frame, so touches only trigger once on contact. */
-  private touching = new Set<Object>();
+  private touching = new Set<Part>();
 
   constructor(canvas: HTMLCanvasElement) {
     // No antialiasing: the scene is drawn at low resolution and upscaled with hard pixel edges.
@@ -113,7 +113,7 @@ export class GameComposer {
     const room = this.room;
     if (!room) return;
 
-    const now = new Set<Object>();
+    const now = new Set<Part>();
     for (const collider of this.player.touching(this.world)) {
       const obj = room.objectFor(collider.handle);
       if (obj) now.add(obj);
@@ -124,7 +124,7 @@ export class GameComposer {
     // Items and damage are checked every frame: a dropped item may not be ready on first contact,
     // and something hostile keeps hurting while you stay in contact (after the invulnerability window).
     for (const obj of now) {
-      if (!(obj instanceof Sprite)) continue;
+      if (!(obj instanceof Character)) continue;
       if (obj.item && room.isPickupReady(obj)) {
         this.player.inventory.push(obj.item);
         this.hud.setItems(this.player.inventory);
@@ -138,7 +138,7 @@ export class GameComposer {
 
     for (const obj of started) {
       if (obj instanceof Door) void this.useDoor(obj);
-      else if (obj instanceof Sprite && obj.emit?.when.type === "collision") room.emitFrom(obj);
+      else if (obj instanceof Character && obj.emit?.when.type === "collision") room.emitFrom(obj);
       if (this.room !== room) return; // went through a door
     }
   }
@@ -165,7 +165,7 @@ export class GameComposer {
 
   /** The NPC with something to say that the player is touching, if any. */
   private talkTarget() {
-    for (const obj of this.touching) if (obj instanceof Sprite && obj.dialogues.length > 0) return obj;
+    for (const obj of this.touching) if (obj instanceof Character && obj.dialogues.length > 0) return obj;
     return undefined;
   }
 
