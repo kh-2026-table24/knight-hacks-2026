@@ -5,7 +5,17 @@ import sharp from "sharp";
 import { ObjectType, type Game, type Group, type Object as ObjectOutput, type SavedGame, type Sprite } from "../src/game/generation/output/output";
 import { gameDir } from "./games";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_IMAGE_KEY ?? "AQ.Ab8RN6JjAh5PSt7pfmSDeO0wQtZvkWAlF6jdxuO6H0d9unzJrA" });
+// The key comes from .env.local (npm run dev loads it). The client is made on first use, so the server
+// can still serve games and already-generated assets without a key.
+let client: GoogleGenAI | undefined;
+function gemini() {
+  if (!client) {
+    const apiKey = process.env.GEMINI_IMAGE_KEY;
+    if (!apiKey) throw new Error("GEMINI_IMAGE_KEY is not set; add it to .env.local");
+    client = new GoogleGenAI({ apiKey });
+  }
+  return client;
+}
 const MODEL = "gemini-nano-banana-2.1";
 const MAX_CONCURRENT = 6; // Gemini calls in flight at once
 
@@ -75,7 +85,7 @@ function original(game: SavedGame, job: AssetJob): Promise<Buffer> {
 }
 
 export async function askGemini(prompt: string, reference: string | undefined, aspectRatio: string): Promise<string> {
-  const interaction = await ai.interactions.create({
+  const interaction = await gemini().interactions.create({
     model: MODEL,
     input: reference
       ? [

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently -k -n server,web -c blue,green \"npm:dev:server\" \"npm:dev:web\"",
-    "dev:server": "tsx watch server/index.ts",
+    "dev:server": "tsx watch --env-file=.env.local server/index.ts",
     "dev:web": "vite",
     "build": "tsc && tsc -p server && vite build",
     "preview": "vite preview",
