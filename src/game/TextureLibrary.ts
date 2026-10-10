@@ -1,4 +1,4 @@
-import { ImageLoader, RepeatWrapping, SRGBColorSpace, Texture } from "three";
+import { ImageLoader, NearestFilter, RepeatWrapping, SRGBColorSpace, Texture } from "three";
 import type { Texture as TextureOutput } from "./generation/output/output";
 
 const imageLoader = new ImageLoader();
@@ -15,6 +15,8 @@ export class TextureLibrary {
       const texture = new Texture(placeholderImage());
       texture.colorSpace = SRGBColorSpace;
       texture.wrapS = texture.wrapT = RepeatWrapping;
+      // Pixel art: keep pixel edges sharp when magnified.
+      texture.magFilter = NearestFilter;
       texture.needsUpdate = true;
       this.textures.set(id, texture);
     }
@@ -24,13 +26,14 @@ export class TextureLibrary {
     return id === undefined ? undefined : this.textures.get(id);
   }
 
-  async setImage(id: string, url: string) {
+  /** Swap in an image, either a URL to load or an already-drawn canvas. */
+  async setImage(id: string, image: string | HTMLCanvasElement) {
     const texture = this.textures.get(id);
     if (!texture) return;
-    const image = await imageLoader.loadAsync(url);
+    const source = typeof image === "string" ? await imageLoader.loadAsync(image) : image;
     // The GPU copy was sized for the placeholder, so drop it before swapping images.
     texture.dispose();
-    texture.image = image;
+    texture.image = source;
     texture.needsUpdate = true;
   }
 }

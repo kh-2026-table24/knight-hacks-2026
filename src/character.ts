@@ -6,8 +6,9 @@ import { GoogleGenAI } from "@google/genai";
 const SERVER_URL = "http://localhost:3001/api/claude";
 const MODEL = "gemini-nano-banana-2.1";
 
-// Image generation needs the billed project's key (exposed to the browser by vite.config.ts).
-const ai = new GoogleGenAI({ apiKey: import.meta.env.GEMINI_IMAGE_KEY });
+// Image generation needs the billed project's key. Hardcoded so it works for everyone without a .env.local.
+const GEMINI_IMAGE_KEY = "AQ.Ab8RN6JjAh5PSt7pfmSDeO0wQtZvkWAlF6jdxuO6H0d9unzJrA";
+const ai = new GoogleGenAI({ apiKey: GEMINI_IMAGE_KEY });
 
 async function askClaude(prompt: string): Promise<string> {
   const res = await fetch(SERVER_URL, {
@@ -21,7 +22,7 @@ async function askClaude(prompt: string): Promise<string> {
 }
 
 // Returns a base64 JPEG. Pass reference (base64 JPEG) to have Gemini redraw that same character.
-async function askGemini(prompt: string, reference?: string): Promise<string> {
+export async function askGemini(prompt: string, reference?: string, aspectRatio = "1:1"): Promise<string> {
   const interaction = await ai.interactions.create({
     model: MODEL,
     input: reference
@@ -30,7 +31,7 @@ async function askGemini(prompt: string, reference?: string): Promise<string> {
           { type: "text", text: prompt },
         ]
       : prompt,
-    response_format: { type: "image", mime_type: "image/jpeg", aspect_ratio: "1:1" },
+    response_format: { type: "image", mime_type: "image/jpeg", aspect_ratio: aspectRatio },
   });
 
   const data = interaction.output_image?.data;
