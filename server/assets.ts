@@ -2,7 +2,8 @@ import { GoogleGenAI } from "@google/genai";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import sharp from "sharp";
-import { ObjectType, type Game, type Group, type Object as ObjectOutput, type SavedGame, type Sprite } from "../src/game/generation/output/output";
+import { collectArt, type ArtJob } from "../src/shared/art";
+import type { GameSpec } from "../src/shared/spec";
 import { gameDir } from "./games";
 
 // The key comes from .env.local (npm run dev loads it). The client is made on first use, so the server
@@ -31,57 +32,60 @@ const isKeyColor = (r: number, g: number, b: number) => g >= 180 && r <= 120 && 
 const CUTOUT_LONG_SIDE = 128; // pixels along a cutout's longer side
 const SURFACE_SIZE = 64; // surfaces are square tiles
 
-// Aspect ratios Gemini can generate. Cutouts use the closest one to the plane they're drawn on.
-const ASPECT_RATIOS = ["1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9", "1:4", "4:1", "1:8", "8:1"];
-
 type Kind = "cutout" | "surface";
-
-interface AssetJob {
-  id: string;
-  prompt: string;
-  kind: Kind;
-  aspectRatio: string;
-  /** For later animation frames: the texture id of the first frame, drawn first and passed as a reference. */
-  referenceId?: string;
-}
 
 const assetsDir = (gameId: string) => join(gameDir(gameId), "assets");
 
-/** The finished PNG for a texture: from disk if it's been made before, otherwise generated now. Undefined if the game has no such texture. */
-export async function getAsset(game: SavedGame, textureId: string): Promise<Buffer | undefined> {
-  const job = planAssets(game).get(textureId);
-  if (!job) return undefined;
-  const file = join(assetsDir(game.id), `${job.id}.png`);
+// The art plan for each game; games.ts keeps one GameSpec object per game file, so this stays warm.
+const plans = new WeakMap<GameSpec, Map<string, ArtJob>>();
+function planOf(game: GameSpec) {
+  let plan = plans.get(game);
+  if (!plan) plans.set(game, (plan = collectArt(game)));
+  return plan;
+}
+
+/** The finished PNG for an art id: from disk if it's been made before, otherwise generated now. Undefined if the game has no such art. */
+export async function getAsset(gameId: string, game: GameSpec, artId: string): Promise<Buffer | undefined> {
+  const job = planOf(game).get(artId);
+  if (!job || job.builtinUrl) return undefined;
+  const file = join(assetsDir(gameId), `${job.id}.png`);
   return once(file, async () => {
     const existing = await readIfExists(file);
     if (existing) return existing;
-    const png = await processImage(await original(game, job), job.kind);
+    const png = await processImage(await original(gameId, game, job), job.kind === "surface" ? "surface" : "cutout");
     await writeFile(file, png);
     return png;
   });
 }
 
-/** Gemini's original JPEG for a texture, kept so later animation frames can use it as a reference. */
-function original(game: SavedGame, job: AssetJob): Promise<Buffer> {
-  const file = join(assetsDir(game.id), `${job.id}.jpg`);
+/** Gemini's original JPEG for an art id, kept so later animation frames can use it as a reference. */
+function original(gameId: string, game: GameSpec, job: ArtJob): Promise<Buffer> {
+  const file = join(assetsDir(gameId), `${job.id}.jpg`);
   return once(file, async () => {
     const existing = await readIfExists(file);
     if (existing) return existing;
 
-    const referenceJob = job.referenceId ? planAssets(game).get(job.referenceId) : undefined;
+    const referenceJob = job.referenceId ? planOf(game).get(job.referenceId) : undefined;
     // If the first frame fails, still draw this one, just without the reference.
-    const reference = referenceJob ? await original(game, referenceJob).catch(() => undefined) : undefined;
-    const prompt = reference ? framePrompt(job.prompt) : job.kind === "surface" ? surfacePrompt(job.prompt) : cutoutPrompt(job.prompt);
+    const reference = referenceJob ? await original(gameId, game, referenceJob).catch(() => undefined) : undefined;
+    const prompt = reference ? framePrompt(job.subject ?? job.prompt, job.prompt) : promptFor(job);
 
     const started = Date.now();
-    console.log(`[${game.id}] generating ${job.id}${reference ? ` (from ${job.referenceId})` : ""}`);
+    console.log(`[${gameId}] generating ${job.id}${reference ? ` (from ${job.referenceId})` : ""}`);
     const jpeg = Buffer.from(await limit(() => askGemini(prompt, reference?.toString("base64"), job.aspectRatio)), "base64");
-    console.log(`[${game.id}] generated ${job.id} in ${((Date.now() - started) / 1000).toFixed(1)}s`);
+    console.log(`[${gameId}] generated ${job.id} in ${((Date.now() - started) / 1000).toFixed(1)}s`);
 
-    await mkdir(assetsDir(game.id), { recursive: true });
+    await mkdir(assetsDir(gameId), { recursive: true });
     await writeFile(file, jpeg);
     return jpeg;
   });
+}
+
+/** The prompt for drawing a job from scratch, without a reference frame. */
+function promptFor(job: ArtJob) {
+  if (job.kind === "surface") return surfacePrompt(job.prompt);
+  if (job.kind === "character") return characterPrompt(job.subject ?? job.prompt, job.prompt);
+  return cutoutPrompt(job.subject ? `${job.subject}, ${job.prompt}` : job.prompt);
 }
 
 export async function askGemini(prompt: string, reference: string | undefined, aspectRatio: string): Promise<string> {
@@ -163,74 +167,6 @@ function removeGreenScreen(data: Buffer, width: number, height: number) {
   for (let p = 0; p < px; p++) if (transparent(p)) data.fill(0, p * 4, p * 4 + 3);
 }
 
-// Planning ------------------------------------------------------------------------------------
-
-const plans = new WeakMap<Game, Map<string, AssetJob>>();
-
-/** Works out what to generate for each texture id, based on what it's drawn on. */
-function planAssets(game: Game): Map<string, AssetJob> {
-  const cached = plans.get(game);
-  if (cached) return cached;
-
-  const prompts = new Map(game.textures.map((t) => [t.id, t.prompt]));
-  const jobs = new Map<string, AssetJob>();
-  const add = (id: string | undefined, kind: Kind, aspect: number, referenceId?: string) => {
-    if (id === undefined || jobs.has(id)) return;
-    const prompt = prompts.get(id);
-    if (prompt === undefined) return;
-    jobs.set(id, { id, prompt, kind, aspectRatio: kind === "surface" ? "1:1" : closestAspectRatio(aspect), referenceId });
-  };
-
-  const items = drawables(game);
-  // Animation frames first, so each is tied to its first frame even if it's also used elsewhere.
-  for (const item of items) {
-    if (!item.animations) continue;
-    const frames = [...new Set([...item.animations.idle, ...Object.values(item.animations).flat()])];
-    const [first, ...rest] = frames;
-    add(first, "cutout", aspectOf(item));
-    for (const id of rest) add(id, "cutout", aspectOf(item), first);
-  }
-  for (const item of items) add(item.textureId, item.type === ObjectType.Plane ? "cutout" : "surface", aspectOf(item));
-  for (const room of game.rooms) add(room.floorTextureId, "surface", 1);
-  // Textures nothing uses are still made (as cutouts) so every id the client asks for exists.
-  for (const { id } of game.textures) add(id, "cutout", 1);
-
-  plans.set(game, jobs);
-  return jobs;
-}
-
-type Drawable = Pick<ObjectOutput, "type" | "scale" | "textureId"> & Partial<Pick<Sprite, "animations" | "actions">>;
-
-// Everything that can carry a texture: room objects, grouped objects, doors, and sprites spawned by emitters.
-function drawables(game: Game): Drawable[] {
-  const out: Drawable[] = [];
-  const add = (item: Drawable) => {
-    out.push(item);
-    const emitted = item.actions?.emit?.sprite;
-    if (emitted) add(emitted);
-  };
-  const addGroup = (group: Group) => {
-    group.objects.forEach(add);
-    group.groups?.forEach(addGroup);
-  };
-  for (const room of game.rooms) {
-    room.objects.forEach(add);
-    room.groups?.forEach(addGroup);
-    room.doors?.forEach(add);
-  }
-  return out;
-}
-
-const aspectOf = (item: Drawable) => (item.scale[1] > 0 ? item.scale[0] / item.scale[1] : 1);
-
-function closestAspectRatio(aspect: number) {
-  const distance = (ratio: string) => {
-    const [w, h] = ratio.split(":").map(Number);
-    return Math.abs(Math.log(w / h) - Math.log(aspect));
-  };
-  return ASPECT_RATIOS.reduce((best, ratio) => (distance(ratio) < distance(best) ? ratio : best));
-}
-
 // Prompts -------------------------------------------------------------------------------------
 
 export function cutoutPrompt(prompt: string) {
@@ -255,11 +191,22 @@ function surfacePrompt(prompt: string) {
   ].join(" ");
 }
 
-function framePrompt(prompt: string) {
+// Characters face right so the engine can flip them to face the way they walk.
+function characterPrompt(subject: string, pose: string) {
+  return [
+    STYLE,
+    `A single full-body game character sprite of ${subject}, ${pose}.`,
+    "Facing right in a three-quarter view, centered, with the whole figure visible and filling most of the image.",
+    `Solid flat ${KEY_COLOR} background everywhere around the figure, and no bright green on the figure itself.`,
+    "No text, no border, no cast shadow, no ground, no scenery.",
+  ].join(" ");
+}
+
+function framePrompt(subject: string, pose: string) {
   return [
     STYLE,
     "The attached image is the first frame of a sprite animation.",
-    `Draw another frame of the same animation: ${prompt}.`,
+    `Draw another frame of the same animation: ${subject}, ${pose}.`,
     "Keep the exact same subject, art style, pixel size, outlines, color palette, proportions and scale,",
     "and keep it in the same place in the image so the frames line up when played in sequence. Change only the pose or motion described.",
     `Solid flat ${KEY_COLOR} background, the same as the attached image. No text, no border, no cast shadow, no scenery.`,
