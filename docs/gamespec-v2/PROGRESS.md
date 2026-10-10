@@ -22,8 +22,8 @@ To resume: read PLAN.md (Part A), this file, AGENTS.md and `git log --oneline -2
 - [x] 2.5 check-specs.ts + spec-cases.ts + npm scripts  (cdfd922)
 
 ## M3 Geometry and validators
-- [x] 3.1 geometry.ts
-- [ ] 3.2 walkGrid.ts
+- [x] 3.1 geometry.ts  (411323b)
+- [x] 3.2 walkGrid.ts
 - [ ] 3.3 checkRoom.ts
 - [ ] 3.4 checkGame.ts
 - [ ] 3.5 validate.ts
@@ -87,6 +87,7 @@ To resume: read PLAN.md (Part A), this file, AGENTS.md and `git log --oneline -2
 - [ ] M9 playtest M9-1 to M9-3 — signed off by: ____
 
 ## Deviations
+- 3.2: walkGrid gets `levelPath(from, to, y)` instead of the planned `floodFromAt`. Characters slide on level ground and never step up, so a level-only flood matches how they actually move.
 - 0.1: The plan said to merge the in-progress work into main first. It needs a teammate review, so instead it's committed on `feat/caleb-npc-hud`, and this branch is stacked on top of it. Merge that PR first, then rebase this branch onto main.
 - PRs: `gh` isn't installed in the agent's environment, and `git push` over SSH fails there too ("Could not read from remote repository"). The developer pushes both branches (`git push -u origin feat/caleb-npc-hud feat/caleb-gamespec-v2`) and opens the PRs.
 
