@@ -1,10 +1,18 @@
-import { BoxGeometry, DoubleSide, Mesh, MeshStandardMaterial, PlaneGeometry, Vector3, type BufferGeometry, type Scene } from "three";
+import { BoxGeometry, DoubleSide, Mesh, MeshStandardMaterial, PlaneGeometry, Quaternion, Vector3, type BufferGeometry, type Object3D, type Texture, type Vector3Tuple } from "three";
 import { ConvexGeometry } from "three/examples/jsm/geometries/ConvexGeometry.js";
-import { ColliderDesc, RigidBodyDesc, type RigidBody, type World } from "@dimforge/rapier3d-compat";
+import { ColliderDesc, RigidBodyDesc, type Collider, type RigidBody, type World } from "@dimforge/rapier3d-compat";
 import { ObjectType, type Object as ObjectOutput } from "./generation/output/output";
+import type { TextureLibrary } from "./TextureLibrary";
 
 // Planes have no depth, so their collider gets some to stop the player clipping through.
 const PLANE_COLLIDER_DEPTH = 0.3;
+
+// Rapier collision groups are (membership << 16) | filter. Dynamic objects (dropped items)
+// land on everything except the player, so they don't get shoved around or block movement.
+const PLAYER_GROUP = 0x0002;
+const DYNAMIC_GROUP = 0x0004;
+export const PLAYER_COLLISION_GROUPS = (PLAYER_GROUP << 16) | (0xffff & ~DYNAMIC_GROUP);
+const DYNAMIC_COLLISION_GROUPS = (DYNAMIC_GROUP << 16) | (0xffff & ~PLAYER_GROUP);
 
 const COLORS: Record<ObjectType, number> = {
   [ObjectType.RectPrism]: 0x5a5048,
@@ -15,13 +23,23 @@ const COLORS: Record<ObjectType, number> = {
 // position: bottom-center of the object. rotation: Euler radians. scale: size [width, height, depth].
 // RightTriPrism (unrotated) is a ramp: low at +z and rises to full height at -z. Plane (unrotated) faces +z and ignores depth.
 export class Object {
+  readonly id: string;
   readonly type: ObjectType;
-  readonly mesh: Mesh;
+  /** [width, height, depth] from the output's scale. */
+  readonly size: Vector3;
+  readonly mesh: Mesh<BufferGeometry, MeshStandardMaterial>;
+  /** Blocks movement. */
+  readonly solid: boolean;
+  /** Simulated by physics (falls under gravity) instead of fixed in place. */
+  dynamic = false;
   private readonly colliderDesc: ColliderDesc | null;
   private body: RigidBody | null = null;
+  private collider: Collider | null = null;
 
-  constructor(output: ObjectOutput) {
+  constructor(output: ObjectOutput, textures: TextureLibrary) {
+    this.id = output.id;
     this.type = output.type;
+    this.size = new Vector3().fromArray(output.scale);
     const [w, h, d] = output.scale;
     let geometry: BufferGeometry;
     let colliderDesc: ColliderDesc | null;
@@ -55,23 +73,60 @@ export class Object {
     this.mesh = new Mesh(geometry, new MeshStandardMaterial({ color: COLORS[output.type], side: DoubleSide }));
     this.mesh.position.fromArray(output.position);
     this.mesh.rotation.fromArray(output.rotation);
-    this.colliderDesc = output.collisionsEnabled ? colliderDesc : null;
+    this.solid = output.collisionsEnabled;
+    this.colliderDesc = colliderDesc;
+    this.setTexture(textures.get(output.textureId));
   }
 
-  addTo(scene: Scene, world: World) {
-    scene.add(this.mesh);
-    if (!this.colliderDesc || this.body) return;
-
-    const { position, quaternion } = this.mesh;
-    this.body = world.createRigidBody(RigidBodyDesc.fixed().setTranslation(position.x, position.y, position.z).setRotation(quaternion));
-    world.createCollider(this.colliderDesc, this.body);
+  /** Whether touching this does something. Non-solid touchable objects get a sensor collider. */
+  get touchable() {
+    return false;
   }
 
-  removeFrom(scene: Scene, world: World) {
-    scene.remove(this.mesh);
+  get colliderHandle() {
+    return this.collider?.handle;
+  }
+
+  protected setTexture(texture: Texture | undefined) {
+    if (!texture) return;
+    const material = this.mesh.material;
+    material.map = texture;
+    material.color.set(0xffffff);
+    material.alphaTest = 0.5;
+    material.needsUpdate = true;
+  }
+
+  addTo(parent: Object3D, world: World) {
+    parent.add(this.mesh);
+    // Dynamic objects always collide with the world so they can land on things.
+    const solid = this.solid || this.dynamic;
+    if (!this.colliderDesc || this.body || (!solid && !this.touchable)) return;
+
+    // Use the world transform so objects inside groups collide where they appear.
+    const position = this.mesh.getWorldPosition(new Vector3());
+    const quaternion = this.mesh.getWorldQuaternion(new Quaternion());
+    const bodyDesc = this.dynamic ? RigidBodyDesc.dynamic().lockRotations() : RigidBodyDesc.fixed();
+    this.body = world.createRigidBody(bodyDesc.setTranslation(position.x, position.y, position.z).setRotation(quaternion));
+    this.colliderDesc.setSensor(!solid);
+    if (this.dynamic) this.colliderDesc.setCollisionGroups(DYNAMIC_COLLISION_GROUPS);
+    this.collider = world.createCollider(this.colliderDesc, this.body);
+  }
+
+  removeFrom(parent: Object3D, world: World) {
+    parent.remove(this.mesh);
     if (this.body) {
       world.removeRigidBody(this.body);
       this.body = null;
+      this.collider = null;
     }
+  }
+
+  setVelocity(velocity: Vector3Tuple) {
+    this.body?.setLinvel({ x: velocity[0], y: velocity[1], z: velocity[2] }, true);
+  }
+
+  /** Move the mesh to where physics put it. Only for dynamic objects added directly to the scene. */
+  syncFromPhysics() {
+    if (this.dynamic && this.body) this.mesh.position.copy(this.body.translation());
   }
 }

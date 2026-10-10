@@ -1,4 +1,4 @@
-import type { Room } from "./output/output"
+import type { Game } from "./output/output"
 import { testOutput } from "./prompts/test-output"
  
 const generateResponse = async () => {
@@ -9,5 +9,5 @@ const generateResponse = async () => {
 export const generate = async () => {
 
     const res = await generateResponse()
-    return JSON.parse(res) as Room
+    return JSON.parse(res) as Game
 }

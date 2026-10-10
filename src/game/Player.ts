@@ -1,27 +1,43 @@
 import { DoubleSide, Mesh, MeshBasicMaterial, PlaneGeometry, Vector3 } from "three";
 import {
+  Capsule,
   ColliderDesc,
+  QueryFilterFlags,
   RigidBodyDesc,
   type Collider,
   type KinematicCharacterController,
   type RigidBody,
   type World,
 } from "@dimforge/rapier3d-compat";
+import { PLAYER_COLLISION_GROUPS } from "./Object";
+import type { Item } from "./generation/output/output";
 
 const MOVE_KEYS = new Set(["w", "a", "s", "d"]);
 const WIDTH = 1;
 const HEIGHT = 1.8;
 const RADIUS = 0.35;
+const GRAVITY = 20;
+const MAX_STEP_HEIGHT = 0.35;
+const MAX_SLOPE = (50 * Math.PI) / 180;
+// How far beyond the player's collider counts as touching something.
+const TOUCH_MARGIN = 0.1;
+const NO_ROTATION = { x: 0, y: 0, z: 0, w: 1 };
+// Gap the character controller keeps from surfaces. Spawning closer than this counts as stuck in the floor.
+const CONTROLLER_OFFSET = 0.02;
+const SPAWN_LIFT = 0.05;
 
 /** The protagonist: an upright 2D plane facing the camera, moved with WASD on the ground (XZ) plane. */
 export class Player {
   readonly mesh: Mesh;
+  readonly inventory: Item[] = [];
   speed = 5;
   private readonly keys = new Set<string>();
   private readonly movement = new Vector3();
+  private verticalVelocity = 0;
   private readonly body: RigidBody;
   private readonly collider: Collider;
   private readonly controller: KinematicCharacterController;
+  private readonly touchShape = new Capsule(HEIGHT / 2 - RADIUS, RADIUS + TOUCH_MARGIN);
 
   constructor(world: World) {
     // Shift geometry up so the mesh origin sits at the character's feet.
@@ -31,10 +47,15 @@ export class Player {
     // Body origin is also at the feet; the capsule sits above it.
     this.body = world.createRigidBody(RigidBodyDesc.kinematicPositionBased());
     this.collider = world.createCollider(
-      ColliderDesc.capsule(HEIGHT / 2 - RADIUS, RADIUS).setTranslation(0, HEIGHT / 2, 0),
+      ColliderDesc.capsule(HEIGHT / 2 - RADIUS, RADIUS)
+        .setTranslation(0, HEIGHT / 2, 0)
+        .setCollisionGroups(PLAYER_COLLISION_GROUPS),
       this.body,
     );
-    this.controller = world.createCharacterController(0.02);
+    this.controller = world.createCharacterController(CONTROLLER_OFFSET);
+    this.controller.enableAutostep(MAX_STEP_HEIGHT, 0.2, false);
+    this.controller.enableSnapToGround(MAX_STEP_HEIGHT);
+    this.controller.setMaxSlopeClimbAngle(MAX_SLOPE);
 
     window.addEventListener("keydown", (e) => {
       const key = e.key.toLowerCase();
@@ -48,9 +69,12 @@ export class Player {
     return this.mesh.position;
   }
 
-  reset(position: Vector3) {
-    this.mesh.position.copy(position);
-    this.body.setTranslation(position, true);
+  reset(position: Vector3, world: World) {
+    // Start just above the given point and let gravity settle it.
+    this.mesh.position.copy(position).setY(position.y + SPAWN_LIFT);
+    this.body.setTranslation(this.mesh.position, true);
+    world.propagateModifiedBodyPositionsToColliders();
+    this.verticalVelocity = 0;
     this.keys.clear();
   }
 
@@ -60,14 +84,37 @@ export class Player {
     if (this.keys.has("s")) m.z += 1;
     if (this.keys.has("a")) m.x -= 1;
     if (this.keys.has("d")) m.x += 1;
-    if (m.lengthSq() === 0) return;
-    m.normalize().multiplyScalar(this.speed * dt);
+    if (m.lengthSq() > 0) m.normalize().multiplyScalar(this.speed * dt);
 
-    // Slide along whatever we hit; ignore any vertical correction so the player stays on the ground.
-    this.controller.computeColliderMovement(this.collider, m);
+    this.verticalVelocity -= GRAVITY * dt;
+    m.y = this.verticalVelocity * dt;
+
+    // Walk through sensors and dynamic things (dropped items); collide with everything else.
+    this.controller.computeColliderMovement(this.collider, m, QueryFilterFlags.EXCLUDE_SENSORS | QueryFilterFlags.EXCLUDE_DYNAMIC);
+    if (this.controller.computedGrounded()) this.verticalVelocity = 0;
+
     const corrected = this.controller.computedMovement();
     const t = this.body.translation();
-    this.mesh.position.set(t.x + corrected.x, t.y, t.z + corrected.z);
+    this.mesh.position.set(t.x + corrected.x, t.y + corrected.y, t.z + corrected.z);
     this.body.setNextKinematicTranslation(this.mesh.position);
+  }
+
+  /** Colliders currently touching the player. */
+  touching(world: World) {
+    const hits: Collider[] = [];
+    const { x, y, z } = this.mesh.position;
+    world.intersectionsWithShape(
+      { x, y: y + HEIGHT / 2, z },
+      NO_ROTATION,
+      this.touchShape,
+      (c) => {
+        hits.push(c);
+        return true;
+      },
+      undefined,
+      undefined,
+      this.collider,
+    );
+    return hits;
   }
 }
