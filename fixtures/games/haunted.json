@@ -1,0 +1,203 @@
+{
+  "version": 1,
+  "title": "The Chateau at Midnight",
+  "summary": "The butler of a decaying chateau died beneath the balcony, the cellar key still clenched in his hand. The old caretaker keeps tending the house as if nothing happened, and the lady of the house has never left it. Whatever they were hiding is locked in the cellar below the foyer.",
+  "rooms": [
+    {
+      "id": "foyer",
+      "name": "Foyer",
+      "grid": [0, 0],
+      "size": [20, 6, 16],
+      "start": [8, 14],
+      "baseLight": 0.2,
+      "walls": "faded victorian damask wallpaper, peeling and water stained",
+      "floor": "dark rotting wooden floorboards",
+      "doors": [
+        { "connection": "foyer-cellar", "offset": 11.5, "art": "heavy wooden door with iron hinges" },
+        { "connection": "foyer-study", "offset": 14.5, "art": "heavy wooden door with iron hinges" }
+      ],
+      "props": [
+        {
+          "id": "balcony", "name": "wooden balcony with a plain railing", "material": "dark worn oak wood grain", "position": [0, 0, 0],
+          "parts": [
+            { "shape": "box", "position": [16.6, 2.7, 3.0], "size": [6.2, 0.3, 5.4] },
+            { "shape": "box", "position": [13.6, 3, 3.0], "size": [0.1, 1, 5.4] },
+            { "shape": "box", "position": [13.8, 0, 5.4], "size": [0.35, 2.7, 0.35] },
+            { "shape": "box", "position": [13.8, 0, 0.6], "size": [0.35, 2.7, 0.35] }
+          ]
+        },
+        {
+          "id": "staircase", "name": "steep wooden staircase up to the balcony", "material": "dark worn oak wood grain", "position": [16.5, 0, 10.2],
+          "parts": [
+            { "shape": "box", "position": [0, 0, -0.225], "size": [3, 0.3, 0.45] },
+            { "shape": "box", "position": [0, 0, -0.675], "size": [3, 0.6, 0.45] },
+            { "shape": "box", "position": [0, 0, -1.125], "size": [3, 0.9, 0.45] },
+            { "shape": "box", "position": [0, 0, -1.575], "size": [3, 1.2, 0.45] },
+            { "shape": "box", "position": [0, 0, -2.025], "size": [3, 1.5, 0.45] },
+            { "shape": "box", "position": [0, 0, -2.475], "size": [3, 1.8, 0.45] },
+            { "shape": "box", "position": [0, 0, -2.925], "size": [3, 2.1, 0.45] },
+            { "shape": "box", "position": [0, 0, -3.375], "size": [3, 2.4, 0.45] },
+            { "shape": "box", "position": [0, 0, -3.825], "size": [3, 2.7, 0.45] },
+            { "shape": "box", "position": [0, 0, -4.275], "size": [3, 3.0, 0.45] },
+            { "shape": "wedge", "position": [-1.575, 0, -2.25], "size": [0.15, 3.0, 4.5] },
+            { "shape": "box", "position": [-1.575, 2.5, -2.25], "rotation": [0.588, 0, 0], "size": [0.1, 0.1, 5.41], "solid": false }
+          ]
+        },
+        {
+          "id": "hearth", "name": "soot-blackened stone hearth with a low fire", "material": "soot-blackened rough fieldstone", "position": [5, 0, 0.8],
+          "light": { "type": "glow", "color": "#ff8a3c", "intensity": 5, "range": 7, "effect": "flicker" },
+          "parts": [{ "shape": "box", "position": [0, 0, 0], "size": [3, 1.4, 1.0] }]
+        },
+        {
+          "id": "chimney-breast", "name": "stone chimney breast", "material": "soot-blackened rough fieldstone", "position": [5, 1.4, 0.6],
+          "parts": [{ "shape": "box", "position": [0, 0, 0], "size": [2, 3.6, 0.6] }]
+        },
+        {
+          "id": "couch", "name": "moth-eaten velvet couch", "material": "faded burgundy velvet upholstery", "position": [5, 0, 6],
+          "parts": [
+            { "shape": "box", "position": [0, 0, 0], "size": [3.5, 0.9, 1.2] },
+            { "shape": "box", "position": [0, 0, 0.75], "size": [3.5, 1.6, 0.3] }
+          ]
+        },
+        {
+          "id": "grandfather-clock", "name": "tall grandfather clock stopped at midnight", "position": [9.5, 0, 0.6],
+          "parts": [{ "shape": "panel", "position": [0, 0, 0], "size": [1, 3, 0], "solid": true }],
+          "examine": [{ "lines": ["Its hands are stopped at midnight. The pendulum hangs perfectly still."] }]
+        },
+        {
+          "id": "portrait", "name": "oil portrait of a stern old man with hollow eyes, ornate gold frame", "position": [2.2, 2, 0.32],
+          "parts": [{ "shape": "panel", "position": [0, 0, 0], "size": [1.2, 1.4, 0] }],
+          "examine": [{ "lines": ["The master of the house. His eyes seem to follow you across the room."] }]
+        },
+        {
+          "id": "rug", "name": "threadbare persian rug with a dark stain", "position": [8, 0.01, 9.5],
+          "parts": [{ "shape": "panel", "position": [0, 0, 0], "rotation": [-1.5708, 0, 0], "size": [4, 3, 0] }]
+        },
+        {
+          "id": "mantel-candle", "name": "single melting candle with a tall flame", "position": [4, 1.4, 1.0],
+          "light": { "type": "glow", "color": "#ffb060", "intensity": 1.5, "range": 3, "effect": "flicker" },
+          "parts": [{ "shape": "panel", "position": [0, 0, 0], "size": [0.3, 0.6, 0], "frames": ["the same candle with a short flickering flame"] }],
+          "ambient": { "art": "single drop of melted candle wax", "size": [0.08, 0.12], "everySeconds": 4, "lifetimeSeconds": 2, "velocity": [0, -0.3, 0] }
+        },
+        {
+          "id": "butler-corpse", "name": "slumped corpse in a tattered butler uniform", "position": [16, 0, 3],
+          "parts": [{ "shape": "panel", "position": [0, 0, 0], "size": [1.8, 0.9, 0], "solid": true }],
+          "examine": [{ "lines": ["The butler. Something glints in his cold, clenched hand."] }],
+          "contains": { "kind": "key", "name": "Brass Key", "art": "old ornate brass key", "unlocks": "foyer-cellar" }
+        },
+        {
+          "id": "parlor-table", "name": "small parlor table under a hanging lamp", "material": "dark worn oak wood grain", "position": [9.5, 0, 9], "rotationY": 0.3,
+          "light": { "type": "spot", "color": "#ffd9a0", "intensity": 3, "range": 2.5 },
+          "parts": [{ "shape": "box", "position": [0, 0, 0], "size": [1.6, 0.8, 1.0] }]
+        },
+        {
+          "id": "parlor-chair-left", "name": "straight-backed parlor chair", "material": "dark worn oak wood grain", "position": [8.258, 0, 9.384], "rotationY": 1.8708,
+          "parts": [
+            { "shape": "box", "position": [0, 0, 0], "size": [0.6, 0.45, 0.6] },
+            { "shape": "box", "position": [0, 0, -0.27], "size": [0.6, 1.1, 0.06] }
+          ]
+        },
+        {
+          "id": "parlor-chair-right", "name": "straight-backed parlor chair", "material": "dark worn oak wood grain", "position": [10.742, 0, 8.616], "rotationY": -1.2708,
+          "parts": [
+            { "shape": "box", "position": [0, 0, 0], "size": [0.6, 0.45, 0.6] },
+            { "shape": "box", "position": [0, 0, -0.27], "size": [0.6, 1.1, 0.06] }
+          ]
+        }
+      ],
+      "characters": [
+        {
+          "id": "ghost", "name": "Ghost", "position": [3, 0, 12], "size": [1, 2],
+          "art": { "description": "pale translucent ghost woman in a nightgown", "idle": ["floating", "floating slightly higher"] },
+          "movement": { "type": "chase", "speed": 2, "detectRadius": 5 },
+          "hostile": { "damage": 1 },
+          "light": { "type": "glow", "color": "#9fd8ff", "intensity": 1.5, "range": 3, "effect": "pulse" }
+        }
+      ]
+    },
+    {
+      "id": "cellar",
+      "name": "Cellar",
+      "grid": [0, -1],
+      "size": [14, 4, 12],
+      "start": [7, 10],
+      "baseLight": 0.08,
+      "walls": "damp cellar stone wall with moss",
+      "floor": "cracked wet cellar flagstones",
+      "doors": [{ "connection": "foyer-cellar", "offset": 7 }],
+      "props": [
+        {
+          "id": "barrel-1", "name": "old oak barrel bound with rusted iron hoops", "material": "dark worn oak wood grain", "position": [2, 0, 2], "rotationY": 0.4,
+          "parts": [{ "shape": "box", "position": [0, 0, 0], "size": [1, 1.3, 1] }]
+        },
+        {
+          "id": "barrel-2", "name": "old oak barrel bound with rusted iron hoops", "material": "dark worn oak wood grain", "position": [3.2, 0, 1.6], "rotationY": 0.1,
+          "parts": [{ "shape": "box", "position": [0, 0, 0], "size": [1, 1.3, 1] }]
+        },
+        {
+          "id": "crate", "name": "splintered wooden crate", "material": "rough pale pine planks", "position": [11, 0, 3], "rotationY": 0.7,
+          "light": { "type": "spot", "color": "#a8c0ff", "intensity": 2, "range": 2.5 },
+          "parts": [{ "shape": "box", "position": [0, 0, 0], "size": [1.2, 1, 1.2] }]
+        }
+      ],
+      "characters": [
+        {
+          "id": "rat", "name": "Rat", "position": [9, 0, 7], "size": [0.6, 0.3],
+          "art": { "description": "mangy black rat with red eyes", "idle": ["still"], "moving": ["scurrying, legs back", "scurrying, legs forward"] },
+          "movement": { "type": "wander", "speed": 1.5, "radius": 2 },
+          "hostile": { "damage": 1 }
+        }
+      ]
+    },
+    {
+      "id": "study",
+      "name": "Study",
+      "grid": [1, 0],
+      "size": [12, 5, 10],
+      "start": [6, 8],
+      "baseLight": 0.25,
+      "walls": "faded victorian damask wallpaper, peeling and water stained",
+      "floor": "dark rotting wooden floorboards",
+      "doors": [{ "connection": "foyer-study", "offset": 5, "art": "heavy wooden door with iron hinges" }],
+      "props": [
+        {
+          "id": "bookshelf", "name": "tall bookshelf crammed with mouldering books", "material": "dark worn oak wood grain", "position": [8, 0, 0.7],
+          "parts": [{ "shape": "box", "position": [0, 0, 0], "size": [3, 3.2, 0.8] }]
+        },
+        {
+          "id": "desk", "name": "heavy writing desk", "material": "dark worn oak wood grain", "position": [5, 0, 4], "rotationY": 0.15,
+          "parts": [{ "shape": "box", "position": [0, 0, 0], "size": [2.2, 0.9, 1.1] }]
+        },
+        {
+          "id": "desk-chair", "name": "worn desk chair", "material": "dark worn oak wood grain", "position": [5.2, 0, 5.3], "rotationY": 0.4,
+          "parts": [{ "shape": "box", "position": [0, 0, 0], "size": [0.6, 0.5, 0.6] }]
+        },
+        {
+          "id": "study-portrait", "name": "oil portrait of a stern old man with hollow eyes, ornate gold frame", "position": [3, 1.8, 0.32],
+          "parts": [{ "shape": "panel", "position": [0, 0, 0], "size": [1, 1.3, 0] }]
+        }
+      ],
+      "characters": [
+        {
+          "id": "caretaker", "name": "Caretaker", "position": [9, 0, 5.5], "size": [1, 1.9], "solid": true,
+          "art": { "description": "hunched elderly caretaker in a stained apron holding a dim lantern", "idle": ["standing, lantern raised"] },
+          "light": { "type": "glow", "color": "#ffc070", "intensity": 3, "range": 5, "effect": "flicker" },
+          "movement": { "type": "patrol", "speed": 0.8, "points": [[9, 5.5], [10.5, 8], [7, 8.5]] },
+          "dialogue": [
+            {
+              "lines": [
+                "You shouldn't have come back here.",
+                "The cellar's locked. Has been since the butler... well.",
+                "He always kept the key on him. Still does, I expect."
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "connections": [
+    { "id": "foyer-cellar", "rooms": ["foyer", "cellar"], "locked": true },
+    { "id": "foyer-study", "rooms": ["foyer", "study"] }
+  ]
+}
