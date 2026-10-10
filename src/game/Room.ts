@@ -6,6 +6,7 @@ import { Sprite } from "./Sprite";
 import type { Side } from "./Connection";
 import type { Object } from "./Object";
 import type { TextureLibrary } from "./TextureLibrary";
+import { PICKUP } from "../shared/constants";
 import type { Room as RoomOutput } from "./generation/output/output";
 
 const FLOOR_THICKNESS = 0.2;
@@ -15,8 +16,7 @@ const FLOOR_TILE_SIZE = 4;
 const SPAWN_OFFSET = 0.5;
 // Base brightness of a room that doesn't say: dim, so placed lights carry the scene.
 const DEFAULT_LIGHT_LEVEL = 0.25;
-// Seconds before a dropped item can be picked up, so it's seen falling out first.
-const PICKUP_DELAY = 0.75;
+const PICKUP_DELAY = PICKUP.delaySeconds;
 
 interface Emitter {
   sprite: Sprite;

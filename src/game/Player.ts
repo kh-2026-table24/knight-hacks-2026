@@ -11,24 +11,20 @@ import {
 } from "@dimforge/rapier3d-compat";
 import { CHARACTER_STRETCH, characterBrightness, createCharacterGlow } from "./characters";
 import { PLAYER_COLLISION_GROUPS } from "./Object";
+import { PLAYER } from "../shared/constants";
 import type { Item } from "./generation/output/output";
 
 const MOVE_KEYS = new Set(["w", "a", "s", "d"]);
 const WIDTH = 1;
-const HEIGHT = 1.8;
-const RADIUS = 0.35;
-const GRAVITY = 20;
-const MAX_STEP_HEIGHT = 0.35;
-const MAX_SLOPE = (50 * Math.PI) / 180;
-// How far beyond the player's collider counts as touching something.
-const TOUCH_MARGIN = 0.1;
+const { height: HEIGHT, radius: RADIUS, gravity: GRAVITY, stepHeight: MAX_STEP_HEIGHT, touchMargin: TOUCH_MARGIN } = PLAYER;
+const MAX_SLOPE = (PLAYER.maxSlopeDeg * Math.PI) / 180;
 const NO_ROTATION = { x: 0, y: 0, z: 0, w: 1 };
 // Gap the character controller keeps from surfaces. Spawning closer than this counts as stuck in the floor.
 const CONTROLLER_OFFSET = 0.02;
 const SPAWN_LIFT = 0.05;
-export const MAX_HEARTS = 4;
-// After a hit the player can't be hurt again for this long, and blinks to show it.
-const INVULNERABLE_SECONDS = 1.2;
+export const MAX_HEARTS = PLAYER.maxHearts;
+// The player blinks while invulnerable after a hit.
+const INVULNERABLE_SECONDS = PLAYER.invulnerableSeconds;
 // Placeholder color until the player has a sprite.
 const COLOR = 0xd0d0d0;
 
@@ -36,8 +32,8 @@ const COLOR = 0xd0d0d0;
 export class Player {
   readonly mesh: Mesh;
   readonly inventory: Item[] = [];
-  speed = 5;
-  hearts = MAX_HEARTS;
+  speed: number = PLAYER.speed;
+  hearts: number = MAX_HEARTS;
   /** Ignores movement keys, e.g. while a dialogue is open. */
   frozen = false;
   private invulnerableFor = 0;

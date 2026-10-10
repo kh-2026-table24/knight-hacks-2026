@@ -2,6 +2,7 @@ import { Vector3, type Object3D, type Texture } from "three";
 import { QueryFilterFlags, type KinematicCharacterController, type World } from "@dimforge/rapier3d-compat";
 import { CHARACTER_STRETCH, characterBrightness, createCharacterGlow } from "./characters";
 import { Object, PLAYER_GROUP } from "./Object";
+import { FRAME_SECONDS } from "../shared/constants";
 import type { TextureLibrary } from "./TextureLibrary";
 import type {
   Animations,
@@ -15,7 +16,6 @@ import type {
 
 export type AnimationState = keyof Animations;
 
-const FRAME_SECONDS = 1 / 6; // animation speed: 6 frames a second
 const ARRIVE_DISTANCE = 0.15; // close enough to a target to count as there
 const STUCK_SECONDS = 0.6; // blocked this long (a wall, furniture), it gives up on the target
 const PAUSE_SECONDS: Record<Movement["type"], [number, number]> = { wander: [1, 3], patrol: [0.5, 1], chase: [0.3, 0.6] };

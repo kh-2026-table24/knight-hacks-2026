@@ -2,14 +2,10 @@ import { Vector3 } from "three";
 import { Object } from "./Object";
 import type { Side } from "./Connection";
 import type { TextureLibrary } from "./TextureLibrary";
+import { DOOR } from "../shared/constants";
 import { ObjectType, type Door as DoorOutput, type Object as ObjectOutput } from "./generation/output/output";
 
-// Doors stand this far in from the room's edge, so they show in front of walls up to 0.3 thick.
-const DOOR_INSET = 0.31;
-// South exits are a dark strip this deep along the front edge of the floor.
-const EXIT_DEPTH = 0.8;
-// How far in front of a door the player appears when arriving through it.
-const ARRIVAL_DISTANCE = 1;
+const { inset: DOOR_INSET, exitDepth: EXIT_DEPTH, arrivalDistance: ARRIVAL_DISTANCE } = DOOR;
 
 const INWARD: Record<Side, Vector3> = {
   north: new Vector3(0, 0, 1),
