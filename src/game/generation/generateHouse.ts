@@ -10,7 +10,7 @@ import { rollTheme } from "./theme";
 export interface HouseOptions {
   /** Defaults to a random roll. */
   theme?: string;
-  /** Exact number of rooms; omit to let the planner choose (4 to 6). */
+  /** Exact number of rooms; omit to let the planner choose (at least 4, no upper limit). */
   roomCount?: number;
   /** Used for room layout calls instead of `ask`, e.g. to send them to a stronger model. */
   askRoom?: AskFn;

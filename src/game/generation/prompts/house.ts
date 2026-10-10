@@ -1,12 +1,12 @@
 // The planner prompt: story, rooms and connections for the whole map. The rules here must match
 // parseHousePlan in output/housePlan.ts.
-import { DEFAULT_ROOM_RANGE } from "../output/housePlan";
+import { MIN_ROOMS } from "../output/housePlan";
 import { repairSection, type RepairContext } from "./repair";
 
 const roomCountRule = (roomCount?: number) =>
   roomCount
     ? `Plan exactly ${roomCount} rooms.`
-    : `Plan ${DEFAULT_ROOM_RANGE[0]} to ${DEFAULT_ROOM_RANGE[1]} rooms; choose how many the story needs. At minimum: the grounds outside, the main room just inside, and 2 side rooms.`;
+    : `Plan as many rooms as the story needs, at least ${MIN_ROOMS}: the grounds outside, the main room just inside, and 2 or more side rooms. Every room should earn its place by revealing something new.`;
 
 export const housePrompt = (theme: string, roomCount?: number, repair?: RepairContext) => `
 You are planning the map for a short, atmospheric 3D exploration game: one building and its

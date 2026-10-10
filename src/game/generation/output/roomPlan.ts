@@ -43,7 +43,7 @@ export interface RoomPlan {
 }
 
 // Looser than what the prompt asks for, so reasonable output isn't rejected over small misses.
-export const PLAN_LIMITS = { minSide: 6, maxSide: 30, minHeight: 3, maxHeight: 10, maxItems: 40, maxParts: 16 };
+export const PLAN_LIMITS = { minSide: 6, maxSide: 30, minHeight: 3, maxHeight: 10, maxItems: 60, maxParts: 16 };
 
 const TYPES = new Set<unknown>(Object.values(ObjectType));
 

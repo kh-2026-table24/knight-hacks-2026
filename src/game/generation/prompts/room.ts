@@ -117,7 +117,7 @@ Playability. A program checks these, and failures are sent back to you:
 - startPosition is [x, 0, z] on open ground in the south third of the room, at least 1 m from any object.
 - Every item can be walked up to from the start, and every door's arrival spot is open, reachable floor.
 - Items don't pass through each other. Resting on or touching is fine.
-- 6 to 14 items. Round numbers to 2 decimal places.
+- 8 to 24 items. Round numbers to 2 decimal places.
 
 Composition:
 - Follow the layout style above, adapted to this room's brief.

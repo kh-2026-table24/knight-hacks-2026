@@ -1,32 +1,32 @@
 // Generates a house with Claude, prints what it came up with, and saves it for the game to load.
 // Needs the Claude server running (npm run server).
 //
-//   npx tsx scripts/gen-house.ts                  2 rooms, random theme
-//   npx tsx scripts/gen-house.ts auto             planner picks 4-6 rooms
-//   npx tsx scripts/gen-house.ts 2 "a lighthouse where the keeper vanished"
+//   npx tsx scripts/gen-house.ts                  random theme, the planner picks how many rooms (4+)
+//   npx tsx scripts/gen-house.ts 2                exactly 2 rooms (quick test: grounds + main room)
+//   npx tsx scripts/gen-house.ts "a lighthouse where the keeper vanished"
+//   npx tsx scripts/gen-house.ts 3 "a lighthouse where the keeper vanished"
 import { mkdir, writeFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { askClaude, ROOM_MODEL } from "../src/game/generation/askClaude";
 import { generateHouse, toSavedHouse } from "../src/game/generation/generateHouse";
 import { rollTheme } from "../src/game/generation/theme";
 
-// For now the default is the 2-room test house: the grounds outside plus the main room.
-const DEFAULT_ROOMS = 2;
 const OUT_DIR = join(import.meta.dirname, "..", "generated", "houses");
 
-const [countArg, ...themeWords] = process.argv.slice(2);
-const roomCount = countArg === "auto" ? undefined : Number(countArg ?? DEFAULT_ROOMS);
-if (roomCount !== undefined && (!Number.isInteger(roomCount) || roomCount < 2)) {
-  console.error(`Room count must be "auto" or an integer of at least 2, got "${countArg}"`);
+// An optional leading number fixes the room count; everything else is the theme.
+const args = process.argv.slice(2);
+const roomCount = /^\d+$/.test(args[0] ?? "") ? Number(args.shift()) : undefined;
+if (roomCount !== undefined && roomCount < 2) {
+  console.error(`Room count must be at least 2 (the grounds and the main room), got ${roomCount}`);
   process.exit(1);
 }
-const theme = themeWords.length ? themeWords.join(" ") : rollTheme();
+const theme = args.length ? args.join(" ") : rollTheme();
 
 const indent = (text: string) => text.split("\n").map((line) => `  ${line}`).join("\n");
 const heading = (text: string) => console.log(`\n━━ ${text} ━━`);
 const slug = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 50);
 
-console.log(`Theme\n${indent(theme)}\n\nPlanning ${roomCount ?? "4-6"} rooms...`);
+console.log(`Theme\n${indent(theme)}\n\nPlanning ${roomCount ?? "as many rooms as the story needs"}...`);
 
 try {
   const house = await generateHouse(askClaude, {

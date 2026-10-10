@@ -41,7 +41,9 @@ export interface RoomContext {
   doors: DoorSlot[];
 }
 
-export const DEFAULT_ROOM_RANGE: [number, number] = [4, 6];
+/** The grounds, the main room and at least 2 side rooms. There is no upper limit: the planner
+ * decides how many the story needs, and the grid rules keep any number of rooms consistent. */
+export const MIN_ROOMS = 4;
 
 type Fields = Record<string, unknown>;
 const isFields = (v: unknown): v is Fields => typeof v === "object" && v !== null && !Array.isArray(v);
@@ -77,9 +79,8 @@ export function parseHousePlan(value: unknown, roomCount?: number): { plan: Hous
   if (!story) errors.push("story must be a non-empty string");
 
   const rawRooms = Array.isArray(value.rooms) ? value.rooms : [];
-  const [min, max] = roomCount ? [roomCount, roomCount] : DEFAULT_ROOM_RANGE;
-  if (rawRooms.length < min || rawRooms.length > max) {
-    errors.push(roomCount ? `There must be exactly ${roomCount} rooms, got ${rawRooms.length}` : `There must be ${min} to ${max} rooms, got ${rawRooms.length}`);
+  if (roomCount ? rawRooms.length !== roomCount : rawRooms.length < MIN_ROOMS) {
+    errors.push(roomCount ? `There must be exactly ${roomCount} rooms, got ${rawRooms.length}` : `There must be at least ${MIN_ROOMS} rooms, got ${rawRooms.length}`);
   }
   const rooms = rawRooms.flatMap((r, i) => parseRoom(r, i, errors) ?? []);
 
