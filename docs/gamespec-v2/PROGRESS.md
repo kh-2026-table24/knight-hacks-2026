@@ -32,8 +32,8 @@ To resume: read PLAN.md (Part A), this file, AGENTS.md and `git log --oneline -2
 ## M4 Engine on the spec (CHECKPOINT)
 - [x] 4.1 art.ts (+ G8 art budget in validate.ts)  (b8b41f6)
 - [x] 4.2 server onto the spec + retire the old pipeline  (d5d064e)
-- [x] 4.3 renames (Part, Prop, Character)
-- [ ] 4.4 engine rework onto GameSpec
+- [x] 4.3 renames (Part, Prop, Character)  (5b30992)
+- [x] 4.4 engine rework onto GameSpec
 - [ ] 4.5 regenerate haunted art, delete old game dirs, gitignore
 
 ## M5 Engine hardening
@@ -91,6 +91,9 @@ To resume: read PLAN.md (Part A), this file, AGENTS.md and `git log --oneline -2
 - 3.2: walkGrid gets `levelPath(from, to, y)` instead of the planned `floodFromAt`. Characters slide on level ground and never step up, so a level-only flood matches how they actually move.
 - 0.1: The plan said to merge the in-progress work into main first. It needs a teammate review, so instead it's committed on `feat/caleb-npc-hud`, and this branch is stacked on top of it. Merge that PR first, then rebase this branch onto main.
 - PRs: `gh` isn't installed in the agent's environment, and `git push` over SSH fails there too ("Could not read from remote repository"). The developer pushes both branches (`git push -u origin feat/caleb-npc-hud feat/caleb-gamespec-v2`) and opens the PRs.
+
+- 4.4: Added `scripts/check-play.ts` (`npm run check:play`), a headless playthrough of the haunted fixture using the real engine (rooms, Rapier, interactions, GameState) with window/document stand-ins. It checks the locked door, examine and search, the key drop and pickup, unlocking, every door, the caretaker's dialogue, ghost damage and death. It is now a gate from M4 on. Gotcha found while building it: Rapier calls `window.performance.now()` whenever a `window` global exists, so a fake window must include `performance`.
+- 4.4: Two M5/M6 items landed early because the rework needed them: moving characters always get a collider (5.5), and the HUD accepts an item icon URL (6.4 only has to pass it).
 
 ## Blockers
 - (none)

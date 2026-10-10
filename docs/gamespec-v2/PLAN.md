@@ -44,7 +44,7 @@ The game server generates on demand.
 ### A2. The loop (each iteration)
 1. Read `docs/gamespec-v2/PLAN.md`, `PROGRESS.md`, `AGENTS.md` and `git log --oneline -20`. Confirm with `git branch --show-current` that the branch is `feat/caleb-gamespec-v2`; if it isn't, stop.
 2. Pick the **first unchecked task** in PROGRESS.md and do exactly what this plan specifies for it.
-3. Run the gates: always `npm run build`; from M2 on, `npm run check`; from M8 on, `npm run check:gen`.
+3. Run the gates: always `npm run build`; from M2 on, `npm run check`; from M4 on, `npm run check:play` (a headless playthrough of the haunted fixture, added during M4); from M8 on, `npm run check:gen`.
 4. If they fail, fix and retry. **After 3 failed fix attempts on the same gate, stop** and write a blocker entry.
 5. Commit, one commit per task: `<type>(<area>): <summary>` (for example `feat(shared): add GameSpec parser`). End the message with `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
 6. Tick the task in PROGRESS.md with the short commit hash, note any deviation, then commit PROGRESS.md (it can go in the same commit as the task).

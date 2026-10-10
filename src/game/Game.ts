@@ -1,25 +1,28 @@
+import { collectArt } from "../shared/art";
+import { doorSides } from "../shared/checkGame";
+import type { GameSpec } from "../shared/spec";
 import { Connection } from "./Connection";
+import { GameState } from "./GameState";
 import { Room } from "./Room";
 import { TextureLibrary } from "./TextureLibrary";
-import type { SavedGame } from "./generation/output/output";
 
+/** A validated GameSpec built into rooms, plus the state of the game being played. */
 export class Game {
-  readonly id: string;
+  readonly state = new GameState();
   readonly textures: TextureLibrary;
   readonly connections: Map<string, Connection>;
   readonly rooms: Map<string, Room>;
   readonly startRoom: Room;
 
-  constructor(output: SavedGame) {
-    if (output.rooms.length === 0) throw new Error("Game has no rooms");
-    this.id = output.id;
-    this.textures = new TextureLibrary(output.textures);
-
-    const grid = new Map(output.rooms.map((r) => [r.id, r.gridPosition]));
-    this.connections = new Map(output.connections.map((c) => [c.id, new Connection(c, grid)]));
-    this.rooms = new Map(
-      output.rooms.map((r) => [r.id, new Room(r, this.textures, (id) => this.connections.get(id)?.sideIn(r.id))]),
-    );
-    this.startRoom = this.rooms.get(output.rooms[0].id)!;
+  constructor(
+    /** The server's id for the game; its assets are served under it. */
+    readonly id: string,
+    readonly spec: GameSpec,
+  ) {
+    this.textures = new TextureLibrary(collectArt(spec));
+    this.connections = new Map(spec.connections.map((c) => [c.id, new Connection(c, this.state)]));
+    const sides = doorSides(spec.rooms, spec.connections);
+    this.rooms = new Map(spec.rooms.map((room) => [room.id, new Room(room, this.textures, sides.get(room.id) ?? new Map(), this.state)]));
+    this.startRoom = this.rooms.get(spec.rooms[0].id)!;
   }
 }

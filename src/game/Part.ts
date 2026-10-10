@@ -1,17 +1,16 @@
 import { BoxGeometry, DoubleSide, Mesh, MeshStandardMaterial, PlaneGeometry, PointLight, Quaternion, SpotLight, Vector3, type BufferGeometry, type Object3D, type Texture, type Vector3Tuple } from "three";
 import { ConvexGeometry } from "three/examples/jsm/geometries/ConvexGeometry.js";
 import { ColliderDesc, RigidBodyDesc, type Collider, type RigidBody, type World } from "@dimforge/rapier3d-compat";
-import { ObjectType, type Light, type Object as ObjectOutput } from "./generation/output/output";
-import type { TextureLibrary } from "./TextureLibrary";
+import type { LightSpec, PartSpec, Shape } from "../shared/spec";
 import { applyWorldUVs } from "./worldUVs";
 
-// Planes have no depth, so their collider gets some to stop the player clipping through.
+// Panels have no depth, so their collider gets some to stop the player clipping through.
 const PLANE_COLLIDER_DEPTH = 0.3;
-// Meters covered by one repeat of a box or ramp's surface texture, so pixels are the same size on
+// Meters covered by one repeat of a box or wedge's surface texture, so pixels are the same size on
 // every face instead of one texture stretched across each face whatever its size.
 const SURFACE_TILE_SIZE = 2;
 
-// Rapier collision groups are (membership << 16) | filter. Dynamic objects (dropped items)
+// Rapier collision groups are (membership << 16) | filter. Dynamic objects (dropped items, particles)
 // land on everything except the player, so they don't get shoved around or block movement.
 export const PLAYER_GROUP = 0x0002;
 const DYNAMIC_GROUP = 0x0004;
@@ -22,64 +21,60 @@ const DYNAMIC_COLLISION_GROUPS = (DYNAMIC_GROUP << 16) | (0xffff & ~PLAYER_GROUP
 // as stuck to a character controller, which then won't slide sideways.
 const MOVER_LIFT = 0.05;
 
-// Output light intensities are on a friendly scale (1 = a candle); this converts to three.js candela.
+// Light intensities are on a friendly scale (1 = a candle); this converts to three.js candela.
 const LIGHT_CANDELA = 6;
-// A glow sits this far up the object (near its top) and this far in front of it, so the object
-// and the floor in front of it catch the light instead of it hiding inside a box.
+// A glow sits this far up the part (near its top) and this far in front of it, so the part and the
+// floor in front of it catch the light instead of it hiding inside a box.
 const GLOW_HEIGHT = 0.8;
 const GLOW_FORWARD = 0.3;
-// Spots shine down from this far above the object's top.
+// Spots shine down from this far above the part's top.
 const SPOT_HEIGHT = 4;
-// How much a glowing object lights up its own surface. Strong for flat cutouts (a candle, a ghost);
+// How much a glowing part lights up its own surface. Strong for flat cutouts (a candle, a ghost);
 // faint for boxes and wedges, which otherwise turn into flat blocks of color.
-const SELF_GLOW: Record<ObjectType, number> = {
-  [ObjectType.RectPrism]: 0.15,
-  [ObjectType.RightTriPrism]: 0.15,
-  [ObjectType.Plane]: 0.7,
-};
+const SELF_GLOW: Record<Shape, number> = { box: 0.15, wedge: 0.15, panel: 0.7 };
+const COLORS: Record<Shape, number> = { box: 0x5a5048, wedge: 0x4a443e, panel: 0x2f3b2a };
 
-const COLORS: Record<ObjectType, number> = {
-  [ObjectType.RectPrism]: 0x5a5048,
-  [ObjectType.RightTriPrism]: 0x4a443e,
-  [ObjectType.Plane]: 0x2f3b2a,
-};
+/** What the engine builds a part from. Walls, doors, characters and pickups are parts too. */
+export type PartShape = Pick<PartSpec, "shape" | "position" | "rotation" | "size" | "solid">;
 
-// position: bottom-center of the object. rotation: Euler radians. scale: size [width, height, depth].
-// RightTriPrism (unrotated) is a ramp: low at +z and rises to full height at -z. Plane (unrotated) faces +z and ignores depth.
+// position: bottom-center. rotation: Euler radians. size: [width, height, depth].
+// A wedge (unrotated) is low at +z and rises to full height at -z. A panel (unrotated) faces +z and ignores depth.
 export class Part {
-  readonly id: string;
-  readonly type: ObjectType;
-  /** [width, height, depth] from the output's scale. */
+  readonly shape: Shape;
+  /** [width, height, depth]. */
   readonly size: Vector3;
   readonly mesh: Mesh<BufferGeometry, MeshStandardMaterial>;
   /** Blocks movement. */
   readonly solid: boolean;
-  /** Simulated by physics (falls under gravity) instead of fixed in place. */
+  /** Simulated by physics (falls under gravity) instead of fixed in place. Set before adding it to the world. */
   dynamic = false;
-  /** Moves under its own control (NPCs) instead of being fixed in place. */
+  /** How strongly gravity pulls a dynamic part; 0 for things that float. */
+  gravityScale = 1;
+  /** Not solid, but still gets a collider (a sensor) so touching it can do something. Set before adding it to the world. */
+  sensor = false;
+  /** Moves under its own control (characters) instead of being fixed in place. */
   private kinematic = false;
   private readonly colliderDesc: ColliderDesc | null;
   protected body: RigidBody | null = null;
   protected collider: Collider | null = null;
-  readonly lightSpec: Light | undefined;
+  readonly lightSpec: LightSpec | undefined;
   private light: PointLight | SpotLight | null = null;
   private readonly lightPhase = Math.random() * 100;
 
-  constructor(output: ObjectOutput, textures: TextureLibrary) {
-    this.id = output.id;
-    this.type = output.type;
-    this.size = new Vector3().fromArray(output.scale);
-    const [w, h, d] = output.scale;
+  constructor(spec: PartShape, options: { texture?: Texture; light?: LightSpec } = {}) {
+    this.shape = spec.shape;
+    this.size = new Vector3().fromArray(spec.size);
+    const [w, h, d] = spec.size;
     let geometry: BufferGeometry;
     let colliderDesc: ColliderDesc | null;
 
-    switch (output.type) {
-      case ObjectType.RectPrism:
+    switch (spec.shape) {
+      case "box":
         geometry = new BoxGeometry(w, h, d).translate(0, h / 2, 0);
         applyWorldUVs(geometry, SURFACE_TILE_SIZE);
         colliderDesc = ColliderDesc.cuboid(w / 2, h / 2, d / 2).setTranslation(0, h / 2, 0);
         break;
-      case ObjectType.RightTriPrism: {
+      case "wedge": {
         // prettier-ignore
         const points = new Float32Array([
           -w / 2, 0, -d / 2,   w / 2, 0, -d / 2,
@@ -88,36 +83,36 @@ export class Part {
         ]);
         const vectors: Vector3[] = [];
         for (let i = 0; i < points.length; i += 3) vectors.push(new Vector3().fromArray(points, i));
-        // ConvexGeometry has no UVs at all, so without this the ramp can't show its texture.
+        // ConvexGeometry has no UVs at all, so without this the wedge can't show its texture.
         geometry = new ConvexGeometry(vectors);
         applyWorldUVs(geometry, SURFACE_TILE_SIZE);
         colliderDesc = ColliderDesc.convexHull(points);
         break;
       }
-      case ObjectType.Plane:
+      case "panel":
         geometry = new PlaneGeometry(w, h).translate(0, h / 2, 0);
         colliderDesc = ColliderDesc.cuboid(w / 2, h / 2, PLANE_COLLIDER_DEPTH / 2).setTranslation(0, h / 2, 0);
         break;
       default:
-        throw new Error(`Unknown object type: ${output.type}`);
+        throw new Error(`Unknown shape: ${spec.shape satisfies never}`);
     }
 
-    this.mesh = new Mesh(geometry, new MeshStandardMaterial({ color: COLORS[output.type], side: DoubleSide }));
-    this.mesh.position.fromArray(output.position);
-    this.mesh.rotation.fromArray(output.rotation);
-    this.solid = output.collisionsEnabled;
+    this.mesh = new Mesh(geometry, new MeshStandardMaterial({ color: COLORS[spec.shape], side: DoubleSide }));
+    this.mesh.position.fromArray(spec.position);
+    this.mesh.rotation.fromArray(spec.rotation);
+    this.solid = spec.solid;
     this.colliderDesc = colliderDesc;
-    this.lightSpec = output.light;
+    this.lightSpec = options.light;
     if (this.lightSpec?.type === "glow") {
       this.mesh.material.emissive.set(this.lightSpec.color);
-      this.mesh.material.emissiveIntensity = SELF_GLOW[output.type];
+      this.mesh.material.emissiveIntensity = SELF_GLOW[spec.shape];
     }
-    this.setTexture(textures.get(output.textureId));
+    this.setTexture(options.texture);
   }
 
-  /** Whether touching this does something. Non-solid touchable objects get a sensor collider. */
+  /** Whether touching this does something. Non-solid touchable parts get a sensor collider. */
   get touchable() {
-    return false;
+    return this.sensor;
   }
 
   get colliderHandle() {
@@ -130,23 +125,30 @@ export class Part {
     material.map = texture;
     material.color.set(0xffffff);
     material.alphaTest = 0.5;
-    // A glowing object lights up its own picture rather than a flat block of color.
+    // A glowing part lights up its own picture rather than a flat block of color.
     if (this.lightSpec?.type === "glow") material.emissiveMap = texture;
     material.needsUpdate = true;
+  }
+
+  /** Swaps in another animation frame. Setting the maps directly avoids recompiling the material. */
+  showFrame(texture: Texture) {
+    const material = this.mesh.material;
+    material.map = texture;
+    if (material.emissiveMap) material.emissiveMap = texture;
   }
 
   addTo(parent: Object3D, world: World) {
     parent.add(this.mesh);
     if (this.lightSpec && !this.light) this.light = this.createLight(this.lightSpec);
-    // Dynamic objects always collide with the world so they can land on things.
+    // Dynamic parts always collide with the world so they can land on things.
     const solid = this.solid || this.dynamic;
     if (!this.colliderDesc || this.body || (!solid && !this.touchable)) return;
 
-    // Use the world transform so objects inside groups collide where they appear.
+    // Use the world transform so parts inside props collide where they appear.
     const position = this.mesh.getWorldPosition(new Vector3());
     const quaternion = this.mesh.getWorldQuaternion(new Quaternion());
     const bodyDesc = this.dynamic
-      ? RigidBodyDesc.dynamic().lockRotations()
+      ? RigidBodyDesc.dynamic().lockRotations().setGravityScale(this.gravityScale)
       : this.kinematic
         ? RigidBodyDesc.kinematicPositionBased()
         : RigidBodyDesc.fixed();
@@ -163,6 +165,12 @@ export class Part {
       this.body = null;
       this.collider = null;
     }
+  }
+
+  /** Frees the GPU copies of this part's geometry and material. Textures are shared, so they stay. */
+  dispose() {
+    this.mesh.geometry.dispose();
+    this.mesh.material.dispose();
   }
 
   /** For things that move themselves: a kinematic body, with the collider lifted off the floor. */
@@ -186,9 +194,9 @@ export class Part {
         : base * (0.55 + 0.45 * Math.sin(t * 2.2));
   }
 
-  // The light is a child of the mesh so it moves with it (moving sprites carry their light), but
-  // it's placed in world terms (above, in front) so rotated or grouped objects still light correctly.
-  private createLight({ type, color, intensity, range }: Light) {
+  // The light is a child of the mesh so it moves with it (moving characters carry their light), but
+  // it's placed in world terms (above, in front) so rotated or grouped parts still light correctly.
+  private createLight({ type, color, intensity, range }: LightSpec) {
     this.mesh.updateWorldMatrix(true, false);
     const base = this.mesh.getWorldPosition(new Vector3());
     const top = base.y + this.size.y;
@@ -215,7 +223,7 @@ export class Part {
     this.body?.setLinvel({ x: velocity[0], y: velocity[1], z: velocity[2] }, true);
   }
 
-  /** Move the mesh to where physics put it. Only for dynamic objects added directly to the scene. */
+  /** Moves the mesh to where physics put it. Only for dynamic parts added directly to the scene. */
   syncFromPhysics() {
     if (this.dynamic && this.body) this.mesh.position.copy(this.body.translation());
   }

@@ -12,7 +12,6 @@ import {
 import { CHARACTER_STRETCH, characterBrightness, createCharacterGlow } from "./characters";
 import { PLAYER_COLLISION_GROUPS } from "./Part";
 import { PLAYER } from "../shared/constants";
-import type { Item } from "./generation/output/output";
 
 const MOVE_KEYS = new Set(["w", "a", "s", "d"]);
 const WIDTH = 1;
@@ -22,18 +21,16 @@ const NO_ROTATION = { x: 0, y: 0, z: 0, w: 1 };
 // Gap the character controller keeps from surfaces. Spawning closer than this counts as stuck in the floor.
 const CONTROLLER_OFFSET = 0.02;
 const SPAWN_LIFT = 0.05;
-export const MAX_HEARTS = PLAYER.maxHearts;
-// The player blinks while invulnerable after a hit.
-const INVULNERABLE_SECONDS = PLAYER.invulnerableSeconds;
 // Placeholder color until the player has a sprite.
 const COLOR = 0xd0d0d0;
 
-/** The protagonist: an upright 2D plane facing the camera, moved with WASD on the ground (XZ) plane. */
+/**
+ * The protagonist: an upright 2D plane facing the camera, moved with WASD on the ground (XZ) plane.
+ * Hearts and keys are game state (GameState); the player only knows whether it's mid-blink after a hit.
+ */
 export class Player {
   readonly mesh: Mesh;
-  readonly inventory: Item[] = [];
   speed: number = PLAYER.speed;
-  hearts: number = MAX_HEARTS;
   /** Ignores movement keys, e.g. while a dialogue is open. */
   frozen = false;
   private invulnerableFor = 0;
@@ -93,16 +90,18 @@ export class Player {
     this.material.color.set(COLOR).multiplyScalar(characterBrightness(lightLevel));
   }
 
-  /** Takes `amount` hearts unless recently hit. Returns whether it landed. */
-  hurt(amount: number) {
-    if (this.invulnerableFor > 0 || this.hearts === 0) return false;
-    this.hearts = Math.max(0, this.hearts - amount);
-    this.invulnerableFor = INVULNERABLE_SECONDS;
-    return true;
+  /** False during the blinking grace period after a hit, when further hits don't land. */
+  get vulnerable() {
+    return this.invulnerableFor === 0;
   }
 
-  heal() {
-    this.hearts = MAX_HEARTS;
+  /** Starts the blinking grace period. */
+  startInvulnerability(seconds: number) {
+    this.invulnerableFor = seconds;
+  }
+
+  /** Ends the grace period early and stops blinking. */
+  clearInvulnerability() {
     this.invulnerableFor = 0;
     this.material.visible = true;
   }

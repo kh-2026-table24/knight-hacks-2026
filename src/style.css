@@ -64,8 +64,25 @@ body {
 
 .hud-items[hidden],
 .hud-hint[hidden],
-.hud-dialogue[hidden] {
+.hud-dialogue[hidden],
+.hud-message[hidden] {
   display: none;
+}
+
+/* Loading and error messages, centered over a dimmed game. */
+.hud-message {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.7);
+  font-size: 22px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  text-align: center;
 }
 
 .hud-item {

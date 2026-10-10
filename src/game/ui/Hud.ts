@@ -1,11 +1,14 @@
-import { ItemType, type Dialogue, type Item } from "../generation/output/output";
+// The 2D overlay: hearts, the items the player carries, a hint line, the dialogue box and a centered
+// message for loading and errors. It's plain HTML over the canvas, so it stays crisp instead of going
+// through the retro filter. The art in public/ui/ is shared by every game (scripts/gen-ui.ts makes it).
+const DEFAULT_ITEM_ICON = "/ui/key.png";
 
-// The 2D overlay: hearts, the items the player carries, a hint line and the dialogue box. It's
-// plain HTML over the canvas, so it stays crisp instead of going through the retro filter. The art
-// in public/ui/ is shared by every game (scripts/gen-ui.ts makes it).
-const ITEM_ICONS: Record<ItemType, string> = {
-  [ItemType.Key]: "/ui/key.png",
-};
+/** An item as the HUD shows it. */
+export interface HudItem {
+  name: string;
+  /** Defaults to the shared key icon. */
+  iconUrl?: string;
+}
 
 const element = <K extends keyof HTMLElementTagNameMap>(tag: K, className: string, parent?: HTMLElement) => {
   const el = document.createElement(tag);
@@ -19,6 +22,7 @@ export class Hud {
   private readonly hearts: HTMLElement;
   private readonly items: HTMLElement;
   private readonly hint: HTMLElement;
+  private readonly message: HTMLElement;
 
   constructor(parent: HTMLElement = document.body) {
     const root = element("div", "hud", parent);
@@ -26,8 +30,16 @@ export class Hud {
     this.hearts = element("div", "hud-hearts", root);
     this.hint = element("div", "hud-hint", root);
     this.dialogue = new DialogueBox(root);
+    this.message = element("div", "hud-message", root);
     this.setItems([]);
     this.setHint(null);
+    this.showMessage(null);
+  }
+
+  /** A centered message over the game ("Generating…", or why a game couldn't load); null hides it. */
+  showMessage(text: string | null) {
+    this.message.hidden = !text;
+    this.message.textContent = text ?? "";
   }
 
   setHearts(current: number, max: number) {
@@ -42,13 +54,18 @@ export class Hud {
   }
 
   /** Shows the items as a row of icons, hidden while there are none. */
-  setItems(items: Item[]) {
+  setItems(items: HudItem[]) {
     this.items.hidden = items.length === 0;
     this.items.replaceChildren(
       ...items.map((item) => {
         const slot = element("div", "hud-item");
         const icon = element("img", "hud-item-icon", slot);
-        icon.src = ITEM_ICONS[item.type];
+        icon.src = item.iconUrl ?? DEFAULT_ITEM_ICON;
+        // A generated icon that hasn't been made yet (or failed) falls back to the shared one.
+        icon.onerror = () => {
+          icon.onerror = null;
+          icon.src = DEFAULT_ITEM_ICON;
+        };
         icon.alt = "";
         element("span", "hud-item-name", slot).textContent = item.name;
         return slot;
@@ -98,8 +115,8 @@ export class DialogueBox {
     return !this.box.hidden;
   }
 
-  /** Plays the dialogue and resolves once the player has read the last line. */
-  async play({ speaker, lines }: Dialogue) {
+  /** Plays the lines and resolves once the player has read the last one. An empty speaker hides the name. */
+  async play(lines: string[], speaker = "") {
     this.box.hidden = false;
     this.speaker.textContent = speaker;
     this.speaker.hidden = !speaker;

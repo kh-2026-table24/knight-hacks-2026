@@ -1,41 +1,36 @@
 import { Vector3, type Object3D, type Texture } from "three";
 import { QueryFilterFlags, type KinematicCharacterController, type World } from "@dimforge/rapier3d-compat";
+import { artFor } from "../shared/art";
+import { FRAME_SECONDS } from "../shared/constants";
+import { DEFAULTS, type CharacterSpec, type Conversation, type Damage, type ItemSpec, type Movement } from "../shared/spec";
 import { CHARACTER_STRETCH, characterBrightness, createCharacterGlow } from "./characters";
 import { Part, PLAYER_GROUP } from "./Part";
-import { FRAME_SECONDS } from "../shared/constants";
 import type { TextureLibrary } from "./TextureLibrary";
-import type {
-  Animations,
-  CollisionAction,
-  Dialogue,
-  EmitAction,
-  Item,
-  Movement,
-  Sprite as SpriteOutput,
-} from "./generation/output/output";
 
-export type AnimationState = keyof Animations;
+type AnimationState = "idle" | "moving";
+const ANIMATION_STATES: AnimationState[] = ["idle", "moving"];
 
 const ARRIVE_DISTANCE = 0.15; // close enough to a target to count as there
 const STUCK_SECONDS = 0.6; // blocked this long (a wall, furniture), it gives up on the target
 const PAUSE_SECONDS: Record<Movement["type"], [number, number]> = { wander: [1, 3], patrol: [0.5, 1], chase: [0.3, 0.6] };
 // A chaser gives up once the player is this many times its detectRadius away.
 const CHASE_GIVE_UP = 1.5;
-// NPCs walk through the player rather than getting blocked by them: their movement ignores colliders in the player's group.
+// Characters walk through the player rather than getting blocked by them: their movement ignores colliders in the player's group.
 const NPC_QUERY_GROUPS = (0xffff << 16) | (0xffff & ~PLAYER_GROUP);
 
+/**
+ * Someone (or something) in a room: drawn as a flat 2D figure, it may wander, patrol or chase, talk
+ * when the player presses [E], hand over an item, or hurt to touch. Always placed at room level, so its
+ * position is in room coordinates.
+ */
 export class Character extends Part {
-  /** Frames per state, with unknown texture ids dropped. */
-  readonly animations: Partial<Record<AnimationState, Texture[]>> = {};
-  readonly collision: CollisionAction | undefined;
-  readonly emit: EmitAction | undefined;
-  readonly item: Item | undefined;
+  readonly id: string;
+  readonly name: string;
+  readonly dialogue: Conversation[] | undefined;
+  readonly gives: ItemSpec | undefined;
+  readonly hostile: Damage | undefined;
   readonly movement: Movement | undefined;
-  readonly dialogues: Dialogue[];
-  /** How many times the player has talked to it. */
-  private conversations = 0;
-  /** Drawn as a flat 2D character (raw picture plus glow) rather than a lit surface. */
-  private readonly characterLook: boolean;
+  private readonly animations: Partial<Record<AnimationState, Texture[]>> = {};
 
   private readonly home: Vector3;
   private readonly target = new Vector3();
@@ -49,58 +44,42 @@ export class Character extends Part {
   private frame = 0;
   private frameTime = 0;
 
-  constructor(output: SpriteOutput, textures: TextureLibrary) {
-    super(output, textures);
-
-    for (const state in output.animations) {
-      const ids = output.animations[state as AnimationState] ?? [];
-      const frames = ids.map((id) => textures.get(id)).filter((t) => t !== undefined);
-      if (frames.length > 0) this.animations[state as AnimationState] = frames;
+  constructor(spec: CharacterSpec, textures: TextureLibrary) {
+    const [w, h] = spec.size;
+    super({ shape: "panel", position: spec.position, rotation: [0, 0, 0], size: [w, h, 0], solid: spec.solid }, { light: spec.light });
+    this.id = spec.id;
+    this.name = spec.name;
+    this.dialogue = spec.dialogue;
+    this.gives = spec.gives;
+    this.hostile = spec.hostile;
+    this.movement = spec.movement;
+    const frames = artFor.character(spec.art, spec.size);
+    for (const state of ANIMATION_STATES) {
+      const list = frames[state].flatMap((art) => textures.get(art.id) ?? []);
+      if (list.length > 0) this.animations[state] = list;
     }
-    this.collision = output.actions?.collision;
-    this.emit = output.actions?.emit;
-    this.item = output.item;
-    this.movement = output.movement;
-    this.dialogues = (output.dialogues ?? []).filter((d) => d.lines.length > 0);
     this.home = this.mesh.position.clone();
 
-    this.characterLook = this.isNpc;
-    if (this.characterLook) {
-      // Unaffected by nearby lights: black base color, with the picture drawn as emission instead.
-      this.mesh.material.color.set(0x000000);
-      this.mesh.material.emissive.set(0xffffff);
-      this.mesh.material.emissiveIntensity = characterBrightness(0.25);
-      this.mesh.geometry.scale(1, CHARACTER_STRETCH, 1);
-      // A glow like the player's, unless it already gives off a light of its own.
-      if (!this.lightSpec) this.mesh.add(createCharacterGlow(this.size.y));
-    }
+    // Unaffected by nearby lights (which make cutouts look like lit cardboard): black base color, with
+    // the picture drawn as emission at a brightness the room sets.
+    this.mesh.material.color.set(0x000000);
+    this.mesh.material.emissive.set(0xffffff);
+    this.mesh.material.emissiveIntensity = characterBrightness(DEFAULTS.baseLight);
+    this.mesh.geometry.scale(1, CHARACTER_STRETCH, 1);
+    // A glow like the player's, unless it already gives off a light of its own.
+    if (!this.lightSpec) this.mesh.add(createCharacterGlow(h));
     if (this.movement) this.makeKinematic();
-    this.setTexture(this.animations.idle?.[0] ?? this.mesh.material.map ?? undefined);
+    this.setTexture(this.animations.idle?.[0]);
   }
 
-  /** Characters: anything that moves on its own or can be talked to. */
-  get isNpc() {
-    return this.movement !== undefined || this.dialogues.length > 0;
-  }
-
+  // Hostile ones hurt on touch; moving ones need a collider for their controller to steer around things.
   override get touchable() {
-    return (
-      this.item !== undefined ||
-      this.collision !== undefined ||
-      this.dialogues.length > 0 ||
-      this.emit?.when.type === "collision"
-    );
+    return this.hostile !== undefined || this.movement !== undefined;
   }
 
-  /** The conversation to play next: each talk moves on to the next one, and the last one repeats. */
-  nextDialogue(): Dialogue | undefined {
-    if (this.dialogues.length === 0) return undefined;
-    return this.dialogues[Math.min(this.conversations++, this.dialogues.length - 1)];
-  }
-
-  /** Characters are drawn at a brightness set by the room's lightLevel. */
+  /** Characters are drawn at a brightness set by the room's base light. */
   setRoomLight(lightLevel: number) {
-    if (this.characterLook) this.mesh.material.emissiveIntensity = characterBrightness(lightLevel);
+    this.mesh.material.emissiveIntensity = characterBrightness(lightLevel);
   }
 
   /** Advances movement and animation. `paused` holds movement (e.g. while a dialogue is open). */
@@ -112,7 +91,7 @@ export class Character extends Part {
 
   protected override setTexture(texture: Texture | undefined) {
     super.setTexture(texture);
-    if (!texture || !this.characterLook) return;
+    if (!texture) return;
     // setTexture makes the base color white; characters keep it black and show the picture as emission.
     this.mesh.material.color.set(0x000000);
     this.mesh.material.emissiveMap = texture;
@@ -131,8 +110,7 @@ export class Character extends Part {
     }
   }
 
-  // Moves toward the current target, sliding along whatever it bumps into. Assumes the sprite is
-  // at room level (not inside a group), so its position is in room coordinates.
+  // Moves toward the current target, sliding along whatever it bumps into.
   private move(dt: number, movement: Movement, player: Vector3) {
     if (movement.type === "chase") this.aimChase(movement.detectRadius, player);
     if (this.pauseFor > 0) {
@@ -191,8 +169,7 @@ export class Character extends Part {
     if (movement.type === "chase") {
       this.target.set(this.home.x, 0, this.home.z);
     } else if (movement.type === "patrol") {
-      if (movement.points.length === 0) return false;
-      const [x, , z] = movement.points[this.patrolIndex % movement.points.length];
+      const [x, z] = movement.points[this.patrolIndex % movement.points.length];
       this.target.set(x, 0, z);
     } else {
       // A random spot within `radius` of where it was placed, spread evenly over the circle.
@@ -222,9 +199,6 @@ export class Character extends Part {
     if (this.frameTime < FRAME_SECONDS) return;
     this.frameTime = 0;
     this.frame = (this.frame + 1) % frames.length;
-    // Swap the picture directly; going through setTexture would recompile the material each frame.
-    const material = this.mesh.material;
-    material.map = frames[this.frame];
-    if (material.emissiveMap) material.emissiveMap = frames[this.frame];
+    this.showFrame(frames[this.frame]);
   }
 }

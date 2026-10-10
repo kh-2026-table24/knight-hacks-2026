@@ -9,6 +9,7 @@
     "dev:web": "vite",
     "build": "tsc && tsc -p server && tsc -p scripts && vite build",
     "check": "tsx scripts/check-specs.ts",
+    "check:play": "tsx scripts/check-play.ts",
     "preview": "vite preview",
     "claude": "tsx scripts/claude.ts",
     "server": "tsx scripts/server.ts",

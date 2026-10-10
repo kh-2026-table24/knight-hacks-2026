@@ -1,17 +1,15 @@
 import { ImageLoader, NearestFilter, RepeatWrapping, SRGBColorSpace, Texture } from "three";
-import type { Texture as TextureOutput } from "./generation/output/output";
+import type { ArtJob } from "../shared/art";
 
 const imageLoader = new ImageLoader();
 
-// Every texture id gets one shared Texture up front, showing a flat placeholder.
-// setImage swaps the generated image in later, and everything using it updates.
+// Every art id gets one shared Texture up front, showing a flat placeholder. load() swaps the generated
+// images in as they arrive, and everything using a texture updates with it.
 export class TextureLibrary {
-  readonly prompts: Map<string, string>;
   private readonly textures = new Map<string, Texture>();
 
-  constructor(outputs: TextureOutput[]) {
-    this.prompts = new Map(outputs.map((t) => [t.id, t.prompt]));
-    for (const { id } of outputs) {
+  constructor(private readonly jobs: Map<string, ArtJob>) {
+    for (const id of jobs.keys()) {
       const texture = new Texture(placeholderImage());
       texture.colorSpace = SRGBColorSpace;
       texture.wrapS = texture.wrapT = RepeatWrapping;
@@ -22,18 +20,32 @@ export class TextureLibrary {
     }
   }
 
+  get ids() {
+    return [...this.jobs.keys()];
+  }
+
   get(id: string | undefined) {
     return id === undefined ? undefined : this.textures.get(id);
   }
 
-  /** Swap in an image, either a URL to load or an already-drawn canvas. */
-  async setImage(id: string, image: string | HTMLCanvasElement) {
+  /** Where an art id's image comes from: shared UI art directly, everything else from the game server. */
+  urlOf(gameId: string, id: string) {
+    return this.jobs.get(id)?.builtinUrl ?? `/api/games/${encodeURIComponent(gameId)}/assets/${encodeURIComponent(id)}`;
+  }
+
+  /** Requests the images in the order given (the current room first) and swaps each in as it arrives. Resolves with the ids that failed. */
+  async load(gameId: string, ids: string[]): Promise<string[]> {
+    const results = await Promise.allSettled(ids.map((id) => this.setImage(id, this.urlOf(gameId, id))));
+    return ids.filter((_, i) => results[i].status === "rejected");
+  }
+
+  private async setImage(id: string, url: string) {
     const texture = this.textures.get(id);
     if (!texture) return;
-    const source = typeof image === "string" ? await imageLoader.loadAsync(image) : image;
+    const image = await imageLoader.loadAsync(url);
     // The GPU copy was sized for the placeholder, so drop it before swapping images.
     texture.dispose();
-    texture.image = source;
+    texture.image = image;
     texture.needsUpdate = true;
   }
 }

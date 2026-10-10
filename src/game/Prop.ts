@@ -1,41 +1,73 @@
-import { Group as ThreeGroup, type Object3D } from "three";
+import { Group, type Box3, type Object3D, type Texture } from "three";
 import type { World } from "@dimforge/rapier3d-compat";
+import { artFor, materialOf } from "../shared/art";
+import { FRAME_SECONDS } from "../shared/constants";
+import { boundsOf, lightPartIndex, placeProp } from "../shared/geometry";
+import type { AmbientSpec, Conversation, Damage, ItemSpec, PropSpec } from "../shared/spec";
 import { Part } from "./Part";
-import { Character } from "./Character";
 import type { TextureLibrary } from "./TextureLibrary";
-import type { Group as GroupOutput, Object as ObjectOutput, Sprite as SpriteOutput } from "./generation/output/output";
 
+/**
+ * A thing in a room built from parts that move together: furniture, scenery, the walls. It may have
+ * something to read ([E] Examine), something inside it ([E] Search), hurt to touch, or give off particles.
+ */
 export class Prop {
   readonly id: string;
-  readonly root = new ThreeGroup();
-  readonly objects: Part[];
-  readonly groups: Prop[];
+  readonly name: string;
+  readonly root = new Group();
+  readonly parts: Part[];
+  /** Room-space box around it: how close the player must get to use it. */
+  readonly bounds: Box3;
+  readonly examine: Conversation[] | undefined;
+  readonly contains: ItemSpec | undefined;
+  readonly hazard: Damage | undefined;
+  readonly ambient: AmbientSpec | undefined;
+  /** Panels with more than one frame, and their frames. */
+  private readonly animated: { part: Part; frames: Texture[] }[] = [];
+  private frame = 0;
+  private frameTime = 0;
 
-  constructor(output: GroupOutput, textures: TextureLibrary) {
-    this.id = output.id;
-    this.root.position.fromArray(output.position);
-    this.root.rotation.fromArray(output.rotation);
-    this.objects = output.objects.map((o) => createObject(o, textures));
-    this.groups = (output.groups ?? []).map((g) => new Prop(g, textures));
+  constructor(spec: PropSpec, textures: TextureLibrary) {
+    this.id = spec.id;
+    this.name = spec.name;
+    this.examine = spec.examine;
+    this.contains = spec.contains;
+    this.hazard = spec.hazard;
+    this.ambient = spec.ambient;
+    this.root.position.fromArray(spec.position);
+    this.root.rotation.set(0, spec.rotationY, 0);
+
+    const lightIndex = spec.light ? lightPartIndex(spec) : -1;
+    this.parts = spec.parts.map((part, i) => {
+      const art = part.shape === "panel" ? artFor.panel(spec, part) : [artFor.surface(materialOf(spec, part))];
+      const frames = art.flatMap((a) => textures.get(a.id) ?? []);
+      const built = new Part(part, { texture: frames[0], light: i === lightIndex ? spec.light : undefined });
+      // Touching a hazard hurts even where it isn't solid (flames, a pool of something).
+      if (spec.hazard && !part.solid) built.sensor = true;
+      if (frames.length > 1) this.animated.push({ part: built, frames });
+      return built;
+    });
+    this.bounds = boundsOf(placeProp(spec, spec.id));
   }
 
   addTo(parent: Object3D, world: World) {
     parent.add(this.root);
-    for (const obj of this.objects) obj.addTo(this.root, world);
-    for (const group of this.groups) group.addTo(this.root, world);
+    for (const part of this.parts) part.addTo(this.root, world);
   }
 
   removeFrom(parent: Object3D, world: World) {
-    for (const obj of this.objects) obj.removeFrom(this.root, world);
-    for (const group of this.groups) group.removeFrom(this.root, world);
+    for (const part of this.parts) part.removeFrom(this.root, world);
     parent.remove(this.root);
   }
-}
 
-// The output has no explicit kind field, so tell sprites apart by the fields only they have.
-function createObject(output: ObjectOutput | SpriteOutput, textures: TextureLibrary) {
-  if (["animations", "actions", "item", "movement", "dialogues"].some((key) => key in output)) {
-    return new Character(output as SpriteOutput, textures);
+  /** Animates panels and flickering lights. `time` is the room's clock, in seconds. */
+  update(dt: number, time: number) {
+    for (const part of this.parts) part.updateLight(time);
+    if (this.animated.length === 0) return;
+    this.frameTime += dt;
+    if (this.frameTime < FRAME_SECONDS) return;
+    this.frameTime = 0;
+    this.frame++;
+    for (const { part, frames } of this.animated) part.showFrame(frames[this.frame % frames.length]);
   }
-  return new Part(output, textures);
 }
