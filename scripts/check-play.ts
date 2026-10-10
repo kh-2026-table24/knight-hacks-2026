@@ -13,7 +13,11 @@ import { Scene, Vector3 } from "three";
 const listeners: ((e: unknown) => void)[] = [];
 Object.assign(globalThis, {
   window: { performance, addEventListener: (type: string, fn: (e: unknown) => void) => type === "keydown" && listeners.push(fn) },
-  document: { createElement: () => ({ getContext: () => ({ fillRect() {} }) }) },
+  document: {
+    createElement: () => ({ getContext: () => ({ fillRect() {} }) }),
+    // The player's sprites load through three's ImageLoader; an <img> that never loads is enough.
+    createElementNS: () => ({ addEventListener() {}, removeEventListener() {} }),
+  },
 });
 const press = (key: string) => listeners.forEach((fn) => fn({ key, repeat: false, defaultPrevented: false, preventDefault() {} }));
 
