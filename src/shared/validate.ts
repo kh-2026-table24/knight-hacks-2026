@@ -1,8 +1,9 @@
+import { collectArt } from "./art";
 import { checkGame, doorSides } from "./checkGame";
 import { checkRoom } from "./checkRoom";
 import { errorsIn, type Issue } from "./issues";
 import { parseGameSpec } from "./parseSpec";
-import type { GameSpec } from "./spec";
+import { LIMITS, type GameSpec } from "./spec";
 
 /**
  * Everything a game must pass before it's saved or played: its shape, every room's layout, and the
@@ -25,6 +26,10 @@ export function validateGame(value: unknown): { spec: GameSpec | undefined; issu
   }
   if (parsed.complete) {
     issues.push(...checkGame(parsed.spec ?? { version: 1, title: "", summary: "", rooms, connections: parsed.connections }));
+    // Every image is a paid Gemini call and part of the wait before a game looks right.
+    const art = collectArt({ rooms, connections: parsed.connections }).size;
+    if (art > LIMITS.artJobs) issues.push({ severity: "error", path: "rooms", message: `The game needs ${art} images; the limit is ${LIMITS.artJobs}. Reuse materials and descriptions, or use fewer animation frames.` });
+    else if (art > LIMITS.artJobsWarning) issues.push({ severity: "warning", path: "rooms", message: `The game needs ${art} images, which will take a while to generate` });
   }
   return { spec: errorsIn(issues).length === 0 ? parsed.spec : undefined, issues };
 }

@@ -4,12 +4,18 @@
 //   npm run check
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
+import { collectArt } from "../src/shared/art";
 import { errorsIn, formatIssues, type Issue } from "../src/shared/issues";
 import { validateGame } from "../src/shared/validate";
 import { CASES } from "./spec-cases";
 
 const FIXTURES = join(import.meta.dirname, "..", "fixtures", "games");
 const validate = (value: unknown): Issue[] => validateGame(value).issues;
+// Images the haunted fixture needs. Update this when the fixture's art changes on purpose: a surprise
+// change means art ids moved, and every generated image would be paid for again.
+const HAUNTED_ART_JOBS = 24;
+// The server writes assets under these ids.
+const SAFE_ID = /^(?!\.)[\w.-]+$/;
 
 let failures = 0;
 const fail = (message: string) => {
@@ -43,6 +49,23 @@ else {
     } else {
       console.log(`✓ case "${c.name}"`);
     }
+  }
+}
+
+const haunted = base ? validateGame(base).spec : undefined;
+if (haunted) {
+  const jobs = collectArt(haunted);
+  const again = collectArt(validateGame(structuredClone(base)).spec ?? haunted);
+  const checks: [boolean, string][] = [
+    [[...jobs.keys()].join() === [...again.keys()].join(), "art ids are the same every time they're derived"],
+    [jobs.size === HAUNTED_ART_JOBS, `the haunted fixture needs ${HAUNTED_ART_JOBS} images (got ${jobs.size})`],
+    [[...jobs.values()].filter((j) => j.prompt === "dark worn oak wood grain").length === 1, "a material used by many props is one image"],
+    [[...jobs.values()].every((j) => !j.referenceId || jobs.has(j.referenceId)), "every animation frame's reference exists"],
+    [[...jobs.keys()].every((id) => SAFE_ID.test(id)), "art ids are safe file names"],
+  ];
+  for (const [ok, what] of checks) {
+    if (ok) console.log(`✓ art: ${what}`);
+    else fail(`art: ${what}`);
   }
 }
 

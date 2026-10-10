@@ -1,6 +1,6 @@
 import { Box3, Vector3 } from "three";
 import { DOOR, INTERACT, PICKUP, PLAYER, REACH, WALL_THICKNESS } from "./constants";
-import { arrivalPoint, boundsOf, placeProp, roomWalls, wallLength, type Side } from "./geometry";
+import { arrivalPoint, boundsOf, distanceXZ, placeProp, roomWalls, wallLength, type Side } from "./geometry";
 import type { Issue } from "./issues";
 import { LIMITS, type DoorSpec, type RoomSpec, type Vec2 } from "./spec";
 import { buildWalkGrid, type WalkGrid } from "./walkGrid";
@@ -27,10 +27,6 @@ export interface RoomContext {
 
 const fmt = (n: number) => String(Math.round(n * 100) / 100);
 const fmtPoint = (p: number[]) => `[${p.map(fmt).join(", ")}]`;
-
-function distanceXZ(box: Box3, x: number, z: number) {
-  return Math.hypot(Math.max(box.min.x - x, 0, x - box.max.x), Math.max(box.min.z - z, 0, z - box.max.z));
-}
 
 // A fixed depth would never flag thin parts (a 6 cm tabletop), so the threshold shrinks to half the
 // thinner part on each axis. Touching or resting (zero penetration) never counts.

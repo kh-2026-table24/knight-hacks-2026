@@ -27,10 +27,10 @@ To resume: read PLAN.md (Part A), this file, AGENTS.md and `git log --oneline -2
 - [x] 3.3 checkRoom.ts  (dc525eb)
 - [x] 3.4 checkGame.ts  (261944e)
 - [x] 3.5 validate.ts  (852c1ce)
-- [x] 3.6 room and game cases
+- [x] 3.6 room and game cases  (70cfac6)
 
 ## M4 Engine on the spec (CHECKPOINT)
-- [ ] 4.1 art.ts
+- [x] 4.1 art.ts (+ G8 art budget in validate.ts)
 - [ ] 4.2 server onto the spec + retire the old pipeline
 - [ ] 4.3 renames (Part, Prop, Character)
 - [ ] 4.4 engine rework onto GameSpec
@@ -87,6 +87,7 @@ To resume: read PLAN.md (Part A), this file, AGENTS.md and `git log --oneline -2
 - [ ] M9 playtest M9-1 to M9-3 — signed off by: ____
 
 ## Deviations
+- 4.1: The G8 art budget lives in validate.ts rather than checkGame.ts, because art.ts already imports checkGame (for door sides). There is no spec case for it: the parser limits (40 props a room, 12 rooms) make 200 images impractical to reach in a fixture-based case.
 - 3.2: walkGrid gets `levelPath(from, to, y)` instead of the planned `floodFromAt`. Characters slide on level ground and never step up, so a level-only flood matches how they actually move.
 - 0.1: The plan said to merge the in-progress work into main first. It needs a teammate review, so instead it's committed on `feat/caleb-npc-hud`, and this branch is stacked on top of it. Merge that PR first, then rebase this branch onto main.
 - PRs: `gh` isn't installed in the agent's environment, and `git push` over SSH fails there too ("Could not read from remote repository"). The developer pushes both branches (`git push -u origin feat/caleb-npc-hud feat/caleb-gamespec-v2`) and opens the PRs.

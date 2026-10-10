@@ -52,6 +52,11 @@ export function placeProp(prop: Pick<PropSpec, "position" | "rotationY" | "parts
   });
 }
 
+/** Horizontal distance from a point to a box's footprint; 0 when the point is over it. */
+export function distanceXZ(box: Box3, x: number, z: number) {
+  return Math.hypot(Math.max(box.min.x - x, 0, x - box.max.x), Math.max(box.min.z - z, 0, z - box.max.z));
+}
+
 /** The room-space box around a placed prop. */
 export function boundsOf(parts: PlacedPart[]) {
   const box = new Box3();
