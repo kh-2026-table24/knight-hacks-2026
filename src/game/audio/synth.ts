@@ -83,6 +83,72 @@ export function roomTone(ctx: AudioContext, out: AudioNode): Stop {
   });
 }
 
+/** Rain: a steady hiss of drops over a low rumble, swelling and easing. */
+export function rain(ctx: AudioContext, out: AudioNode): Stop {
+  return loop(ctx, out, (bus) => {
+    const hiss = noise(ctx);
+    const band = ctx.createBiquadFilter();
+    band.type = "bandpass";
+    band.frequency.value = 2500;
+    band.Q.value = 0.4;
+    const hissGain = ctx.createGain();
+    hissGain.gain.value = 0.18;
+    hiss.connect(band).connect(hissGain).connect(bus);
+
+    const rumble = noise(ctx);
+    const low = ctx.createBiquadFilter();
+    low.type = "lowpass";
+    low.frequency.value = 250;
+    const rumbleGain = ctx.createGain();
+    rumbleGain.gain.value = 0.3;
+    rumble.connect(low).connect(rumbleGain).connect(bus);
+
+    hiss.start();
+    // Offset so the two copies of the noise loop don't line up.
+    rumble.start(ctx.currentTime, 1);
+    return [hiss, rumble, lfo(ctx, hissGain.gain, 0.04, 0.06)];
+  });
+}
+
+/** Water dripping somewhere in the dark, over the room's low hum. */
+export function drip(ctx: AudioContext, out: AudioNode): Stop {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const stopTone = roomTone(ctx, out);
+  const stopDrips = loop(ctx, out, (bus) => {
+    const echo = ctx.createDelay();
+    echo.delayTime.value = 0.23;
+    const feedback = ctx.createGain();
+    feedback.gain.value = 0.3;
+    echo.connect(feedback).connect(echo);
+    echo.connect(bus);
+
+    const plink = () => {
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const pitch = 900 + Math.random() * 900;
+      osc.frequency.setValueAtTime(pitch, now);
+      osc.frequency.exponentialRampToValueAtTime(pitch * 2.2, now + 0.05);
+      const env = ctx.createGain();
+      env.gain.setValueAtTime(0.0001, now);
+      env.gain.exponentialRampToValueAtTime(0.08, now + 0.005);
+      env.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+      osc.connect(env);
+      env.connect(bus);
+      env.connect(echo);
+      osc.start(now);
+      osc.stop(now + 0.15);
+      timer = setTimeout(plink, 700 + Math.random() * 2800);
+    };
+    timer = setTimeout(plink, 500);
+    return [];
+  });
+  return () => {
+    clearTimeout(timer);
+    stopTone();
+    stopDrips();
+  };
+}
+
 // A minor and its flattened second: the notes the music's high bell tones are picked from.
 const BELL_NOTES = [440, 466.16, 523.25, 587.33, 659.25, 698.46, 880];
 

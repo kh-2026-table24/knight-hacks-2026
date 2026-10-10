@@ -1,8 +1,11 @@
+import { guessFootsteps } from "./footsteps";
 import type { Issue } from "./issues";
 import { nested, parseAmbient, parseCharacter, parseConversation, parseDamage, parseItem, parseLight } from "./parseFeatures";
 import { isFields, Reader } from "./reader";
 import {
+  AMBIENCES,
   DEFAULTS,
+  FOOTSTEPS,
   LIMITS,
   SHAPES,
   type ConnectionSpec,
@@ -68,7 +71,7 @@ function tagRoom<T>(r: Reader, value: unknown, parse: () => T): T {
   return result;
 }
 
-const ROOM_FIELDS = ["id", "name", "outdoor", "grid", "size", "start", "baseLight", "walls", "floor", "doors", "props", "characters", "pickups"];
+const ROOM_FIELDS = ["id", "name", "outdoor", "grid", "size", "start", "baseLight", "walls", "floor", "footsteps", "ambience", "doors", "props", "characters", "pickups"];
 
 /** Parses one room. Exported for room-scoped repair, where Claude returns replacement rooms. */
 export function parseRoom(r: Reader, value: unknown, path: string): RoomSpec | undefined {
@@ -91,13 +94,15 @@ export function parseRoom(r: Reader, value: unknown, path: string): RoomSpec | u
   const baseLight = o.num("baseLight", { optional: true, min: 0, max: 1 }) ?? DEFAULTS.baseLight;
   const walls = o.text("walls");
   const floor = o.text("floor");
+  const footsteps = o.oneOf("footsteps", FOOTSTEPS, { optional: true }) ?? guessFootsteps(floor ?? "");
+  const ambience = o.oneOf("ambience", AMBIENCES, { optional: true }) ?? DEFAULTS.ambience[outdoor ? "outdoor" : "indoor"];
   const doors = o.array("doors", (v, p) => parseDoor(r, v, p), { optional: true }) ?? [];
   const props = o.array("props", (v, p) => parseProp(r, v, p), { optional: true, max: LIMITS.propsPerRoom }) ?? [];
   const characters = o.array("characters", (v, p) => parseCharacter(r, v, p), { optional: true, max: LIMITS.charactersPerRoom }) ?? [];
   const pickups = o.array("pickups", (v, p) => parsePickup(r, v, p), { optional: true, max: LIMITS.pickupsPerRoom }) ?? [];
 
   if (o.failed || !id || !name || !grid || !size || !start || !walls || !floor) return undefined;
-  return { id, name, outdoor, grid, size, start, baseLight, walls, floor, doors, props, characters, pickups };
+  return { id, name, outdoor, grid, size, start, baseLight, walls, floor, footsteps, ambience, doors, props, characters, pickups };
 }
 
 function parseConnection(r: Reader, value: unknown, path: string): ConnectionSpec | undefined {

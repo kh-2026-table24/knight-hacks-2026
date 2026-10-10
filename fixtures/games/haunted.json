@@ -12,6 +12,8 @@
       "baseLight": 0.2,
       "walls": "faded victorian damask wallpaper, peeling and water stained",
       "floor": "dark rotting wooden floorboards",
+      "footsteps": "wood",
+      "ambience": "room",
       "doors": [
         { "connection": "foyer-cellar", "offset": 11.5, "art": "heavy wooden door with iron hinges" },
         { "connection": "foyer-study", "offset": 14.5, "art": "heavy wooden door with iron hinges" }
@@ -124,6 +126,8 @@
       "baseLight": 0.08,
       "walls": "damp cellar stone wall with moss",
       "floor": "cracked wet cellar flagstones",
+      "footsteps": "stone",
+      "ambience": "drip",
       "doors": [{ "connection": "foyer-cellar", "offset": 7 }],
       "props": [
         {
@@ -158,6 +162,8 @@
       "baseLight": 0.25,
       "walls": "faded victorian damask wallpaper, peeling and water stained",
       "floor": "dark rotting wooden floorboards",
+      "footsteps": "wood",
+      "ambience": "rain",
       "doors": [{ "connection": "foyer-study", "offset": 5, "art": "heavy wooden door with iron hinges" }],
       "props": [
         {

@@ -562,6 +562,7 @@ export interface ArtJob {
      - 0–2 locked connections, each key placed in a room the player can reach before that lock;
      - room count from the storyboard, or exactly `roomCount`.
   4. **`<world>`:** coordinates, camera, the walls the engine builds (indoor/outdoor), what the player can climb and reach.
+     Also each room's sound: `footsteps` and `ambience`, listing the options from `FOOTSTEPS` and `AMBIENCES` in spec.ts with their one-line meanings. Ask for the footsteps that match the floor, and an ambience that fits the setting (e.g. drip for a cellar, rain when the story has a storm).
   5. **`<doors>`:** each connection needs a door in both rooms, and the grid decides the wall. Give the rule with a worked example: A at [0,0] and B at [0,−1] puts the door on A's north wall and B's south wall (an exit strip). Also cover offsets and arrival spots.
   6. **`<building_blocks>`:** box, wedge, panel, cylinder, stairs, plus part and prop fields. Reuse the existing examples and add one each for cylinder and stairs.
   7. **`<interaction>`:** examine, contains, characters (art description and poses, movement, dialogue, gives, hostile), pickups (key, heart), ambient, hazard. One example each.
