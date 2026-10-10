@@ -97,14 +97,15 @@ export async function askGemini(prompt: string, reference: string | undefined, a
           { type: "text", text: prompt },
         ]
       : prompt,
-    response_format: { type: "image", mime_type: "image/jpeg", aspect_ratio: aspectRatio },
+    // The smallest size Gemini offers; every image is shrunk to 128px or less anyway.
+    response_format: { type: "image", mime_type: "image/jpeg", aspect_ratio: aspectRatio, image_size: "512" },
   });
   const data = interaction.output_image?.data;
   if (!data) throw new Error("Gemini did not return an image");
   return data;
 }
 
-// Shrinks Gemini's 1024px+ JPEG to pixel-art size with nearest-neighbor sampling, and for cutouts
+// Shrinks Gemini's 512px+ JPEG to pixel-art size with nearest-neighbor sampling, and for cutouts
 // makes the green screen transparent. Removes green everywhere, not just from the edges, so gaps
 // (between legs, inside handles) come out transparent too.
 export async function processImage(jpeg: Buffer, kind: Kind, longSide = CUTOUT_LONG_SIDE): Promise<Buffer> {

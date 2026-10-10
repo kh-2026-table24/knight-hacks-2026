@@ -35,7 +35,7 @@ export async function generateSprite(
           { type: "text", text },
         ]
       : text,
-    response_format: { type: "image", mime_type: "image/jpeg", aspect_ratio: "1:1" },
+    response_format: { type: "image", mime_type: "image/jpeg", aspect_ratio: "1:1", image_size: "512" },
   });
 
   const data = interaction.output_image?.data;
@@ -44,7 +44,7 @@ export async function generateSprite(
 }
 
 // Saves the full-size original as <name>.jpg and a size×size PNG as <name>-<size>.png.
-// Gemini's smallest output is 1024×1024, so we shrink with nearest-neighbor to keep pixel edges sharp.
+// Gemini's smallest output is 512×512, so we shrink with nearest-neighbor to keep pixel edges sharp.
 // Returns the URL path of the resized sprite for the game.
 export async function saveSprite(name: string, base64: string, size = 64): Promise<string> {
   const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
