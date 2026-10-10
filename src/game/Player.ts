@@ -53,6 +53,9 @@ export class Player {
   speed: number = PLAYER.speed;
   /** Ignores movement keys, e.g. while a dialogue is open. */
   frozen = false;
+  /** Called when a foot comes down while walking on something, for footstep sounds. */
+  onStep: (() => void) | null = null;
+  private grounded = false;
   private invulnerableFor = 0;
   private readonly material: MeshBasicMaterial;
   private readonly keys = new Set<string>();
@@ -143,6 +146,8 @@ export class Player {
       if (this.frameTime >= FRAME_SECONDS) {
         this.frameTime = 0;
         this.frame = (this.frame + 1) % WALK_CYCLE.length;
+        // Both walk poses are a foot landing; the stand pose between them is the passing step.
+        if (WALK_CYCLE[this.frame] !== 0 && this.grounded) this.onStep?.();
       }
     } else {
       this.frame = 0;
@@ -188,7 +193,8 @@ export class Player {
 
     // Walk through sensors and dynamic things (dropped items); collide with everything else.
     this.controller.computeColliderMovement(this.collider, m, QueryFilterFlags.EXCLUDE_SENSORS | QueryFilterFlags.EXCLUDE_DYNAMIC);
-    if (this.controller.computedGrounded()) this.verticalVelocity = 0;
+    this.grounded = this.controller.computedGrounded();
+    if (this.grounded) this.verticalVelocity = 0;
 
     const corrected = this.controller.computedMovement();
     const t = this.body.translation();

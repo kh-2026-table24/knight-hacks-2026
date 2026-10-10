@@ -48,13 +48,14 @@ export class GameAudio {
       bus.gain.value = volume;
       bus.connect(this.master);
     }
-    const unlock = () => {
-      void this.context.resume();
-      window.removeEventListener("pointerdown", unlock);
-      window.removeEventListener("keydown", unlock);
-    };
-    window.addEventListener("pointerdown", unlock);
-    window.addEventListener("keydown", unlock);
+    // Keeps trying on every click and key press until the browser lets audio start, since one
+    // attempt can be refused (e.g. a press that arrives while the page is still loading).
+    const unlock = () => void this.context.resume();
+    const events = ["pointerdown", "keydown", "touchend"] as const;
+    for (const event of events) window.addEventListener(event, unlock);
+    this.context.addEventListener("statechange", () => {
+      if (this.context.state === "running") for (const event of events) window.removeEventListener(event, unlock);
+    });
   }
 
   /** Downloads and decodes every recorded sound. Ones that fail to load are skipped with a warning. */

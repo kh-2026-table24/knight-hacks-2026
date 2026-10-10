@@ -25,7 +25,7 @@ export const SOUND_VARIATIONS = {
 export type SoundName = keyof typeof SOUND_VARIATIONS;
 
 export const soundUrls = (name: SoundName) =>
-  Array.from({ length: SOUND_VARIATIONS[name] }, (_, i) => `${import.meta.env.BASE_URL}sfx/${name}-${i}.ogg`);
+  Array.from({ length: SOUND_VARIATIONS[name] }, (_, i) => `/sfx/${name}-${i}.ogg`);
 
 export type FloorSound = "concrete" | "wood" | "grass" | "carpet" | "snow";
 
@@ -35,10 +35,11 @@ const FLOOR_WORDS: [FloorSound, RegExp][] = [
   ["wood", /wood|plank|board|timber|parquet|oak|pine|deck/],
   ["snow", /snow|ice|frost/],
   ["grass", /grass|lawn|moss|dirt|earth|soil|mud|leaves|leaf|garden|meadow|field|turf|hay|straw/],
+  ["concrete", /stone|flag|cobble|brick|concrete|marble|tile|slate|granite|rock|metal|iron/],
 ];
 
-/** Which footsteps fit a floor, from its texture description. Anything unrecognized is stone/concrete. */
-export function floorSoundFor(description: string | undefined): FloorSound {
+/** Which footsteps fit a floor, from its description, or `fallback` if nothing in it says. */
+export function floorSoundFor(description: string | undefined, fallback: FloorSound = "concrete"): FloorSound {
   const text = description?.toLowerCase() ?? "";
-  return FLOOR_WORDS.find(([, words]) => words.test(text))?.[0] ?? "concrete";
+  return FLOOR_WORDS.find(([, words]) => words.test(text))?.[0] ?? fallback;
 }

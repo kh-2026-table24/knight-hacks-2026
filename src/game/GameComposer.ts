@@ -1,6 +1,7 @@
 import { AmbientLight, Color, Fog, PerspectiveCamera, Scene, Timer, WebGLRenderer } from "three";
 import { World } from "@dimforge/rapier3d-compat";
 import { PLAYER } from "../shared/constants";
+import { SoundDirector } from "./audio/SoundDirector";
 import { CAMERA_OFFSET } from "./camera";
 import type { Game } from "./Game";
 import { Interactions } from "./Interactions";
@@ -25,6 +26,7 @@ export class GameComposer {
   readonly world = new World({ x: 0, y: -9.81, z: 0 });
   readonly player: Player;
   readonly hud = new Hud();
+  readonly sounds = new SoundDirector();
   private readonly timer = new Timer();
   private readonly ambient = new AmbientLight(AMBIENT_COLOR, 0);
   private readonly retro: RetroFilter;
@@ -47,11 +49,13 @@ export class GameComposer {
 
     this.player = new Player(this.world);
     this.scene.add(this.player.mesh);
+    this.player.onStep = () => this.sounds.footstep(this.room, this.player.position);
     this.hud.setHearts(PLAYER.maxHearts, PLAYER.maxHearts);
     this.interactions = new Interactions({
       player: this.player,
       world: this.world,
       hud: this.hud,
+      audio: this.sounds.audio,
       game: () => this.game,
       room: () => this.room,
       swapRooms: (next, arrivalConnectionId) => this.swapRooms(next, arrivalConnectionId),
@@ -66,6 +70,7 @@ export class GameComposer {
   loadGame(game: Game) {
     this.game = game;
     this.hud.setHearts(game.state.hearts, PLAYER.maxHearts);
+    this.sounds.start();
     this.swapRooms(game.startRoom);
   }
 
@@ -76,6 +81,8 @@ export class GameComposer {
     this.room = next;
     this.ambient.intensity = AMBIENT_AT_FULL * next.baseLight;
     this.player.setRoomLight(next.baseLight);
+    const spec = this.game?.spec.rooms.find((room) => room.id === next.id);
+    if (spec) this.sounds.enterRoom(spec);
     this.interactions.reset();
     this.player.reset(arrivalConnectionId ? next.arrivalPoint(arrivalConnectionId) : next.start, this.world);
   }
@@ -95,7 +102,10 @@ export class GameComposer {
       // Nothing happens to the player, and characters stand still, while they're reading.
       const reading = this.hud.dialogue.isOpen;
       this.room?.update(dt, reading, this.player.position);
-      if (!reading) this.interactions.step();
+      if (!reading) {
+        this.interactions.step();
+        this.sounds.update(dt, this.room, this.player.position);
+      }
     }
     this.camera.position.copy(this.player.position).add(CAMERA_OFFSET);
 

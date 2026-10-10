@@ -1,6 +1,7 @@
 import type { World } from "@dimforge/rapier3d-compat";
 import { PLAYER } from "../shared/constants";
 import type { ItemSpec } from "../shared/spec";
+import type { GameAudio } from "./audio/GameAudio";
 import { Character } from "./Character";
 import { Door } from "./Door";
 import type { Game } from "./Game";
@@ -15,6 +16,8 @@ export interface InteractionHost {
   readonly player: Player;
   readonly world: World;
   readonly hud: Hud;
+  /** Sound effects. Headless runs (scripts/check-play.ts) have none. */
+  readonly audio?: GameAudio;
   game(): Game | null;
   room(): Room | null;
   swapRooms(next: Room, arrivalConnectionId?: string): void;
@@ -64,6 +67,7 @@ export class Interactions {
     }
 
     for (const pickup of room.pickupsInReach(player.position)) {
+      this.host.audio?.play(pickup.item.kind === "key" ? "key-pickup" : "pickup");
       if (pickup.item.kind === "key") {
         game.state.keys.push(pickup.item);
         hud.setItems(game.state.keys.map((key) => ({ name: key.name })));
@@ -87,6 +91,7 @@ export class Interactions {
     if (!player.vulnerable || game.state.hearts === 0) return false;
     game.state.hearts = Math.max(0, game.state.hearts - damage);
     player.startInvulnerability(PLAYER.invulnerableSeconds);
+    this.host.audio?.play("hurt");
     hud.setHearts(game.state.hearts, PLAYER.maxHearts);
     if (game.state.hearts === 0) void this.die(game);
     return true;
@@ -114,6 +119,7 @@ export class Interactions {
     if (conversations.length === 0) await this.show([`You find ${describe(item)}.`]);
     game.state.given.add(key);
     room.drop(target, item);
+    this.host.audio?.play("drop");
   }
 
   private async useDoor(door: Door) {
@@ -125,15 +131,18 @@ export class Interactions {
     if (connection.locked) {
       const key = game.state.keys.find((k) => k.unlocks === connection.id);
       if (!key) {
+        this.host.audio?.play("door-locked");
         await this.show(["It's locked."]);
         return;
       }
       connection.unlock();
+      this.host.audio?.play("unlock");
       await this.show([`You unlock it with ${describe(key)}.`]);
     }
 
     const next = game.rooms.get(connection.otherRoom(room.id));
     if (!next || this.host.room() !== room) return;
+    this.host.audio?.play("door-open");
     this.host.swapRooms(next, connection.id);
   }
 
@@ -142,6 +151,7 @@ export class Interactions {
     const { player, hud } = this.host;
     player.frozen = true;
     hud.setHint(null);
+    this.host.audio?.play("dialogue", { volume: 0.5 });
     try {
       await hud.dialogue.play(lines, speaker);
     } finally {
@@ -151,6 +161,7 @@ export class Interactions {
 
   // Placeholder until the game's states are designed: back to the room's start with full hearts.
   private async die(game: Game) {
+    this.host.audio?.play("thud");
     await this.show(["Everything goes dark..."]);
     game.state.hearts = PLAYER.maxHearts;
     this.host.player.clearInvulnerability();
