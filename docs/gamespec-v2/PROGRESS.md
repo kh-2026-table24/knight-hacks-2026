@@ -12,10 +12,10 @@ To resume: read PLAN.md (Part A), this file, AGENTS.md and `git log --oneline -2
 ## M1 Hygiene and shared constants
 - [x] 1.1 Remove key literals, delete src/character.ts, drop envPrefix, --env-file for dev:server  (06cf839)
 - [x] 1.2 strict in tsconfig.json  (9cd06c2)
-- [x] 1.3 src/shared/constants.ts; Player/Door/Room/Sprite import it
+- [x] 1.3 src/shared/constants.ts; Player/Door/Room/Sprite import it  (7c6e1c4)
 
 ## M2 Contract and parser
-- [ ] 2.1 spec.ts
+- [x] 2.1 spec.ts
 - [ ] 2.2 reader.ts
 - [ ] 2.3 parseSpec.ts
 - [ ] 2.4 fixtures/games/haunted.json
@@ -88,7 +88,7 @@ To resume: read PLAN.md (Part A), this file, AGENTS.md and `git log --oneline -2
 
 ## Deviations
 - 0.1: The plan said to merge the in-progress work into main first. It needs a teammate review, so instead it's committed on `feat/caleb-npc-hud`, and this branch is stacked on top of it. Merge that PR first, then rebase this branch onto main.
-- PRs: `gh` isn't installed in the agent's environment, so the developer opens the PRs; the agent pushes branches.
+- PRs: `gh` isn't installed in the agent's environment, and `git push` over SSH fails there too ("Could not read from remote repository"). The developer pushes both branches (`git push -u origin feat/caleb-npc-hud feat/caleb-gamespec-v2`) and opens the PRs.
 
 ## Blockers
 - (none)
