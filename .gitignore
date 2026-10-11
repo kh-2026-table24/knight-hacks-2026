@@ -27,4 +27,4 @@ dist-ssr
 generated/houses/
 
 # Generated games and their art.
-server/games/*
+# server/games/*

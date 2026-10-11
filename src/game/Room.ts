@@ -20,6 +20,8 @@ const SPAWN_OFFSET = 0.5;
 // Items dropped by a prop or character pop up out of it before landing.
 const DROP_VELOCITY: Vector3Tuple = [0, 3, 0];
 const TOLERANCE = 0.05;
+// Reused by interactTarget, which runs every frame.
+const scratch = new Vector3();
 
 /** Things touching does something to: doors go through, hazards and hostile characters hurt. */
 export type Touchable = Prop | Character | Door;
@@ -142,25 +144,30 @@ export class Room {
     return this.doors.find((d) => d.connectionId === connectionId)?.arrivalPoint() ?? this.start.clone();
   }
 
-  /** The nearest thing within [E] reach of a player whose feet are at `feet`. Characters win ties. */
+  /**
+   * What [E] uses for a player whose feet are at `feet`. Anything whose edge is within reach counts; of
+   * those, the one whose middle is nearest wins. Going by the edge alone favors big things: a rug the
+   * player stands on, or a whole building front, is always 0 m away and would hide the small thing in
+   * front of them. Characters win ties.
+   */
   interactTarget(feet: Vector3): Interactable | undefined {
     let best: Interactable | undefined;
     let bestDistance = Infinity;
     for (const prop of this.props) {
       const searchable = prop.contains && !this.state.given.has(stateKey(this.id, prop.id));
       if (!prop.examine && !searchable) continue;
-      const distance = distanceXZ(prop.bounds, feet.x, feet.z);
-      if (distance <= INTERACT.range && prop.bounds.min.y <= feet.y + INTERACT.maxHeightAboveFeet + TOLERANCE && distance < bestDistance) {
-        [best, bestDistance] = [prop, distance];
-      }
+      const inReach = distanceXZ(prop.bounds, feet.x, feet.z) <= INTERACT.range && prop.bounds.min.y <= feet.y + INTERACT.maxHeightAboveFeet + TOLERANCE;
+      if (!inReach) continue;
+      prop.bounds.getCenter(scratch);
+      const distance = Math.hypot(scratch.x - feet.x, scratch.z - feet.z);
+      if (distance < bestDistance) [best, bestDistance] = [prop, distance];
     }
     for (const character of this.characters) {
       if (!character.dialogue) continue;
       const p = character.mesh.position;
-      const distance = Math.max(0, Math.hypot(p.x - feet.x, p.z - feet.z) - character.size.x / 2);
-      if (distance <= INTERACT.range && p.y <= feet.y + INTERACT.maxHeightAboveFeet + TOLERANCE && distance <= bestDistance) {
-        [best, bestDistance] = [character, distance];
-      }
+      const distance = Math.hypot(p.x - feet.x, p.z - feet.z);
+      const inReach = distance - character.size.x / 2 <= INTERACT.range && p.y <= feet.y + INTERACT.maxHeightAboveFeet + TOLERANCE;
+      if (inReach && distance <= bestDistance) [best, bestDistance] = [character, distance];
     }
     return best;
   }
