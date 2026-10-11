@@ -70,7 +70,7 @@ const firstSentence = (text: string) => text.match(/^.*?[.!?](\s|$)/)?.[0].trim(
 
 export class TitleScreen {
   private readonly root: HTMLElement;
-  private readonly art = new TitleArt(GAME_NAME, "/title/ghost.jpg");
+  private readonly art = new TitleArt(GAME_NAME, "/title/dreamcatcher.jpg");
   private readonly prompt: HTMLElement;
   private readonly menu: HTMLElement;
   private items: HTMLButtonElement[] = [];

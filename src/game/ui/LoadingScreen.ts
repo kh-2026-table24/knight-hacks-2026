@@ -20,7 +20,7 @@ const element = <K extends keyof HTMLElementTagNameMap>(tag: K, className: strin
 
 export class LoadingScreen {
   private readonly root: HTMLElement;
-  private readonly art = new TitleArt(GAME_NAME, "/title/ghost.jpg");
+  private readonly art = new TitleArt(GAME_NAME, "/title/dreamcatcher.jpg");
   private readonly title: HTMLElement;
   private readonly stage: HTMLElement;
   private readonly bar: HTMLElement;
