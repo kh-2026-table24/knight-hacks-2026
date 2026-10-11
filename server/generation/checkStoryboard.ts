@@ -4,8 +4,8 @@ import { isFields, SLUG } from "../../src/shared/reader";
 import { LIMITS, type Vec2 } from "../../src/shared/spec";
 
 // The storyboard is mostly prose that the room prompts read as-is, so only the parts code relies on
-// are typed and checked here: the room ids and cells, the doors between them, and which room holds
-// each key. Those are cheap to fix now and expensive to discover after every room is built.
+// are typed and checked here: the room ids and cells, the doors between them, which room holds each
+// key, and the objectives and the rooms that set them. Those are cheap to fix now and expensive to discover after every room is built.
 
 export interface StoryboardRoom {
   id: string;
@@ -30,6 +30,15 @@ export interface StoryboardKey {
   hint?: string;
 }
 
+export interface StoryboardObjective {
+  id: string;
+  text: string;
+  /** The room whose prop, character or pickup sets it. The first objective has none: it's shown from the start. */
+  room?: string;
+  /** What the player interacts with there to set it. */
+  trigger?: string;
+}
+
 /** The checked parts of a storyboard, plus the whole thing as Claude wrote it. */
 export interface Storyboard {
   title: string;
@@ -37,6 +46,7 @@ export interface Storyboard {
   rooms: StoryboardRoom[];
   doors: StoryboardDoor[];
   keys: StoryboardKey[];
+  objectives: StoryboardObjective[];
   raw: Record<string, unknown>;
 }
 
@@ -105,6 +115,23 @@ export function checkStoryboard(value: unknown): { storyboard?: Storyboard; prob
     keys.push({ name, appearance: str(k.appearance) ?? name, unlocks: door.id, room, howFound: str(k.howFound), hint: str(k.hint) });
   });
 
+  const objectives: StoryboardObjective[] = [];
+  list("objectives").forEach((o, i) => {
+    const at = `objectives[${i}]`;
+    if (!isFields(o)) return problems.push(`${at} must be an object`);
+    const id = str(o.id);
+    const text = str(o.text);
+    if (!id || !SLUG.test(id)) return problems.push(`${at}.id must be kebab-case, got ${JSON.stringify(o.id)}`);
+    if (objectives.some((objective) => objective.id === id)) return problems.push(`${at}.id "${id}" is used by another objective too`);
+    if (!text) return problems.push(`${at}(${id}).text is missing`);
+    if (text.length > LIMITS.objectiveLength) return problems.push(`${at}(${id}).text is ${text.length} characters; keep it under ${LIMITS.objectiveLength}`);
+    const room = str(o.room);
+    if (i > 0 && (!room || !roomById.has(room))) return problems.push(`${at}(${id}).room must be the id of the room whose object sets it, got ${JSON.stringify(o.room)}`);
+    objectives.push({ id, text, ...(i > 0 && { room, trigger: str(o.trigger) }) });
+  });
+  if (objectives.length === 0) problems.push(`"objectives" needs at least one objective, the one shown at the start`);
+  if (objectives.length > LIMITS.objectives) problems.push(`The storyboard has ${objectives.length} objectives; the limit is ${LIMITS.objectives}`);
+
   // Walk the map the way a player would, opening each locked door once its key's room is reached.
   if (rooms.length > 0) {
     const keyRooms = new Map<string, string[]>();
@@ -118,5 +145,5 @@ export function checkStoryboard(value: unknown): { storyboard?: Storyboard; prob
   }
 
   if (problems.length > 0 || !title || !summary) return { problems };
-  return { storyboard: { title, summary, rooms, doors, keys, raw: value }, problems };
+  return { storyboard: { title, summary, rooms, doors, keys, objectives, raw: value }, problems };
 }

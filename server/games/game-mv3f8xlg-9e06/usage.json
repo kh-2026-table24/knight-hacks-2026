@@ -1,0 +1,92 @@
+{
+  "input": 230748,
+  "cached": 95460,
+  "output": 149309,
+  "live": 0,
+  "calls": [
+    {
+      "label": "storyboard",
+      "input": 6299,
+      "cached": 0,
+      "output": 42392,
+      "seconds": 462.8
+    },
+    {
+      "label": "room keepers-kitchen",
+      "input": 1592,
+      "cached": 23865,
+      "output": 8468,
+      "seconds": 84
+    },
+    {
+      "label": "room keepers-room",
+      "input": 28819,
+      "cached": 0,
+      "output": 8292,
+      "seconds": 84.3
+    },
+    {
+      "label": "room st-flannans-chapel",
+      "input": 29085,
+      "cached": 0,
+      "output": 10935,
+      "seconds": 108
+    },
+    {
+      "label": "room oil-store",
+      "input": 29019,
+      "cached": 0,
+      "output": 12532,
+      "seconds": 122.2
+    },
+    {
+      "label": "room east-landing",
+      "input": 25276,
+      "cached": 0,
+      "output": 13731,
+      "seconds": 140.8
+    },
+    {
+      "label": "room lantern",
+      "input": 29033,
+      "cached": 0,
+      "output": 14173,
+      "seconds": 142.7
+    },
+    {
+      "label": "room west-landing",
+      "input": 28827,
+      "cached": 0,
+      "output": 14945,
+      "seconds": 149.4
+    },
+    {
+      "label": "room summit-yard",
+      "input": 29086,
+      "cached": 0,
+      "output": 16557,
+      "seconds": 162.6
+    },
+    {
+      "label": "room east-landing (repair)",
+      "input": 7550,
+      "cached": 23865,
+      "output": 730,
+      "seconds": 7.2
+    },
+    {
+      "label": "room summit-yard (repair)",
+      "input": 9100,
+      "cached": 23865,
+      "output": 1407,
+      "seconds": 13
+    },
+    {
+      "label": "room lantern (repair)",
+      "input": 7062,
+      "cached": 23865,
+      "output": 5147,
+      "seconds": 50.4
+    }
+  ]
+}

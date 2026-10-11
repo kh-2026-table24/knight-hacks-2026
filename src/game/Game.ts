@@ -29,6 +29,11 @@ export class Game {
     this.roomArt = new Map(spec.rooms.map((room) => [room.id, artIdsForRoom(spec, room)]));
   }
 
+  /** The text of the objective on screen, if the game has any. */
+  get objective(): string | undefined {
+    return this.spec.objectives[this.state.objective]?.text;
+  }
+
   /** A room can be entered once every image it needs has loaded (or been given up on). */
   isRoomReady(roomId: string) {
     return (this.roomArt.get(roomId) ?? []).every((id) => this.textures.isSettled(id));

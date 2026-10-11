@@ -46,7 +46,7 @@ export class LoadingScreen {
       return cell;
     });
     element("span", "loading-mark", this.bar).style.left = `${PLAYABLE_SHARE * 100}%`;
-    // What it's costing: images from the GPU, tokens from Claude.
+    // What it's costing: images from Gemini, tokens from Claude.
     this.images = element("p", "loading-stats", column);
     this.tokens = element("p", "loading-stats", column);
     this.images.hidden = this.tokens.hidden = true;

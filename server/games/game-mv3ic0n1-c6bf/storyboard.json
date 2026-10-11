@@ -1,0 +1,524 @@
+{
+  "research": "**Where and what**\n- The Sallie House stands at 508 North 2nd Street in Atchison, Kansas. Atchison is a Missouri River town that promotes itself as one of the most haunted towns in Kansas. The house is a modest two-story frame house with a front porch. It is usually dated to the late 1860s or early 1870s.\n- Local history ties the house to the Finney family. Popular accounts say Dr. Charles Finney, a physician, lived there and ran his practice from the ground floor in the early 20th century. Sources disagree on whether he actually saw patients in this house.\n\n**The legend (undocumented)**\n- A mother brought her daughter, about six years old and named Sallie, to the doctor with severe stomach pain, usually described as appendicitis.\n- In a hurry, the doctor began to operate before the anesthetic had fully taken effect. The girl woke screaming and died on the table.\n- Her spirit is said to stay in the house, unhappy with men in particular.\n- Local researchers report no death record, burial or census entry that matches this girl. Even her name may have come later.\n\n**The documented claims (first-hand reports, not proof)**\n- In the early 1990s (accounts give about 1992–1994) a young couple rented the house. They are real, living people, so this storyboard calls them Ray and Dana Corwin. Dana was pregnant when they moved in, and the baby was born while they lived there.\n- They reported:\n  - stuffed animals found arranged in a circle on the nursery floor\n  - framed pictures turned upside down\n  - appliances and lights switching on by themselves\n  - small fires starting on their own\n  - pets reacting to things nobody could see\n- Above all, the husband reported scratches and burns appearing on his body, often in parallel lines. The attacks got worse over time.\n- A psychic they consulted said the presence was a little girl named Sallie. Accounts say the spirit seemed fond of the wife and baby and hostile to the husband.\n- The family moved out after about two years.\n- The case was featured on *Unsolved Mysteries* in the mid-1990s. The house later became a paid paranormal-tour site and appeared on several ghost-hunting TV shows.\n\n**Later theory (legend)**\n- Some investigators, and the family themselves, came to believe a darker, non-human presence was using the gentle story of \"Sallie\" as a mask. Their argument was that a six-year-old girl wouldn't claw a grown man.\n\n**Physical details I will use**\n- the ground-floor doctor's office and waiting room\n- the anesthetic: a 1900s ether bottle and mask\n- the operating table\n- the stuffed-animal circle in the nursery\n- the upside-down pictures\n- appliances and burners lighting themselves (the gas range)\n- small scorch marks from the fires\n- parallel scratch marks in threes (the husband's wounds)\n- the family's fast exit around 1994\n- the missing record of Sallie, which I turn into an in-game reason (the doctor never reported the death)\n- the later \"something else wearing her name\" theory, which becomes the hostile Other One\n- the present-day tour house: a hand-painted tour sign and a neighbor who holds the key\n\n**Names**\n- Invented: the doctor's in-game name (Dr. Amos Vail), Sallie's mother (Nell Tolliver), the neighbor (Mrs. Vantreese), the Corwins and the player's name, Wren.\n- The doctor is fictionalized because the malpractice story is not documented.\n- \"Sallie\" keeps her legend name.\n- The daybook entry, the doctor's guilt and the reason the record is missing are fiction, written for the game.",
+  "storyboard": {
+    "source": {
+      "story": "The Sallie House (Atchison, Kansas)",
+      "account": "The Sallie House is a modest two-story frame house at 508 North 2nd Street in Atchison, Kansas, built around the late 1860s. Local history ties it to the Finney family, and popular accounts say Dr. Charles Finney ran a medical practice from its ground floor in the early 1900s. LEGEND: a mother brought her six-year-old daughter, Sallie, to the doctor with severe stomach pain. He began to operate before the anesthetic had fully taken effect, and the girl woke screaming and died on the table. No death record, burial or census entry has been found that confirms a girl named Sallie died there.\n\nDOCUMENTED (as first-hand reports, not proof): in the early 1990s a young couple rented the house. The wife was pregnant, and their baby was born while they lived there. They reported stuffed animals arranged in a circle on the nursery floor, pictures turned upside down, appliances and lights switching on by themselves, small fires starting on their own, and pets reacting to things nobody could see. Above all, the husband reported scratches and burns appearing on his body, which got worse over time. A psychic told them the presence was a little girl named Sallie, who seemed fond of the mother and baby and hostile to the father. The family left after about two years. The case was featured on Unsolved Mysteries in the mid-1990s, and the house later became a paranormal-tour site visited by many TV investigators.\n\nLATER THEORY (legend): some investigators, and the family themselves, came to believe that a darker, non-human presence was hiding behind the gentle story of Sallie, since a small girl would hardly claw a grown man. The game takes both versions seriously: a real, frightened child and something else that borrowed her name.",
+      "inspirations": [
+        "Doctor's practice on the ground floor (legend): the Waiting Room and the locked Surgery behind its frosted-glass door",
+        "Surgery begun before the anesthetic took (legend): the ether bottle and mask, and the operating table in the Surgery",
+        "Stuffed animals arranged in a circle (reported, 1990s): the focal point of the Nursery, drawn around the crib",
+        "Pictures turned upside down (reported): the upside-down portraits in the Waiting Room",
+        "Appliances turning on and small fires starting by themselves (reported): the gas range in the Kitchen whose burner flares on its own (a hazard) and the scorch marks on the wall",
+        "The husband's scratches and burns (reported): three-line gouges in the Stair Hall wallpaper, the father's notebook in the Kitchen, and the scratches the Other One leaves when it strikes",
+        "The baby born in the house (reported): the player is that baby, grown up",
+        "The family's exit after about two years (reported): told by the neighbor in the Front Yard",
+        "No historical record of Sallie (documented absence): explained in-game by the doctor's daybook entry, marked 'Not reported'",
+        "The 'something wearing Sallie's name' theory (legend): the hostile Other One in the Cellar",
+        "The house as a present-day tour site (documented): the hand-painted tour sign and the neighbor who keeps the key"
+      ]
+    },
+    "title": "Sallie: The House on North 2nd",
+    "summary": "In the early 1900s a little girl was carried into a doctor's front-room office in Atchison, Kansas, with a burning pain in her side, and she never came out. In 1993 a young couple moved into the same house and had a baby there. Toys gathered in circles around the crib, pictures turned upside down, burners lit themselves and the father woke with scratches in rows of three. They fled before the baby's first birthday. The house has kept two things ever since: the girl everyone calls Sallie, and something else that answers when people say her name.",
+    "premise": "The player is Wren Corwin, the baby born in the house in 1993, now a young woman. Her parents never spoke about Atchison. After finding her father's old notebook and a photograph of her crib ringed by stuffed animals, she has come back on a cold October night to learn what was in the nursery with her. The tour company's neighbor, Mrs. Vantreese, has agreed to let her in alone.",
+    "ending": "Behind the frosted-glass door is the doctor's surgery, still smelling of ether. Dr. Amos Vail's ghost stands at the basin scrubbing his hands and admits he had a second patient waiting and started cutting before the ether took. His daybook gives the rest. The girl's name was Sarah, called Sallie. She died at ten past four. Beside the entry he wrote two words, 'Not reported', which is why no record of her exists. Because nobody ever wrote her name down, something else could take it. The scratches, the fires and the rows of three were the Other One. Sallie's toy circle was a little girl's attempt to guard a baby's crib from it. Wren reads the name aloud in the room where it was hidden. Upstairs, the stuffed animals tip out of their circle for the first time in thirty years, and in the cellar the scratching stops, at least for tonight.",
+    "beats": [
+      "Mrs. Vantreese, the neighbor, remembers the Corwins: toys in circles, flipped pictures, the father's scratches, and the night in 1994 she carried baby Wren out to the car.",
+      "Inside, the front parlor is still set up as a doctor's waiting room, with its portraits hanging upside down.",
+      "Nell Tolliver, a mother from the early 1900s, is still waiting on the bench. She tells the legend: her girl Sallie, the pain in her side, the doctor taking her through the frosted door, the screaming.",
+      "In the kitchen the gas range lights itself. Ray Corwin's notebook records the fires and the scratches, always three lines, and says he locked the nursery and hid the key.",
+      "In the stair hall, three deep gouges run down the wallpaper at a grown man's shoulder height. A child couldn't have reached them.",
+      "In the nursery the stuffed animals sit in a perfect circle around the crib. Sallie's ghost says she didn't scratch the baby's papa. The Other One did, and it tells people it's her.",
+      "Sallie hands over the cellar key and warns that the Other One lives down there, among the doctor's things.",
+      "In the cellar, the doctor's instrument cabinet holds the surgery key while the Other One crawls toward Wren.",
+      "In the surgery, Dr. Vail confesses he didn't wait for the ether.",
+      "The daybook names her, Sarah, called Sallie, and shows he never reported her death. That unrecorded name is what the Other One has been wearing."
+    ],
+    "artDirection": {
+      "style": "PS1-era low-poly horror: chunky geometry, wobbling affine-warped textures at 128 px or below, heavy ordered dithering and fog that swallows the edges of every room. Everything feels like an old house photographed on cheap film under a single bulb. Victorian bones sit under 1970s–90s rental grime: rose wallpaper over doctor's-office trim, linoleum over pine. Shapes are simple and readable; faces are flat painted textures with dark eye sockets. Nothing is gory. The horror lives in arrangement and wrongness: things turned, circled, scratched in threes.",
+      "palette": [
+        "nicotine yellow",
+        "oxblood red",
+        "ether green",
+        "tarnished brass",
+        "cold moonlight blue",
+        "soot black"
+      ],
+      "materials": [
+        "faded rose-and-ivy wallpaper yellowed by lamp smoke, peeling at the seams",
+        "worn heart-pine floorboards, dark varnish rubbed pale along the walking paths",
+        "dark-stained oak wainscot and door trim with chipped varnish",
+        "mustard-and-brown 1970s linoleum, curling at the edges",
+        "whitewashed limestone foundation wall, damp and flaking",
+        "white hexagonal porcelain tile with grey grout, stained rust-brown near the drain",
+        "white clapboard siding with paint flaking to grey wood",
+        "frost-browned lawn grass over packed dark earth"
+      ],
+      "lighting": "Cold moonlight blue spills through every window as the base light, broken by one warm, unreliable source per room: a fringed lamp, a bare bulb, the blue flicker of a gas burner, a streetlamp. Bulbs buzz and dip. Deep corners fall to soot black under fog. The surgery alone is lit by a sick ether-green glow from its glass-fronted cabinet."
+    },
+    "rooms": [
+      {
+        "id": "front-yard",
+        "name": "The Front Yard on North 2nd Street",
+        "outdoor": true,
+        "grid": [
+          1,
+          0
+        ],
+        "size": "wide and shallow, 18 x 10 m, open sky",
+        "purpose": "Start. Introduces the 1990s haunting and the Corwins' escape through a living witness, and hands over the front door key.",
+        "description": "A cold October night on North 2nd Street in Atchison. Along the north edge stands the Sallie House: a narrow two-story frame house of white clapboard siding with paint flaking to grey wood, a sagging front porch, and two upstairs windows that look like they're watching. A low iron fence runs along the frost-browned lawn, its gate hanging open. A hand-painted tour sign is staked by the walk. A bare elm leans over the porch, and the one streetlamp buzzes on and off. Mrs. Vantreese waits at the gate in her housecoat and parka with a flashlight, the way she's waited for tour groups for twenty years. Thin mist hangs low over the grass.",
+        "walls": "white clapboard siding with paint flaking to grey wood (house face along the north edge)",
+        "floor": "frost-browned lawn grass over packed dark earth, with a cracked limestone front walk",
+        "lighting": "Cold moonlight blue over everything, a sodium-yellow streetlamp at the west edge that keeps cutting out, and a faint warm glow behind the front parlor's curtains though no one is inside.",
+        "focalPoint": "The front door at the top of the porch steps, center of the north edge, its oval glass pane glowing faintly yellow.",
+        "storyObjects": [
+          {
+            "name": "hand-painted 'Sallie House Tours' sign on a wooden stake",
+            "where": "beside the front walk, just inside the gate",
+            "reveals": "The tourist version of the legend: 'A little girl named Sallie died here on the doctor's table. Some say she never left. Tours by appointment. Do not go in alone.'"
+          },
+          {
+            "name": "rusted tin mailbox stuffed with a yellowed 1994 newspaper",
+            "where": "on a post by the gate",
+            "reveals": "A faded local story: 'Young family leaves North 2nd St. home citing ghost.' The father is pictured from behind, his forearm bandaged in three strips."
+          }
+        ],
+        "dressing": [
+          "low wrought-iron fence with open gate",
+          "bare elm tree leaning over the porch",
+          "flickering cast-iron streetlamp",
+          "sagging wooden porch with two posts and a broken step",
+          "dead potted geranium on the porch rail",
+          "fallen elm leaves heaped along the fence",
+          "a tour group's dropped paper ticket stub"
+        ],
+        "characters": [
+          {
+            "name": "Mrs. Ilse Vantreese",
+            "appearance": "A small woman in her late seventies with a white braid, a quilted pink housecoat under a man's brown canvas parka, rubber boots, and a heavy silver flashlight held against her chest.",
+            "role": "witness, neighbor and keyholder",
+            "personality": "Brisk, warm, a little too talkative, Kansas-plain. Covers fear with practicality. 'Lord, look at you. You were this big. I carried you out that door myself.'",
+            "knows": "She has lived across the street since 1971. She remembers the Corwins: the stuffed animals they'd find circled on the nursery floor, the pictures turned upside down, the stove lighting itself, and Ray's arms covered in scratches, always three lines, like fingers. The night they left in 1994, she carried baby Wren to the car while Ray loaded it bleeding through his shirt. 'And there's always a woman sitting in the front room. Tour folks see her. Be polite to her.' OUTCOME: hands over the Front Door Key and sets the objective to unlock the door and speak to the woman inside.",
+            "brushOff": "I've told you all I know, honey. I'll be right here with the flashlight.",
+            "behavior": "stands still at the gate",
+            "hostile": false
+          }
+        ]
+      },
+      {
+        "id": "waiting-room",
+        "name": "The Doctor's Waiting Room",
+        "outdoor": false,
+        "grid": [
+          1,
+          1
+        ],
+        "size": "medium, 10 x 7 m, 3.6 m tall",
+        "purpose": "Tells the legend of Sallie's death from her mother's point of view and points the player to the nursery key in the kitchen. Its north wall holds the final locked door.",
+        "description": "The front parlor was never quite turned back into a home. A long oak bench and two hard chairs still face the north wall like a waiting room, with a brass umbrella stand by the door and a small table of crumbling magazines. Every framed portrait on the walls hangs upside down, stern faces staring at the floor. In the center of the north wall is a dark oak door with a frosted-glass panel, black-and-gold lettering reading 'A. VAIL, M.D. – SURGERY', and a glass knob. It's locked, and a faint green glow seeps through the glass. Doorways open west to the kitchen and east to the stair hall. On the bench sits a woman in a 1900s shirtwaist and long skirt, holding a child's small coat in her lap.",
+        "walls": "faded rose-and-ivy wallpaper yellowed by lamp smoke, peeling at the seams, above dark-stained oak wainscot and door trim with chipped varnish",
+        "floor": "worn heart-pine floorboards, dark varnish rubbed pale along the walking paths",
+        "lighting": "Dim. A fringed table lamp with a nicotine-yellow shade buzzes in the corner, moonlight falls through lace curtains, and the frosted surgery door gives off a thin ether-green glow.",
+        "focalPoint": "The frosted-glass surgery door with its gold lettering, center of the north wall, glowing green.",
+        "storyObjects": [
+          {
+            "name": "row of upside-down portraits in oval gilt frames",
+            "where": "along the east and west walls at eye level",
+            "reveals": "Each one has been turned on its nail, not dropped. On the back of one, in a 1990s ballpoint scrawl: 'Turned them right AGAIN. 3rd time this week. —R.'"
+          },
+          {
+            "name": "frosted-glass surgery door lettered 'A. VAIL, M.D. – SURGERY'",
+            "where": "center of the north wall",
+            "reveals": "Locked tight. Through the frosted glass, a green glow and the shape of a tall table. The air at the keyhole smells sweet and chemical, like ether."
+          }
+        ],
+        "dressing": [
+          "long oak waiting bench",
+          "two hard spindle-back chairs",
+          "brass umbrella stand",
+          "side table with crumbling 1910s magazines",
+          "fringed table lamp with a nicotine-yellow shade",
+          "lace curtains on the south-facing window frames",
+          "a coat rack holding one small child's bonnet"
+        ],
+        "characters": [
+          {
+            "name": "Nell Tolliver",
+            "appearance": "Ghost of a thin young mother from the early 1900s: high-collared white shirtwaist, long dark wool skirt, hair pinned up and coming loose, a small red child's coat folded in her lap. Washed in a faint grey-blue translucence, eyes red-rimmed and fixed on the surgery door.",
+            "role": "ghost, Sallie's mother",
+            "personality": "Quiet, polite, stuck in the worst afternoon of her life and speaking as if it's still happening. 'He said it would only be a little while. He said to wait here.'",
+            "knows": "She brought her daughter Sallie, six years old, with a burning pain low on her right side. The doctor took the girl straight through the frosted door, saying he had another patient coming. She heard the ether bottle clink, and then, too soon, Sallie screaming her name. Then it went quiet, and the door never opened again. 'She's upstairs now, in the nursery, with the toys. She won't come down. The last man who lived here locked that room. I watched him hide the key in the breadbox on the kitchen counter.' One ominous line: 'Something else goes up and down those stairs, and it isn't her.' OUTCOME: sets the objective to search the breadbox in the kitchen.",
+            "brushOff": "I've told you all I know. I have to wait here. He said to wait.",
+            "behavior": "sits still on the bench, facing the surgery door",
+            "hostile": false
+          }
+        ]
+      },
+      {
+        "id": "kitchen",
+        "name": "The Kitchen Where the Burners Lit Themselves",
+        "outdoor": false,
+        "grid": [
+          0,
+          1
+        ],
+        "size": "small and cluttered, 8 x 7 m, 3.4 m tall",
+        "purpose": "The 1990s haunting up close: the fires, the father's notebook, the nursery key. Its north wall holds the locked cellar door.",
+        "description": "The Corwins' 1990s rental kitchen, abandoned mid-life: a harvest-gold refrigerator, a white enamel gas range, a chrome-legged dinette table with one chair knocked over. Above the range, black scorch marks spread up the wallpaper in soft-edged blooms. The front burner flickers blue on its own every few seconds and flares high when anyone gets close. A dented tin breadbox sits on the counter beside a dish rack of baby bottles. A spiral notebook lies open on the table. On the north wall a narrow plank door with a padlocked hasp leads to the cellar stairs. A hand-lettered card is thumbtacked to it: 'DO NOT OPEN. —R.'",
+        "walls": "faded rose-and-ivy wallpaper yellowed by lamp smoke, peeling at the seams, black with scorch marks above the stove",
+        "floor": "mustard-and-brown 1970s linoleum, curling at the edges",
+        "lighting": "A bare bulb on a pull-chain that dips and buzzes, the refrigerator's open door spilling yellow light, and the blue pulse of the self-lighting burner.",
+        "focalPoint": "The white enamel gas range against the north wall, its front burner flaring blue under a fan of black scorch marks.",
+        "storyObjects": [
+          {
+            "name": "Ray Corwin's open spiral notebook with coffee rings",
+            "where": "on the chrome dinette table, center of the room",
+            "reveals": "Dated entries from 1993–94: 'Burner on again. Knobs OFF.' 'Toys in a circle round the crib. Dana says she didn't.' 'Woke up with scratches. Three lines. Always three.' Last entry: 'Locked the nursery. Key in the breadbox. Cellar key is gone off its nail. We leave Friday.'"
+          },
+          {
+            "name": "dented tin breadbox stenciled 'BREAD'",
+            "where": "on the counter beside the dish rack",
+            "reveals": "The Nursery Key drops out from behind a hardened heel of bread wrapped in a 1994 grocery bag."
+          },
+          {
+            "name": "black scorch marks blooming up the wallpaper",
+            "where": "on the north wall above the gas range",
+            "reveals": "The burns start well away from the stove and spread toward it, as if the fires began in the wall. Three thin lines are scratched through the soot."
+          }
+        ],
+        "dressing": [
+          "harvest-gold refrigerator with its door hanging open",
+          "white enamel gas range (hazard: the front burner flares on its own; touching the flame costs a heart)",
+          "chrome-legged dinette table with one overturned chair",
+          "dish rack of baby bottles",
+          "wall-mounted rotary phone with its cord dangling",
+          "empty dog bowl and a chewed leash by the back wall",
+          "padlocked plank cellar door on the north wall"
+        ],
+        "characters": []
+      },
+      {
+        "id": "stair-hall",
+        "name": "The Stair Hall",
+        "outdoor": false,
+        "grid": [
+          2,
+          1
+        ],
+        "size": "narrow and tall, 6 x 8 m, 6.5 m tall, open to the second floor",
+        "purpose": "The scratches made physical: proof that what attacked the father was not a six-year-old. The stairs lead to the locked nursery.",
+        "description": "A narrow, two-story hall. A steep staircase with a turned oak banister climbs the north wall from west to east to a small landing and a white-painted door. That's the nursery, locked, with a child's crayon drawing of a house taped to it. Halfway up, three deep parallel gouges run down the wallpaper at a grown man's shoulder height. Below, a hall table holds a family photograph lying face down. The stairwell rises into shadow. Every so often a floorboard creaks on the landing above, though nobody is there.",
+        "walls": "faded rose-and-ivy wallpaper yellowed by lamp smoke, peeling at the seams, above dark-stained oak wainscot and door trim with chipped varnish",
+        "floor": "worn heart-pine floorboards, dark varnish rubbed pale along the walking paths, continuing up the stair treads",
+        "lighting": "Very dark. One frosted glass ceiling globe on the landing flickers, and a tall stair window throws a cold moonlight blue band across the steps.",
+        "focalPoint": "The steep staircase climbing the north wall to the white nursery door on the landing.",
+        "storyObjects": [
+          {
+            "name": "three deep gouges torn down the wallpaper",
+            "where": "on the north wall halfway up the stairs, at shoulder height",
+            "reveals": "Each gouge is a finger's width apart and runs nearly a meter. They are far too high and too long for a child's hand, and the plaster underneath is scored."
+          },
+          {
+            "name": "face-down family photograph in a brass frame",
+            "where": "on the hall table at the foot of the stairs",
+            "reveals": "Ray and Dana Corwin, 1993, holding a newborn wrapped in a yellow blanket: Wren. Behind them, half out of focus on the stairs, stands a small blurred shape in white."
+          }
+        ],
+        "dressing": [
+          "turned oak banister and newel post",
+          "narrow hall table with a dried flower vase",
+          "brass hooks with one man's flannel jacket, sleeve torn in three strips",
+          "frosted ceiling globe on the landing",
+          "tall stair window with a cracked pane",
+          "a child's crayon house drawing taped to the nursery door"
+        ],
+        "characters": []
+      },
+      {
+        "id": "nursery",
+        "name": "Sallie's Nursery",
+        "outdoor": false,
+        "grid": [
+          2,
+          2
+        ],
+        "size": "small and low, 7 x 6 m, 3.2 m tall, under a sloped ceiling",
+        "purpose": "The heart of the 1990s haunting and the gentlest room in the house. Sallie tells the truth about the scratches and hands over the cellar key.",
+        "description": "A low upstairs bedroom under a sloped ceiling, painted for a baby in 1993 and left that way. Against the north wall stands a white-painted wooden crib, and around it, on the floor in a perfect circle, sit twelve stuffed animals facing outward like guards: a worn bear, a rabbit with one ear, a yellow duck, a calico cat. A rocking chair creaks slowly by itself. A mobile of paper stars turns over the crib with no draft. Sitting cross-legged inside the toy circle, beside the crib, is a small girl in a white nightgown.",
+        "walls": "faded rose-and-ivy wallpaper yellowed by lamp smoke, peeling at the seams, with a pastel duckling border pasted along the top",
+        "floor": "worn heart-pine floorboards, dark varnish rubbed pale along the walking paths, with a braided oval rag rug",
+        "lighting": "Soft and dim. A duck-shaped night-light glows nicotine yellow by the crib, and moonlight falls through a small dormer window. It's the warmest light in the house.",
+        "focalPoint": "The white crib against the north wall, ringed on the floor by twelve stuffed animals in a perfect outward-facing circle.",
+        "storyObjects": [
+          {
+            "name": "circle of twelve stuffed animals facing outward around the crib",
+            "where": "on the floor around the crib, center of the north wall",
+            "reveals": "The toys are evenly spaced, each turned to face out at the room and the door, like sentries. The rug inside the circle is clean; outside it the floorboards are scratched in threes."
+          },
+          {
+            "name": "white-painted wooden crib with a yellow baby blanket",
+            "where": "against the north wall, inside the toy circle",
+            "reveals": "A faded name card is tied to the rail: 'WREN, born Feb. 1993.' Under the blanket lies a small hand-sewn rag doll in a 1900s calico dress. It doesn't belong to the 1990s."
+          }
+        ],
+        "dressing": [
+          "slow-turning mobile of paper stars",
+          "rocking chair that rocks by itself",
+          "low painted dresser with a lamp and a baby monitor",
+          "duck-shaped night-light",
+          "pastel duckling wallpaper border",
+          "braided oval rag rug",
+          "small dormer window"
+        ],
+        "characters": [
+          {
+            "name": "Sallie",
+            "appearance": "Ghost of a six-year-old girl from the early 1900s: plain white cotton nightgown, bare feet, dark hair in a loose braid, a pale round face with large dark eyes, one hand pressed to her right side. Faint grey-blue translucence, sitting cross-legged inside the toy circle.",
+            "role": "ghost, the girl from the legend",
+            "personality": "Shy, serious, a little bossy the way small children are about rules. Speaks in plain short sentences. 'You got big. I watched you when you were little. I put the animals out so it couldn't get close.'",
+            "knows": "She remembers Wren as a baby and stayed by the crib every night. She did NOT scratch the baby's papa: 'That was the Other One. It came after me. It tells people it's me, because nobody wrote my real name down.' She kept the toys in a circle because the Other One won't cross them. She took the cellar key off its kitchen nail so Papa couldn't go down there again. 'The Other One lives down in the cellar with the doctor's old things. His key to the room with the table is in his cabinet down there.' One ominous line: 'It's very slow. But it doesn't ever stop.' OUTCOME: hands over the Cellar Key and sets the objective to unlock the cellar in the kitchen and find the doctor's cabinet.",
+            "brushOff": "I told you all I know. I have to stay with the animals.",
+            "behavior": "sits still inside the toy circle",
+            "hostile": false
+          }
+        ]
+      },
+      {
+        "id": "cellar",
+        "name": "The Cellar Where the Doctor's Things Were Put Away",
+        "outdoor": false,
+        "grid": [
+          0,
+          2
+        ],
+        "size": "low and wide, 12 x 9 m, 3 m tall, crowded with pillars",
+        "purpose": "The danger room. The Other One prowls here. The doctor's instrument cabinet holds the surgery key.",
+        "description": "Wooden steps drop from the kitchen door into a low cellar of whitewashed limestone foundation wall, damp and flaking, held up by thick timber posts. Everything from the old office was shoved down here decades ago: a sheeted examination chair, crates of brown medicine bottles, a jointed wooden screen. Against the north wall stands a tall oak-and-glass instrument cabinet, its panes spidered with cracks. Three-line scratches score the posts and walls at every height, from the floor to the ceiling joists. Something child-sized and wrong moves between the pillars, dragging long grey fingers across the stone.",
+        "walls": "whitewashed limestone foundation wall, damp and flaking",
+        "floor": "packed dark earth with a few rotted planks laid as a path",
+        "lighting": "Nearly black. A single bare bulb hangs over the stairs, and a low coal-chute window lets in a cold moonlight blue slit. The cabinet's glass catches the light.",
+        "focalPoint": "The tall oak-and-glass instrument cabinet against the north wall, its cracked panes catching the bulb's light.",
+        "storyObjects": [
+          {
+            "name": "tall oak-and-glass instrument cabinet with cracked panes",
+            "where": "against the center of the north wall",
+            "reveals": "Rows of rusted scalpels, clamps and a cracked ether cone. A brass key on a cardboard tag drops from the bottom drawer, labeled in faded ink: 'Surgery — A.V.'"
+          },
+          {
+            "name": "Ray Corwin's dropped cassette recorder",
+            "where": "on a crate near the foot of the stairs",
+            "reveals": "The tape is labeled 'Cellar, 3 a.m.' On it is hiss, slow dragging, then a deep, flat voice that is not a child's, saying 'Sallie. Sallie. Sallie,' three times, mimicking a little girl and getting it wrong."
+          }
+        ],
+        "dressing": [
+          "thick timber support posts scratched in threes",
+          "sheeted 1900s examination chair",
+          "crates of brown glass medicine bottles",
+          "folding wooden privacy screen",
+          "rusted coal-chute hatch",
+          "steep wooden cellar steps",
+          "bare bulb over the stairs"
+        ],
+        "characters": [
+          {
+            "name": "The Other One",
+            "appearance": "A figure that starts out the size of a six-year-old girl in a stained white nightgown, a mockery of Sallie, but its limbs are too long and it stands too tall when it rises. Its face is a smooth grey smudge with no features. Its fingers are long, grey and jointed, three to a hand, ending in black nails. It moves in a low crouching crawl.",
+            "role": "threat, the thing that borrowed Sallie's name",
+            "personality": "Says nothing of its own. It mutters 'Sallie' in a deep, flat voice that tries to sound like a child.",
+            "knows": "Nothing to tell. It is the presence that scratched Ray Corwin, set the fires and hid behind a dead girl's name.",
+            "brushOff": "",
+            "behavior": "hunts the player slowly through the cellar pillars, slower than her; a touch costs one heart and leaves three scratches on screen",
+            "hostile": true
+          }
+        ]
+      },
+      {
+        "id": "surgery",
+        "name": "Dr. Vail's Surgery",
+        "outdoor": false,
+        "grid": [
+          1,
+          2
+        ],
+        "size": "medium, 9 x 7 m, 3.6 m tall",
+        "purpose": "The final room and the truth: what happened on the table, what Sallie's name was, and why no record of her exists.",
+        "description": "Behind the frosted door the room is untouched since the early 1900s. White porcelain tile covers the floor, sloping to a drain stained rust-brown. In the center stands a narrow enameled operating table with cracked leather straps, under a hanging metal lamp. A brown ether bottle and wire-and-gauze mask sit on a rolling stand beside it, the bottle still uncorked, and an open leather daybook rests on the instrument stand. Against the north wall is a glass-fronted cabinet glowing ether green, and beside it a deep porcelain basin where a tall man in a surgeon's apron stands scrubbing his hands. He has been scrubbing them for over a hundred years.",
+        "walls": "dark-stained oak wainscot and door trim with chipped varnish, with white hexagonal porcelain tile with grey grout, stained rust-brown near the drain, running halfway up the walls",
+        "floor": "white hexagonal porcelain tile with grey grout, stained rust-brown near the drain",
+        "lighting": "A sick ether-green glow from the glass cabinet on the north wall and a dead hanging surgical lamp that flickers on for a second at a time. The light is cold, clinical and wrong.",
+        "focalPoint": "The narrow enameled operating table with cracked leather straps at the center of the room, under the hanging lamp.",
+        "storyObjects": [
+          {
+            "name": "narrow enameled operating table with cracked leather straps",
+            "where": "center of the room under the hanging lamp",
+            "reveals": "The straps are sized for an adult and buckled to their last holes, as small as they go. A child's red hair ribbon is caught in one buckle."
+          },
+          {
+            "name": "brown glass ether bottle and wire-and-gauze mask",
+            "where": "on a rolling stand beside the table",
+            "reveals": "The label reads 'ETHER, for anaesthesia — allow four minutes.' The bottle is nearly full. Barely any was used."
+          },
+          {
+            "name": "Dr. Vail's open leather daybook",
+            "where": "on the instrument stand at the foot of the table",
+            "reveals": "The entry, in a shaking hand: 'Female child, aged six, brought by mother. Pain right side; appendix. Second patient waiting. Began before the ether had taken. Child woke. Lost her at ten past four. Mother gave the name Sarah, called Sallie.' In the margin, underlined twice: 'Not reported.' This is why there is no record. The name that was never written down is the one the Other One has been wearing. Reading it aloud ends the game."
+          }
+        ],
+        "dressing": [
+          "deep porcelain scrub basin with brass taps",
+          "glass-fronted cabinet glowing ether green",
+          "hanging metal surgical lamp",
+          "rolling instrument stand",
+          "enamel kidney dish",
+          "white cotton surgeon's gowns on a peg",
+          "floor drain stained rust-brown"
+        ],
+        "characters": [
+          {
+            "name": "Dr. Amos Vail",
+            "appearance": "Ghost of a tall, gaunt physician from the early 1900s: grey mutton-chop whiskers, wire spectacles, starched collar and black waistcoat under a long white surgeon's apron, sleeves rolled to the elbow, hands red and raw from scrubbing. Grey-blue translucence, always half-turned toward the basin.",
+            "role": "ghost, the doctor from the legend",
+            "personality": "Clipped, defensive, exhausted, with a physician's habit of hiding behind facts. He doesn't look at Wren. 'It was an emergency. Appendix. There was no time. There was another patient.'",
+            "knows": "He had a second patient waiting and believed he could work fast. The ether needs four minutes; he gave it barely two. The girl woke on the table. Afterward he told the mother nothing and didn't report the death. He wrote it only in his daybook and never spoke of it, and something came into the house that liked a secret like that. One ominous line: 'A name nobody writes down is a name anything can wear.' OUTCOME: sets the final objective to read his daybook on the instrument stand.",
+            "brushOff": "I've told you all I know. I have to finish washing.",
+            "behavior": "stands at the basin, scrubbing his hands",
+            "hostile": false
+          }
+        ]
+      }
+    ],
+    "doors": [
+      {
+        "id": "front-door",
+        "rooms": [
+          "front-yard",
+          "waiting-room"
+        ],
+        "locked": true,
+        "description": "A heavy painted front door at the top of the porch steps, with an oval of beveled glass glowing faintly yellow and a tarnished brass knob and deadbolt."
+      },
+      {
+        "id": "kitchen-doorway",
+        "rooms": [
+          "waiting-room",
+          "kitchen"
+        ],
+        "locked": false,
+        "description": "A plain doorway in the west wall with dark-stained oak trim, its swinging door propped open with a doorstop."
+      },
+      {
+        "id": "hall-doorway",
+        "rooms": [
+          "waiting-room",
+          "stair-hall"
+        ],
+        "locked": false,
+        "description": "An arched doorway in the east wall with dark-stained oak trim and a faded velvet portiere pulled to one side."
+      },
+      {
+        "id": "nursery-door",
+        "rooms": [
+          "stair-hall",
+          "nursery"
+        ],
+        "locked": true,
+        "description": "A white-painted four-panel door on the stair landing, with a child's crayon drawing of a house taped at child height and a shiny 1990s brass lock fitted below the old porcelain knob."
+      },
+      {
+        "id": "cellar-door",
+        "rooms": [
+          "kitchen",
+          "cellar"
+        ],
+        "locked": true,
+        "description": "A narrow plank door in the kitchen's north wall with a padlocked iron hasp and a thumbtacked card reading 'DO NOT OPEN. —R.' Three scratches cross its lower boards."
+      },
+      {
+        "id": "surgery-door",
+        "rooms": [
+          "waiting-room",
+          "surgery"
+        ],
+        "locked": true,
+        "description": "A dark oak door with a frosted-glass panel lettered in black and gold 'A. VAIL, M.D. – SURGERY', a glass knob and an old brass lock, with ether-green light seeping through the glass."
+      }
+    ],
+    "keys": [
+      {
+        "name": "Front Door Key",
+        "appearance": "A modern brass house key on a red plastic tag that reads 'SALLIE HOUSE – TOURS'.",
+        "unlocks": "front-door",
+        "room": "front-yard",
+        "howFound": "Mrs. Vantreese hands it over at the end of her conversation at the gate.",
+        "hint": "Mrs. Vantreese"
+      },
+      {
+        "name": "Nursery Key",
+        "appearance": "A small shiny brass 1990s door key on a pink plastic duck keyring.",
+        "unlocks": "nursery-door",
+        "room": "kitchen",
+        "howFound": "Ray Corwin hid it in the tin breadbox the week the family fled. It drops out the first time the breadbox is searched.",
+        "hint": "Nell Tolliver in the waiting room saw him hide it in the breadbox; Ray's notebook confirms it."
+      },
+      {
+        "name": "Cellar Key",
+        "appearance": "A rusted iron padlock key on a loop of faded red hair ribbon.",
+        "unlocks": "cellar-door",
+        "room": "nursery",
+        "howFound": "Sallie took it off its kitchen nail decades ago to keep the baby's father out of the cellar, and gives it to Wren at the end of her conversation.",
+        "hint": "Ray's notebook notes the cellar key went missing off its nail."
+      },
+      {
+        "name": "Surgery Key",
+        "appearance": "A long tarnished brass bit key with a cardboard tag in faded ink: 'Surgery — A.V.'",
+        "unlocks": "surgery-door",
+        "room": "cellar",
+        "howFound": "It drops out of the bottom drawer the first time the doctor's oak-and-glass instrument cabinet is searched, while the Other One hunts nearby.",
+        "hint": "Sallie says the doctor's key to the room with the table is in his cabinet in the cellar."
+      }
+    ],
+    "objectives": [
+      {
+        "id": "meet-neighbor",
+        "text": "Talk to Mrs. Vantreese at the front gate of the Sallie House"
+      },
+      {
+        "id": "enter-house",
+        "text": "Unlock the front door and speak to the woman in the waiting room",
+        "room": "front-yard",
+        "trigger": "Mrs. Vantreese"
+      },
+      {
+        "id": "find-nursery-key",
+        "text": "Search the breadbox in the kitchen, west of the waiting room",
+        "room": "waiting-room",
+        "trigger": "Nell Tolliver"
+      },
+      {
+        "id": "open-nursery",
+        "text": "Climb the stairs in the east stair hall and unlock the nursery",
+        "room": "kitchen",
+        "trigger": "Nursery Key"
+      },
+      {
+        "id": "enter-cellar",
+        "text": "Unlock the cellar door in the kitchen and find the doctor's cabinet",
+        "room": "nursery",
+        "trigger": "Sallie"
+      },
+      {
+        "id": "open-surgery",
+        "text": "Open the frosted surgery door in the waiting room",
+        "room": "cellar",
+        "trigger": "Surgery Key"
+      },
+      {
+        "id": "read-daybook",
+        "text": "Read Dr. Vail's daybook on the instrument stand",
+        "room": "surgery",
+        "trigger": "Dr. Amos Vail"
+      }
+    ]
+  }
+}

@@ -1,4 +1,4 @@
-// The 2D overlay: hearts, the items the player carries, a hint line, the dialogue box and a centered
+// The 2D overlay: hearts, the items the player carries, the current objective, a hint line, the dialogue box and a centered
 // message for loading and errors. It's plain HTML over the canvas, so it stays crisp instead of going
 // through the retro filter. The art in public/ui/ is shared by every game (scripts/gen-ui.ts makes it).
 const DEFAULT_ITEM_ICON = "/ui/key.png";
@@ -21,6 +21,8 @@ export class Hud {
   readonly dialogue: DialogueBox;
   private readonly hearts: HTMLElement;
   private readonly items: HTMLElement;
+  private readonly objective: HTMLElement;
+  private readonly objectiveText: HTMLElement;
   private readonly hint: HTMLElement;
   private readonly message: HTMLElement;
 
@@ -28,10 +30,14 @@ export class Hud {
     const root = element("div", "hud", parent);
     this.items = element("div", "hud-items hud-frame", root);
     this.hearts = element("div", "hud-hearts", root);
+    this.objective = element("div", "hud-objective", root);
+    element("div", "hud-objective-label", this.objective).textContent = "Objective";
+    this.objectiveText = element("div", "hud-objective-text", this.objective);
     this.hint = element("div", "hud-hint", root);
     this.dialogue = new DialogueBox(root);
     this.message = element("div", "hud-message", root);
     this.setItems([]);
+    this.setObjective(null);
     this.setHint(null);
     this.showMessage(null);
   }
@@ -71,6 +77,12 @@ export class Hud {
         return slot;
       }),
     );
+  }
+
+  /** What the player should do next, along the top of the screen; null hides it. */
+  setObjective(text: string | null) {
+    this.objective.hidden = !text;
+    this.objectiveText.textContent = text ?? "";
   }
 
   /** A short prompt above the bottom of the screen, e.g. "[E] Talk". */

@@ -25,8 +25,8 @@ export function validateGame(value: unknown): { spec: GameSpec | undefined; issu
     if (judgeable) issues.push(...checkRoom(room, { path: `rooms[${index}](${room.id})`, sides: sides.get(room.id) ?? new Map() }));
   }
   if (parsed.complete) {
-    issues.push(...checkGame(parsed.spec ?? { version: 1, title: "", summary: "", rooms, connections: parsed.connections }));
-    // Every image is a paid GPU call and part of the wait before a game looks right.
+    issues.push(...checkGame(parsed.spec ?? { version: 1, title: "", summary: "", rooms, connections: parsed.connections, objectives: parsed.objectives }));
+    // Every image is a paid Gemini call and part of the wait before a game looks right.
     const art = collectArt({ rooms, connections: parsed.connections }).size;
     if (art > LIMITS.artJobs) issues.push({ severity: "error", path: "rooms", message: `The game needs ${art} images; the limit is ${LIMITS.artJobs}. Reuse materials and descriptions (with "tint" for color variants), and animate only things that move.` });
     else if (art > LIMITS.artJobsWarning) issues.push({ severity: "warning", path: "rooms", message: `The game needs ${art} images, which will take a while to generate` });

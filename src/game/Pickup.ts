@@ -15,13 +15,16 @@ export class Pickup extends Part {
   readonly item: ItemSpec;
   /** GameState key ("room/id") of a placed pickup, so it stays collected. Dropped ones are tracked by what dropped them. */
   readonly stateKey: string | undefined;
+  /** Id of the objective a placed pickup sets when it's picked up. */
+  readonly objective: string | undefined;
   /** Room clock time it was dropped, or undefined if it was placed. */
   readonly droppedAt: number | undefined;
 
-  constructor(item: ItemSpec, position: Vec3, textures: TextureLibrary, origin: { stateKey: string } | { droppedAt: number }) {
+  constructor(item: ItemSpec, position: Vec3, textures: TextureLibrary, origin: { stateKey: string; objective?: string } | { droppedAt: number }) {
     super({ shape: "panel", position, rotation: [0, 0, 0], size: [SIZE, SIZE, 0], solid: false }, { texture: textures.get(artFor.item(item).id) });
     this.item = item;
     this.stateKey = "stateKey" in origin ? origin.stateKey : undefined;
+    this.objective = "stateKey" in origin ? origin.objective : undefined;
     this.droppedAt = "droppedAt" in origin ? origin.droppedAt : undefined;
     this.dynamic = this.droppedAt !== undefined;
     this.leanBack(CAMERA_PITCH);

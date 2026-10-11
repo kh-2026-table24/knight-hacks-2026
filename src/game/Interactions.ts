@@ -25,7 +25,7 @@ export interface InteractionHost {
 
 const verb = (target: Interactable) => (target instanceof Character ? "Talk" : target.examine ? "Examine" : "Search");
 const describe = (item: ItemSpec) => `the ${item.name}`;
-// Said on later visits by something that already handed over its item and has no "afterwards" of its own.
+// Said on later visits by a character, or by a prop that already handed over its item, with no "afterwards" of its own.
 const NOTHING_MORE = { character: "I've told you all I know.", prop: "There's nothing more here." };
 
 // What the player does to the world. Touching is passive: doors go through, hazards and hostile
@@ -76,6 +76,7 @@ export class Interactions {
       }
       if (pickup.stateKey) game.state.collected.add(pickup.stateKey);
       room.take(pickup);
+      this.setObjective(game, pickup.objective);
     }
 
     const target = room.interactTarget(player.position);
@@ -99,8 +100,9 @@ export class Interactions {
     return true;
   }
 
-  // The first press plays the whole conversation (or examine text) and hands over any item at the end.
-  // Later presses play "afterwards": a brush-off once the item is gone, or the same lines again.
+  // The first press plays the whole conversation (or examine text), then hands over any item and sets any
+  // objective. Later presses play "afterwards". A character never repeats its conversation, so without
+  // one it brushes the player off; a prop repeats its lines unless it held an item.
   private async interact() {
     const room = this.host.room();
     const game = this.host.game();
@@ -113,7 +115,7 @@ export class Interactions {
     const item = character ? target.gives : target.contains;
     const speaker = character ? target.name : "";
     if (game.state.heard.has(key)) {
-      const fallback = item ? [character ? NOTHING_MORE.character : NOTHING_MORE.prop] : lines;
+      const fallback = character ? [NOTHING_MORE.character] : item ? [NOTHING_MORE.prop] : lines;
       const later = target.afterwards ?? fallback;
       if (later) await this.show(later, speaker);
       return;
@@ -121,11 +123,21 @@ export class Interactions {
 
     if (lines) await this.show(lines, speaker);
     game.state.heard.add(key);
-    if (!item || game.state.given.has(key) || this.host.room() !== room) return;
-    if (!lines) await this.show([`You find ${describe(item)}.`]);
-    game.state.given.add(key);
-    room.drop(target, item);
-    this.host.audio?.play("drop");
+    if (item && !game.state.given.has(key) && this.host.room() === room) {
+      if (!lines) await this.show([`You find ${describe(item)}.`]);
+      game.state.given.add(key);
+      room.drop(target, item);
+      this.host.audio?.play("drop");
+    }
+    this.setObjective(game, target.objective);
+  }
+
+  /** Makes `id` the objective on screen, unless the player is already past it. */
+  private setObjective(game: Game, id: string | undefined) {
+    const index = id ? game.spec.objectives.findIndex((objective) => objective.id === id) : -1;
+    if (index <= game.state.objective) return;
+    game.state.objective = index;
+    this.host.hud.setObjective(game.objective ?? null);
   }
 
   private async useDoor(door: Door) {
@@ -150,15 +162,13 @@ export class Interactions {
       return;
     }
 
+    // Walking up to a locked door with its key opens it straight away. Each key opens one door, so it's used up.
     if (key) {
       connection.unlock();
-      // Each key opens one door, so it's used up.
       game.state.keys.splice(game.state.keys.indexOf(key), 1);
       this.showKeys(game);
       this.host.audio?.play("unlock");
-      await this.show([`You unlock it with ${describe(key)}.`]);
     }
-    if (this.host.room() !== room) return;
     this.host.audio?.play("door-open");
     this.host.swapRooms(next, connection.id);
   }

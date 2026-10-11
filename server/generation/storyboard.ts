@@ -1,7 +1,10 @@
-// Stage 1 of generation: Claude picks a real haunting or crime, recalls what is known about it, and
-// writes a storyboard. Stage 2 (a separate prompt with the mechanics and GameSpec instructions)
+// Stage 1 of generation: the server picks a real haunting or crime at random, and Claude recalls what
+// is known about it and writes a storyboard. Left to choose, Claude kept picking the same story. Stage 2 (a separate prompt with the mechanics and GameSpec instructions)
 // turns the storyboard into the game, so this stage decides the story and the house, not the JSON.
 // Claude runs without tools here, so "research" means careful recall, not web search.
+
+import { GENERATED_ROOM } from "../../src/shared/constants";
+import { LIMITS } from "../../src/shared/spec";
 
 const STORIES = [
   // Haunted places: North America
@@ -111,27 +114,28 @@ const STORIES = [
   "The convict-era Port Arthur penal settlement (Tasmania)",
 ];
 
-export const STORYBOARD_PROMPT = `You are the lead writer and level designer for Paradise Chateau, a short 2.5D horror
+/** One story from the list, picked at random. */
+export const randomStory = () => STORIES[Math.floor(Math.random() * STORIES.length)];
+
+export const storyboardPrompt = (story: string) => `You are the lead writer and level designer for Paradise Chateau, a short 2.5D horror
 exploration game in a retro PS1 style. Each game is built from a real haunting, crime or legend.
 Your job in this step is the storyboard: the story, the cast, the house and what the player finds in it.
 A second step, with the full building instructions, turns your storyboard into the playable game, so
 write it to give that step everything it needs: vivid, specific and consistent.
 
-<stories>
-${STORIES.map((story) => `- ${story}`).join("\n")}
-</stories>
+<story>
+${story}
+</story>
 
 <steps>
-1. Choose one story from the list. Don't default to the most famous entries; the lesser-known ones
-   often make better games.
-2. Research it. Recall everything you reliably know: who was there, what happened and in what order,
-   the buildings and rooms involved, the objects, the period details, the rumors and sightings that
+1. Research the story above. Recall everything you reliably know: who was there, what happened and
+   in what order, the buildings and rooms involved, the objects, the period details, the rumors and sightings that
    came after. Separate the documented record from legend, and never present an invented detail as
    fact. Look hardest for physical details (an object, a mark on a wall, a locked room, a habit),
    because the player learns the story only through what they see, examine and hear.
-3. Find the game in it: a place the player explores, a mystery that unfolds room by room, and a
+2. Find the game in it: a place the player explores, a mystery that unfolds room by room, and a
    final room where the truth (or the haunting at its heart) is revealed.
-4. Write the storyboard.
+3. Write the storyboard.
 </steps>
 
 <the_game>
@@ -145,20 +149,33 @@ These are facts about the engine. A storyboard that ignores them can't be built.
 - The only item is a key, and each key opens one locked door and is used up. Nothing else gates
   progress: there are no other items, no inventory puzzles and no flags, so a character can't react to
   what the player has done or found.
-- Each character has one conversation, heard the first time the player talks to them. It tells part of
-  the story, hands over a key, or points toward one. After that they only brush her off (or repeat their
-  hint), so nobody has to be talked to twice.
+- Every character is someone the player can talk to; the only exception is a hostile threat. A figure
+  who has nothing to say doesn't belong in the game.
+- Each character has exactly one conversation, heard the first time the player talks to them. It tells
+  part of the story and always ends in an outcome: it hands over a key, gives the player a new
+  objective, or both. Every later talk gets the same short brush-off that helps no further ("I've told
+  you all I know."), so nobody has to be talked to twice.
 - A key can lie in the open, be hidden inside an object (it drops out the first time the player
   examines or searches it), or be handed over by a character at the end of their conversation. Hints
   are only words: a character or a note can point the player toward a key.
-- Each room has 2 to 4 story objects the player can examine; everything else in it is scenery.
+- Each room has 1 to 5 things the player can interact with in all, counting both story objects to
+  examine and characters to talk to; 2 or 3 is usually right. Everything else in it is scenery, so the
+  few things that respond are the ones that matter.
+- Objectives keep the player from getting stuck. One short instruction is on screen at a time. The
+  first is shown from the start; each later one replaces it when the player finishes examining a
+  particular story object, talking to a particular character, or picking up a particular key. Write one
+  for each step of the way through: after every key and every important clue, the next objective says
+  what to look for or where to go. Keep each under ${LIMITS.objectiveLength} characters, concrete, and naming the
+  thing and the place ("Ask the keeper's widow about the logbook", "Unlock the lamp room upstairs").
 - The map is a grid of rooms, one room per cell. Rooms connect only to neighboring cells (north,
   south, east or west), through a door in the shared wall. The first room listed is where the game
   starts. Every locked door's key must be reachable before that door.
 - The camera looks north from the south side of each room. Indoors, the north, west and east walls
   are built and the south side is open to the camera, so the north wall is the stage. Outdoor areas
   (yards, gardens, graveyards, the street) show only the building's face along the north edge.
-- A room is 6 to 30 m wide and deep and 3 to 10 m tall. A room holds at most 4 characters.
+- A room is ${LIMITS.roomSide[0]} to ${GENERATED_ROOM.maxSide} m wide and deep and ${LIMITS.roomHeight[0]} to ${GENERATED_ROOM.maxHeight} m tall. A room holds at most 4 characters.
+- The whole game is drawn from at most ${LIMITS.artJobsWarning} generated images: every distinct material, object
+  picture and character pose is one, and a description repeated word for word is drawn once.
 - Plan 4 to 8 rooms and 2 to 5 locked doors. At most 12 rooms.
 </the_game>
 
@@ -175,11 +192,12 @@ Everything here is advice, not rules. Break it when the story is better for it.
 - Characters can be ghosts, survivors, witnesses, caretakers or the thing itself. Give each one a
   voice, something they want and something they know. A hostile character should feel like part of
   the story, not just an obstacle.
-- Hold one visual identity across the whole game: a palette, a few recurring materials, and a
-  lighting mood. Describe surfaces and light concretely ("whitewashed plaster yellowed by lamp
-  smoke"), since those words become textures and lights.
+- Hold one visual identity across the whole game: a palette, a small set of recurring materials (6 to
+  10 for the whole game, reused word for word from room to room), and a lighting mood. Describe
+  surfaces and light concretely ("whitewashed plaster yellowed by lamp smoke"), since those words
+  become textures and lights.
 - Give each room one focal point on its north wall or at its center that the eye goes to first, and
-  2 to 4 story objects the player will want to examine. Outdoor areas have no walls to frame them, so
+  a few story objects the player will want to examine. Outdoor areas have no walls to frame them, so
   give them more dressing than indoor rooms.
 - Dressing and story objects are solid things that could stand, sit or hang somewhere. Weather and
   effects (spray, waves, fog, smoke, wind) belong in a room's lighting and description, not its objects.
@@ -189,13 +207,13 @@ Everything here is advice, not rules. Break it when the story is better for it.
 </guidance>
 
 <output>
-First write your research inside <research></research>: what you chose and why, the documented
-account, the legends, and the physical details you plan to use. Then write the storyboard as one JSON
-object inside <storyboard></storyboard>, in this shape:
+First write your research inside <research></research>: the documented account, the legends, and the
+physical details you plan to use. Then write the storyboard as one JSON object inside
+<storyboard></storyboard>, in this shape:
 
 {
   "source": {
-    "story": "the list entry you chose",
+    "story": "the story you were given, as written",
     "account": "the true story, 1-3 paragraphs, documented and legendary parts marked as such",
     "inspirations": ["real details you are using and where they appear in the game"]
   },
@@ -216,7 +234,7 @@ object inside <storyboard></storyboard>, in this shape:
       "name": "Name shown to the player",
       "outdoor": false,
       "grid": [0, 0],
-      "size": "rough size and shape, e.g. 'large and tall, 20 x 7 x 16 m' or 'a narrow passage'",
+      "size": "rough size and shape, e.g. 'large and tall, 18 x 6 x 14 m' or 'a narrow passage'",
       "purpose": "what this room does for the story and the progression",
       "description": "a vivid paragraph: what the player sees, where things are, what happened here",
       "walls": "wall surface",
@@ -224,7 +242,7 @@ object inside <storyboard></storyboard>, in this shape:
       "lighting": "how dark the room is and what lights it",
       "focalPoint": "the first thing the eye goes to, and where it is",
       "storyObjects": [
-        { "name": "specific, visual name (2 to 4 per room)", "where": "its place in the room", "reveals": "what examining it tells the player" }
+        { "name": "specific, visual name (with the characters, 1 to 5 things to interact with per room)", "where": "its place in the room", "reveals": "what examining it tells the player" }
       ],
       "dressing": ["other objects that fill the room and set the scene"],
       "characters": [
@@ -233,7 +251,8 @@ object inside <storyboard></storyboard>, in this shape:
           "appearance": "what the image model should draw",
           "role": "ghost, survivor, witness, threat...",
           "personality": "voice and manner, with one or two sample lines",
-          "knows": "what their one conversation tells the player, including any key they hand over or hint toward one",
+          "knows": "what their one conversation tells the player, and its outcome: the key they hand over, the objective it sets, or both",
+          "brushOff": "the one unhelpful line they say on every later talk",
           "behavior": "stands still, wanders, patrols a route, or hunts the player",
           "hostile": false
         }
@@ -257,9 +276,17 @@ object inside <storyboard></storyboard>, in this shape:
       "howFound": "how the player gets it, in story terms",
       "hint": "who or what points the player toward it, if anything"
     }
+  ],
+  "objectives": [
+    {
+      "id": "kebab-case-id",
+      "text": "what to do next, shown on screen (under ${LIMITS.objectiveLength} characters)",
+      "room": "id of the room where it's set (leave out for the first objective, which is shown from the start)",
+      "trigger": "the story object, character or key in that room that sets it, once the player examines it, talks to them or picks it up"
+    }
   ]
 }
 
 Rooms in the "rooms" list must have distinct grid cells, and every door must join two rooms whose
-cells are neighbors. Write nothing after the closing </storyboard>.
+cells are neighbors. List the objectives in the order the player meets them. Write nothing after the closing </storyboard>.
 </output>`;

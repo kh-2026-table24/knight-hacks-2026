@@ -70,6 +70,15 @@ export function keysIn(room: RoomSpec): { key: KeySpec; path: string }[] {
   ].flatMap(({ item, path }) => (item?.kind === "key" ? [{ key: item, path }] : []));
 }
 
+/** Everything in a room that sets an objective, with its path. */
+export function objectivesSetIn(room: RoomSpec): { objective: string; path: string }[] {
+  return [
+    ...room.props.map((p, i) => ({ objective: p.objective, path: `props[${i}](${p.id}).objective` })),
+    ...room.characters.map((c, i) => ({ objective: c.objective, path: `characters[${i}](${c.id}).objective` })),
+    ...room.pickups.map((p, i) => ({ objective: p.objective, path: `pickups[${i}](${p.id}).objective` })),
+  ].flatMap(({ objective, path }) => (objective ? [{ objective, path }] : []));
+}
+
 /** For each room, the wall each of its connections leaves through. Connections that don't join two neighboring rooms are skipped. */
 export function doorSides(rooms: RoomSpec[], connections: ConnectionSpec[]): Map<string, Map<string, Side>> {
   const grid = new Map(rooms.map((r) => [r.id, r.grid]));
@@ -114,6 +123,22 @@ export function checkGame(spec: GameSpec): Issue[] {
       if (ids.has(id)) error(`${roomPath(i)}.${path}`, `${roomPath(i)}.${path} uses the id "${id}", which something else in this room already has; ids must be unique within a room`, room.id);
       ids.add(id);
     }
+  });
+
+  const objectiveIds = new Set<string>();
+  spec.objectives.forEach((objective, i) => {
+    if (objectiveIds.has(objective.id)) error(`objectives[${i}]`, `objectives[${i}].id "${objective.id}" is used by another objective too; objective ids must be unique`);
+    objectiveIds.add(objective.id);
+  });
+  const objectivesSet = new Set<string>();
+  spec.rooms.forEach((room, i) => {
+    for (const { objective, path } of objectivesSetIn(room)) {
+      objectivesSet.add(objective);
+      if (!objectiveIds.has(objective)) error(`${roomPath(i)}.${path}`, `${roomPath(i)}.${path} is "${objective}", but there is no objective with that id`, room.id);
+    }
+  });
+  spec.objectives.slice(1).forEach((objective, i) => {
+    if (!objectivesSet.has(objective.id)) warn(`objectives[${i + 1}]`, `objectives[${i + 1}](${objective.id}) is never set by anything, so the player never sees it`);
   });
 
   const connectionIds = new Set<string>();

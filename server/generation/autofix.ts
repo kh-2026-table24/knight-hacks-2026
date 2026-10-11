@@ -20,8 +20,8 @@ const HANG_REACH = 1;
 /** How far a nudge clears what it moves away from. */
 const NUDGE_GAP = 0.02;
 
-/** Each room has 1 to this many things to examine or search (characters don't count). */
-export const MAX_INTERACTABLES = 4;
+/** Each room has 1 to this many things to interact with: props to examine or search, and characters to talk to. */
+export const MAX_INTERACTABLES = 5;
 
 const isScenery = (prop: PropSpec) => !prop.examine && !prop.contains && !prop.hazard;
 const interactable = (prop: PropSpec) => !!(prop.examine || prop.contains);
@@ -34,6 +34,7 @@ const fmt = (n: number) => String(Math.round(n * 100) / 100);
 export function autofixRoom(room: RoomSpec, sides: Map<string, Side>, doorArt: Map<string, string>): string[] {
   const fixes: string[] = [];
   fixDoors(room, sides, doorArt, fixes);
+  dropSilentCharacters(room, fixes);
   trimInteractables(room, fixes);
   trimLights(room, fixes);
   dropFloatingSprites(room, fixes);
@@ -72,13 +73,25 @@ function fixDoors(room: RoomSpec, sides: Map<string, Side>, doorArt: Map<string,
   }
 }
 
-/** Keeps every prop that holds an item, then the first ones written, until there are MAX_INTERACTABLES. */
+/** Characters the player can't talk to don't belong in the game, unless they're a threat. */
+function dropSilentCharacters(room: RoomSpec, fixes: string[]) {
+  const silent = room.characters.filter((character) => !character.dialogue && !character.hostile);
+  if (silent.length === 0) return;
+  room.characters = room.characters.filter((character) => !silent.includes(character));
+  fixes.push(`removed characters the player can't talk to: ${silent.map((c) => c.id).join(", ")}`);
+}
+
+/**
+ * Keeps every prop that holds an item or sets an objective, then the first ones written, until props and
+ * characters to talk to come to MAX_INTERACTABLES.
+ */
 function trimInteractables(room: RoomSpec, fixes: string[]) {
   const all = room.props.filter(interactable);
-  if (all.length <= MAX_INTERACTABLES) return;
-  const holders = all.filter((prop) => prop.contains);
-  const others = all.filter((prop) => !prop.contains).slice(0, Math.max(0, MAX_INTERACTABLES - holders.length));
-  const keep = new Set([...holders, ...others]);
+  const budget = Math.max(0, MAX_INTERACTABLES - room.characters.filter((character) => character.dialogue).length);
+  if (all.length <= budget) return;
+  const needed = all.filter((prop) => prop.contains || prop.objective);
+  const others = all.filter((prop) => !needed.includes(prop)).slice(0, Math.max(0, budget - needed.length));
+  const keep = new Set([...needed, ...others]);
   const dropped = all.filter((prop) => !keep.has(prop));
   for (const prop of dropped) {
     delete prop.examine;

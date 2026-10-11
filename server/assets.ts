@@ -1,3 +1,4 @@
+import { GoogleGenAI } from "@google/genai";
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import sharp from "sharp";
@@ -7,14 +8,15 @@ import { gameDir } from "./games";
 import { log } from "./log";
 import { getSecret } from "./secrets";
 
-// Images are drawn by FLUX.2 [klein] on a Modal GPU (imagegen/flux_modal.py). The endpoint and its proxy auth
-// token come from .env.local locally and from Secret Manager on Cloud Run (see secrets.ts). They're read on
-// first use, so the server can still serve games and already-generated assets without them.
-// Modal runs one GPU and queues extra requests there, where our play-order priority can't reach them,
-// so only a couple are sent at once and the rest wait here in priority order.
-const MAX_CONCURRENT = 2; // Modal calls in flight at once
-// Generous: a cold start loads the model before drawing (30+ s), and queued requests wait behind it.
-const REQUEST_TIMEOUT_MS = 5 * 60 * 1000;
+// The key comes from .env.local locally and from Secret Manager on Cloud Run (see secrets.ts). The client
+// is made on first use, so the server can still serve games and already-generated assets without a key.
+let client: GoogleGenAI | undefined;
+async function gemini() {
+  client ??= new GoogleGenAI({ apiKey: await getSecret("GEMINI_IMAGE_KEY", "gemini-image-key") });
+  return client;
+}
+const MODEL = "gemini-nano-banana-2.1";
+const MAX_CONCURRENT = 6; // Gemini calls in flight at once
 
 // Shared by every prompt so all of a game's assets look like they belong together.
 const STYLE =
@@ -23,9 +25,7 @@ const STYLE =
 // Cutouts are drawn on a green screen that is then made transparent. Green rather than white so
 // pale subjects (ghosts, bones, candles) don't get erased along with the background.
 const KEY_COLOR = "pure bright green (#00FF00)";
-// FLUX doesn't hit #00FF00 exactly, and frames redrawn from a reference come out darker (around 30,170,12),
-// so any strongly saturated green counts. Muted greens (moss, sage) are far less saturated and survive.
-const isKeyColor = (r: number, g: number, b: number) => g >= 140 && g - Math.max(r, b) >= 80;
+const isKeyColor = (r: number, g: number, b: number) => g >= 180 && r <= 120 && b <= 120;
 
 const CUTOUT_LONG_SIDE = 128; // pixels along a cutout's longer side
 const SURFACE_SIZE = 64; // surfaces are square tiles
@@ -55,7 +55,7 @@ export async function getAsset(gameId: string, game: GameSpec, artId: string): P
 export interface PaintStatus {
   /** Still working through the images. */
   running: boolean;
-  /** Images being drawn on Modal right now. */
+  /** Images being drawn by Gemini right now. */
   generating: number;
   total: number;
   ready: string[];
@@ -74,7 +74,7 @@ interface Painting {
 
 // Keyed by the GameSpec object, so an edited fixture starts a fresh plan.
 const paintings = new WeakMap<GameSpec, Painting>();
-// Modal calls in flight per game id.
+// Gemini calls in flight per game id.
 const generating = new Map<string, number>();
 
 /** Where a game's images stand. `start` begins painting it if it hasn't been started since the server started. */
@@ -106,7 +106,7 @@ function startPainting(gameId: string, game: GameSpec): Painting {
     if (todo.length) log(gameId, `painting ${todo.length} of ${painting.total} images (${painting.ready.size} already on disk)`);
     await Promise.all(
       todo.map(async ({ job, room }) => {
-        // One retry: a request can fail on a cold start or a dropped connection and succeed the second time.
+        // One retry: Gemini occasionally returns nothing or refuses a prompt it accepts the second time.
         for (let attempt = 0; ; attempt++) {
           try {
             await make(gameId, game, job, room);
@@ -150,12 +150,11 @@ function make(gameId: string, game: GameSpec, job: ArtJob, priority: number): Pr
   });
 }
 
-/** FLUX's full-size PNG for an art id, kept so later animation frames can use it as a reference. */
+/** Gemini's original JPEG for an art id, kept so later animation frames can use it as a reference. */
 function original(gameId: string, game: GameSpec, job: ArtJob, priority: number): Promise<Buffer> {
-  const file = join(assetsDir(gameId), `${job.id}.original.png`);
+  const file = join(assetsDir(gameId), `${job.id}.jpg`);
   return once(file, async () => {
-    // Games painted before the move to Modal kept Gemini's original as <id>.jpg.
-    const existing = (await readIfExists(file)) ?? (await readIfExists(join(assetsDir(gameId), `${job.id}.jpg`)));
+    const existing = await readIfExists(file);
     if (existing) return existing;
 
     const referenceJob = job.referenceId ? planOf(game).get(job.referenceId) : undefined;
@@ -165,19 +164,22 @@ function original(gameId: string, game: GameSpec, job: ArtJob, priority: number)
 
     const started = Date.now();
     log(gameId, `painting ${job.id} (room ${priority + 1} in play order${reference ? `, from ${job.referenceId}` : ""})`);
-    const png = await limit(priority, async () => {
-      generating.set(gameId, (generating.get(gameId) ?? 0) + 1);
-      try {
-        return await askModal(prompt, reference, job.aspectRatio);
-      } finally {
-        generating.set(gameId, generating.get(gameId)! - 1);
-      }
-    });
+    const jpeg = Buffer.from(
+      await limit(priority, async () => {
+        generating.set(gameId, (generating.get(gameId) ?? 0) + 1);
+        try {
+          return await askGemini(prompt, reference?.toString("base64"), job.aspectRatio);
+        } finally {
+          generating.set(gameId, generating.get(gameId)! - 1);
+        }
+      }),
+      "base64",
+    );
     log(gameId, `painted ${job.id} in ${((Date.now() - started) / 1000).toFixed(1)}s`);
 
     await mkdir(assetsDir(gameId), { recursive: true });
-    await writeFile(file, png);
-    return png;
+    await writeFile(file, jpeg);
+    return jpeg;
   });
 }
 
@@ -188,28 +190,28 @@ function promptFor(job: ArtJob) {
   return cutoutPrompt(job.subject ? `${job.subject}, ${job.prompt}` : job.prompt);
 }
 
-/** Draws one image on the Modal endpoint and returns it as a PNG. `reference` is an earlier frame to redraw. */
-export async function askModal(prompt: string, reference: Buffer | undefined, aspectRatio: string): Promise<Buffer> {
-  const [url, key, secret] = await Promise.all([
-    getSecret("MODAL_FLUX_URL", "modal-flux-url"),
-    getSecret("MODAL_KEY", "modal-key"),
-    getSecret("MODAL_SECRET", "modal-secret"),
-  ]);
-  const response = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "Modal-Key": key, "Modal-Secret": secret },
-    body: JSON.stringify({ prompt, aspect_ratio: aspectRatio, reference: reference?.toString("base64") }),
-    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+export async function askGemini(prompt: string, reference: string | undefined, aspectRatio: string): Promise<string> {
+  const interaction = await (await gemini()).interactions.create({
+    model: MODEL,
+    input: reference
+      ? [
+          { type: "image", data: reference, mime_type: "image/jpeg" },
+          { type: "text", text: prompt },
+        ]
+      : prompt,
+    // The smallest size Gemini offers; every image is shrunk to 128px or less anyway.
+    response_format: { type: "image", mime_type: "image/jpeg", aspect_ratio: aspectRatio, image_size: "512" },
   });
-  if (!response.ok) throw new Error(`Modal returned ${response.status}: ${(await response.text()).slice(0, 200)}`);
-  return Buffer.from(await response.arrayBuffer());
+  const data = interaction.output_image?.data;
+  if (!data) throw new Error("Gemini did not return an image");
+  return data;
 }
 
-// Shrinks FLUX's ~1024px PNG to pixel-art size with nearest-neighbor sampling, and for cutouts
+// Shrinks Gemini's 512px+ JPEG to pixel-art size with nearest-neighbor sampling, and for cutouts
 // makes the green screen transparent. Removes green everywhere, not just from the edges, so gaps
 // (between legs, inside handles) come out transparent too.
-export async function processImage(image: Buffer, kind: Kind, longSide = CUTOUT_LONG_SIDE): Promise<Buffer> {
-  const { width = 1, height = 1 } = await sharp(image).metadata();
+export async function processImage(jpeg: Buffer, kind: Kind, longSide = CUTOUT_LONG_SIDE): Promise<Buffer> {
+  const { width = 1, height = 1 } = await sharp(jpeg).metadata();
   const aspect = width / height;
   const [w, h] =
     kind === "surface"
@@ -218,7 +220,7 @@ export async function processImage(image: Buffer, kind: Kind, longSide = CUTOUT_
         ? [longSide, Math.round(longSide / aspect)]
         : [Math.round(longSide * aspect), longSide];
 
-  const { data, info } = await sharp(image)
+  const { data, info } = await sharp(jpeg)
     .resize(w, h, { kernel: "nearest", fit: "fill" })
     .ensureAlpha()
     .raw()
@@ -270,11 +272,19 @@ function removeGreenScreen(data: Buffer, width: number, height: number) {
 
 // Prompts -------------------------------------------------------------------------------------
 
+// The picture is stretched over a panel the size of the real thing, so any empty margin shrinks the
+// subject on screen and anything cropped is missing from the game. The image's aspect ratio already
+// matches the subject's, so it can fill the frame exactly.
+const FILL_FRAME = [
+  "Frame it tightly: the subject spans the full width or the full height of the image, touching those edges, with no empty margin or padding around it.",
+  "Yet every part of it is inside the image: nothing is cropped or cut off at any edge.",
+].join(" ");
+
 export function cutoutPrompt(prompt: string) {
   return [
     STYLE,
     `A single game sprite of ${prompt}.`,
-    "Centered, with the whole subject visible and filling most of the image.",
+    FILL_FRAME,
     `Solid flat ${KEY_COLOR} background everywhere around the subject, and no bright green on the subject itself.`,
     "No text, no border, no cast shadow, no ground, no scenery.",
   ].join(" ");
@@ -297,7 +307,9 @@ function characterPrompt(subject: string, pose: string) {
   return [
     STYLE,
     `A single full-body game character sprite of ${subject}, ${pose}.`,
-    "Facing right in a three-quarter view, centered, with the whole figure visible and filling most of the image.",
+    "Facing right in a three-quarter view.",
+    "Frame it tightly: the figure fills the image from the top of its head to the soles of its feet, touching the top and bottom edges with no empty margin.",
+    "Yet the whole figure is inside the image, head to feet: nothing is cropped or cut off at any edge.",
     `Solid flat ${KEY_COLOR} background everywhere around the figure, and no bright green on the figure itself.`,
     "No text, no border, no cast shadow, no ground, no scenery.",
   ].join(" ");
@@ -309,7 +321,7 @@ function framePrompt(subject: string, pose: string) {
     "The attached image is the first frame of a sprite animation.",
     `Draw another frame of the same animation: ${subject}, ${pose}.`,
     "Keep the exact same subject, art style, pixel size, outlines, color palette, proportions and scale,",
-    "and keep it in the same place in the image so the frames line up when played in sequence. Change only the pose or motion described.",
+    "and keep it in the same place in the image, filling it the same way, edge to edge with nothing cropped, so the frames line up when played in sequence. Change only the pose or motion described.",
     `Solid flat ${KEY_COLOR} background, the same as the attached image. No text, no border, no cast shadow, no scenery.`,
   ].join(" ");
 }

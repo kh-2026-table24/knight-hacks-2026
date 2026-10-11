@@ -2,7 +2,8 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { artIdsForRoom, collectArt } from "../../src/shared/art";
-import { doorSides } from "../../src/shared/checkGame";
+import { doorSides, objectivesSetIn } from "../../src/shared/checkGame";
+import { GENERATED_ROOM } from "../../src/shared/constants";
 import { errorsIn, formatIssues, type Issue } from "../../src/shared/issues";
 import { parseGameSpec } from "../../src/shared/parseSpec";
 import { isFields } from "../../src/shared/reader";
@@ -15,7 +16,7 @@ import { autofixRoom } from "./autofix";
 import { askClaude, TokenMeter } from "./claude";
 import { applyPatch, patchSection, repairSection, type RepairContext } from "./repair";
 import { roomPrompt, roomSystemPrompt } from "./roomPrompt";
-import { STORYBOARD_PROMPT } from "./storyboard";
+import { randomStory, storyboardPrompt } from "./storyboard";
 import { extractTagged, extractTaggedJson } from "./tagged";
 
 // The whole pipeline: a storyboard call, then one call per room in parallel, then validation with
@@ -49,7 +50,7 @@ export async function generateGame(gameId: string, hooks: GenerateHooks = {}): P
   const storyboard = draft?.storyboard ?? (await writeStoryboard(gameId, hooks.meter));
   hooks.onStoryboard?.(storyboard);
   const system = roomSystemPrompt(storyboard);
-  // A share of the warning level, not the hard limit, so a few rooms running over still fits.
+  // Each room's share of what generation aims for (the warning level), well under the hard limit.
   const artBudget = Math.floor(LIMITS.artJobsWarning / storyboard.rooms.length);
   const ask = { gameId, system, storyboard, artBudget, meter: hooks.meter };
 
@@ -79,7 +80,7 @@ export async function generateGame(gameId: string, hooks: GenerateHooks = {}): P
     if (warnings.length) log(gameId, `${warnings.length} warning${warnings.length === 1 ? "" : "s"}:\n${formatIssues(warnings)}`, "warn");
     const problems = problemsByRoom(game, errorsIn(issues), artBudget);
     // Asked for while there are repair rounds left, but not worth failing a playable game over.
-    const wishes = wishesByRoom(game);
+    const wishes = wishesByRoom(game, storyboard, artBudget);
     if (spec && (wishes.size === 0 || round === MAX_REPAIRS)) {
       await saveGame(gameId, spec);
       log(gameId, `saved "${spec.title}"`);
@@ -113,9 +114,12 @@ async function savedDraft(gameId: string): Promise<{ storyboard: Storyboard; roo
 
 /** Asks for a storyboard until its map and keys check out, and saves it next to the game. */
 async function writeStoryboard(gameId: string, meter: TokenMeter | undefined): Promise<Storyboard> {
+  // Picked once, so a storyboard sent back for fixes keeps its story.
+  const story = randomStory();
+  log(gameId, `story: ${story}`);
   let repair: RepairContext | undefined;
   for (let attempt = 0; ; attempt++) {
-    const prompt = STORYBOARD_PROMPT + (repair ? repairSection(repair, "storyboard", "fix the rooms, doors and keys so the map works, and keep the story") : "");
+    const prompt = storyboardPrompt(story) + (repair ? repairSection(repair, "storyboard", "fix the rooms, doors, keys and objectives so the map works, and keep the story") : "");
     const text = await askClaude(prompt, { label: `storyboard${attempt ? ` (fix ${attempt})` : ""}`, gameId, effort: STORYBOARD_EFFORT, meter });
 
     let json: unknown;
@@ -205,6 +209,7 @@ function assemble(storyboard: Storyboard, rooms: Map<string, unknown>) {
     // The storyboard's first room is where the game starts, and the GameSpec's rooms[0] is too.
     rooms: storyboard.rooms.map((room) => rooms.get(room.id)),
     connections: storyboard.doors.map(({ id, rooms, locked }) => ({ id, rooms, locked })),
+    objectives: storyboard.objectives.map(({ id, text }) => ({ id, text })),
   };
 }
 
@@ -229,12 +234,43 @@ function problemsByRoom(game: unknown, errors: Issue[], artBudget: number): Map<
   return byRoom;
 }
 
-/** Rooms that are valid but fall short of what generation asks for: something to examine in every room. */
-function wishesByRoom(game: unknown): Map<string, string[]> {
+/**
+ * Rooms that are valid but fall short of what generation asks for: 1 to 5 things to interact with, a
+ * compact size, characters whose conversations lead somewhere, the storyboard's objectives, and the
+ * room's share of the image budget.
+ */
+function wishesByRoom(game: unknown, storyboard: Storyboard, artBudget: number): Map<string, string[]> {
   const wishes = new Map<string, string[]>();
-  for (const { room } of parseGameSpec(game).rooms) {
-    if (!room.props.some((prop) => prop.examine || prop.contains)) {
-      wishes.set(room.id, [`${room.id} has nothing to examine or search. Give 2 to 4 of its story objects "examine" lines (characters don't count).`]);
+  const add = (room: string, wish: string) => wishes.set(room, [...(wishes.get(room) ?? []), wish]);
+  const parsed = parseGameSpec(game);
+  const rooms = parsed.rooms.map(({ room }) => room);
+  const totalArt = collectArt({ rooms, connections: parsed.connections }).size;
+  for (const room of rooms) {
+    const examinable = room.props.filter((prop) => prop.examine || prop.contains).length;
+    const talkers = room.characters.filter((character) => character.dialogue).length;
+    if (examinable + talkers === 0) {
+      add(room.id, `${room.id} has nothing to interact with. Give 1 to 3 of its story objects "examine" lines.`);
+    }
+
+    const [w, h, d] = room.size;
+    if (Math.max(w, d) > GENERATED_ROOM.maxSide || h > GENERATED_ROOM.maxHeight) {
+      add(room.id, `${room.id} is ${w} x ${h} x ${d} m; keep rooms to at most ${GENERATED_ROOM.maxSide} m wide and deep and ${GENERATED_ROOM.maxHeight} m tall. Shrink it and move everything in to fit.`);
+    }
+
+    room.characters.forEach((character, i) => {
+      if (character.dialogue && !character.gives && !character.objective) {
+        add(room.id, `characters[${i}](${character.id})'s conversation leads nowhere. End it with an outcome: "gives" a key or sets an "objective" (one of this room's, from the prompt).`);
+      }
+    });
+
+    const set = new Set(objectivesSetIn(room).map(({ objective }) => objective));
+    for (const objective of storyboard.objectives.filter((o) => o.room === room.id && !set.has(o.id))) {
+      add(room.id, `Nothing sets the objective "${objective.id}". Put "objective": "${objective.id}" on ${objective.trigger ?? "the story object or character that leads to it"}.`);
+    }
+
+    const art = artIdsForRoom({ rooms, connections: parsed.connections }, room).length;
+    if (totalArt > LIMITS.artJobsWarning && art > artBudget) {
+      add(room.id, `The game needs ${totalArt} images; it should need at most ${LIMITS.artJobsWarning}. This room needs ${art}; bring it to about ${artBudget} by building blocky things from color-only parts, reusing one material with different "color"s, reusing one sprite description (with "tint" for color variants), and animating only things that move.`);
     }
   }
   return wishes;

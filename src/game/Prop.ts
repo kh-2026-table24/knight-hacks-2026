@@ -21,6 +21,8 @@ export class Prop {
   readonly examine: string[] | undefined;
   readonly afterwards: string[] | undefined;
   readonly contains: ItemSpec | undefined;
+  /** Id of the objective set at the end of the first examine or search. */
+  readonly objective: string | undefined;
   readonly hazard: Damage | undefined;
   readonly ambient: AmbientSpec | undefined;
   /** Panels with more than one frame, and their frames. */
@@ -34,6 +36,7 @@ export class Prop {
     this.examine = spec.examine;
     this.afterwards = spec.afterwards;
     this.contains = spec.contains;
+    this.objective = spec.objective;
     this.hazard = spec.hazard;
     this.ambient = spec.ambient;
     this.root.position.fromArray(spec.position);

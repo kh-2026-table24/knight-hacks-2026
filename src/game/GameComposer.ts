@@ -70,6 +70,7 @@ export class GameComposer {
   loadGame(game: Game) {
     this.game = game;
     this.hud.setHearts(game.state.hearts, PLAYER.maxHearts);
+    this.hud.setObjective(game.objective ?? null);
     this.sounds.start();
     this.swapRooms(game.startRoom);
   }

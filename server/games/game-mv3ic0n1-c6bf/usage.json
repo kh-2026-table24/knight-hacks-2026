@@ -1,0 +1,71 @@
+{
+  "input": 145641,
+  "cached": 80913,
+  "output": 112989,
+  "live": 0,
+  "calls": [
+    {
+      "label": "storyboard",
+      "input": 7934,
+      "cached": 0,
+      "output": 25839,
+      "seconds": 269.8
+    },
+    {
+      "label": "room surgery",
+      "input": 25897,
+      "cached": 2643,
+      "output": 9340,
+      "seconds": 85.3
+    },
+    {
+      "label": "room waiting-room",
+      "input": 1668,
+      "cached": 23447,
+      "output": 9172,
+      "seconds": 87
+    },
+    {
+      "label": "room cellar",
+      "input": 26083,
+      "cached": 2643,
+      "output": 10815,
+      "seconds": 108.6
+    },
+    {
+      "label": "room kitchen",
+      "input": 26120,
+      "cached": 2643,
+      "output": 11924,
+      "seconds": 118.8
+    },
+    {
+      "label": "room stair-hall",
+      "input": 1405,
+      "cached": 23447,
+      "output": 13644,
+      "seconds": 140.6
+    },
+    {
+      "label": "room front-yard",
+      "input": 24949,
+      "cached": 0,
+      "output": 14677,
+      "seconds": 142.4
+    },
+    {
+      "label": "room nursery",
+      "input": 26041,
+      "cached": 2643,
+      "output": 15289,
+      "seconds": 145.1
+    },
+    {
+      "label": "room stair-hall (repair)",
+      "input": 5544,
+      "cached": 23447,
+      "output": 2289,
+      "seconds": 25
+    }
+  ]
+}

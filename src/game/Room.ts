@@ -80,7 +80,7 @@ export class Room {
     });
     this.pickups = spec.pickups
       .filter((p) => !state.collected.has(stateKey(spec.id, p.id)))
-      .map((p) => new Pickup(p.item, p.position, textures, { stateKey: stateKey(spec.id, p.id) }));
+      .map((p) => new Pickup(p.item, p.position, textures, { stateKey: stateKey(spec.id, p.id), objective: p.objective }));
     this.emitters = this.props.flatMap((prop) => (prop.ambient ? [{ prop, ambient: prop.ambient, wait: prop.ambient.everySeconds * Math.random() }] : []));
     this.leanSprites(spec);
 

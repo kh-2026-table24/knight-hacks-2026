@@ -17,6 +17,8 @@ export class GameState {
   readonly given = new Set<string>();
   /** Props and characters the player has already examined or talked to once. */
   readonly heard = new Set<string>();
+  /** Index into the game's objectives of the one on screen. It only ever moves forward. */
+  objective = 0;
 }
 
 export const stateKey = (roomId: string, id: string) => `${roomId}/${id}`;

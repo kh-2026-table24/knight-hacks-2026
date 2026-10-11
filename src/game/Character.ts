@@ -32,6 +32,8 @@ export class Character extends Part {
   readonly dialogue: string[] | undefined;
   readonly afterwards: string[] | undefined;
   readonly gives: ItemSpec | undefined;
+  /** Id of the objective set at the end of the first conversation. */
+  readonly objective: string | undefined;
   readonly hostile: Damage | undefined;
   readonly movement: Movement | undefined;
   private readonly animations: Partial<Record<AnimationState, Texture[]>> = {};
@@ -56,6 +58,7 @@ export class Character extends Part {
     this.dialogue = spec.dialogue;
     this.afterwards = spec.afterwards;
     this.gives = spec.gives;
+    this.objective = spec.objective;
     this.hostile = spec.hostile;
     this.movement = spec.movement;
     const frames = artFor.character(spec.art, spec.size);

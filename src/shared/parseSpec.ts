@@ -11,6 +11,7 @@ import {
   type ConnectionSpec,
   type DoorSpec,
   type GameSpec,
+  type ObjectiveSpec,
   type PartSpec,
   type PickupSpec,
   type PropSpec,
@@ -29,6 +30,7 @@ export interface ParsedGame {
   /** The rooms that parsed, with their index in the input, so their layout can be checked even if others failed. */
   rooms: { index: number; room: RoomSpec }[];
   connections: ConnectionSpec[];
+  objectives: ObjectiveSpec[];
   /** Every room and connection parsed (other fields may still have errors). */
   complete: boolean;
 }
@@ -36,8 +38,8 @@ export interface ParsedGame {
 export function parseGameSpec(value: unknown): ParsedGame {
   const r = new Reader();
   const parsedRooms: ParsedGame["rooms"] = [];
-  const game = r.object(value, "", ["version", "title", "summary", "rooms", "connections"]);
-  if (!game) return { spec: undefined, issues: r.issues, rooms: parsedRooms, connections: [], complete: false };
+  const game = r.object(value, "", ["version", "title", "summary", "rooms", "connections", "objectives"]);
+  if (!game) return { spec: undefined, issues: r.issues, rooms: parsedRooms, connections: [], objectives: [], complete: false };
 
   const version = game.num("version");
   if (version !== undefined && version !== 1) game.error("version", `must be 1, got ${version}`);
@@ -55,12 +57,13 @@ export function parseGameSpec(value: unknown): ParsedGame {
     { min: 1, max: LIMITS.rooms },
   );
   const connections = game.array("connections", (v, path) => parseConnection(r, v, path), { optional: true }) ?? [];
+  const objectives = game.array("objectives", (v, path) => parseObjective(r, v, path), { optional: true, max: LIMITS.objectives }) ?? [];
   const [rawRooms, rawConnections] = [game.raw("rooms"), game.raw("connections") ?? []];
   const complete =
     Array.isArray(rawRooms) && parsedRooms.length === rawRooms.length && Array.isArray(rawConnections) && connections.length === rawConnections.length;
 
-  const spec = r.errorCount === 0 && title && summary && rooms ? { version: 1 as const, title, summary, rooms, connections } : undefined;
-  return { spec, issues: r.issues, rooms: parsedRooms, connections, complete };
+  const spec = r.errorCount === 0 && title && summary && rooms ? { version: 1 as const, title, summary, rooms, connections, objectives } : undefined;
+  return { spec, issues: r.issues, rooms: parsedRooms, connections, objectives, complete };
 }
 
 /** Marks every issue found while parsing one room with that room's id, so it can be repaired on its own. */
@@ -122,6 +125,15 @@ function parseConnection(r: Reader, value: unknown, path: string): ConnectionSpe
   return { id, rooms: [rooms[0], rooms[1]], locked };
 }
 
+function parseObjective(r: Reader, value: unknown, path: string): ObjectiveSpec | undefined {
+  const o = r.object(value, path, ["id", "text"]);
+  if (!o) return undefined;
+  const id = o.slug("id");
+  const text = o.text("text", { max: LIMITS.objectiveLength });
+  if (o.failed || !id || !text) return undefined;
+  return { id, text };
+}
+
 function parseDoor(r: Reader, value: unknown, path: string): DoorSpec | undefined {
   const o = r.object(value, path, ["connection", "offset", "art"]);
   if (!o) return undefined;
@@ -132,7 +144,7 @@ function parseDoor(r: Reader, value: unknown, path: string): DoorSpec | undefine
   return { connection, offset, ...(art && { art }) };
 }
 
-const PROP_FIELDS = ["id", "name", "position", "rotationY", "material", "parts", "copies", "light", "examine", "afterwards", "contains", "hazard", "ambient"];
+const PROP_FIELDS = ["id", "name", "position", "rotationY", "material", "parts", "copies", "light", "examine", "afterwards", "contains", "objective", "hazard", "ambient"];
 
 /** A prop, followed by one prop per entry of its "copies". */
 function parseProp(r: Reader, value: unknown, path: string): PropSpec[] | undefined {
@@ -150,16 +162,18 @@ function parseProp(r: Reader, value: unknown, path: string): PropSpec[] | undefi
   const examine = parseLines(r, o, "examine", LIMITS.dialogueLines);
   const afterwards = parseLines(r, o, "afterwards", LIMITS.afterwardsLines);
   const contains = nested(o, "contains", parseItem, r);
+  const objective = o.slug("objective", { optional: true });
   const hazard = nested(o, "hazard", parseDamage, r);
   const ambient = nested(o, "ambient", parseAmbient, r);
   if (parts && !material && parts.some((part) => part.shape !== "panel" && !part.material && !part.color)) {
     r.error(path, `${path} needs a "material" (what its box and wedge parts are made of), unless every box and wedge part has its own "material" or "color"`);
   }
   if (copies && (examine || contains)) o.error("copies", `can't be used on a prop with "examine" or "contains"; each thing the player can examine or search is its own prop`);
+  if (objective && !examine && !contains) o.error("objective", `needs "examine" or "contains": the objective is set when the player examines or searches the prop`);
   if (o.failed || !id || !name || !position || !parts) return undefined;
   const prop: PropSpec = {
     id, name, position, rotationY, ...(material && { material }), parts,
-    ...(light && { light }), ...(examine && { examine }), ...(afterwards && { afterwards }), ...(contains && { contains }), ...(hazard && { hazard }), ...(ambient && { ambient }),
+    ...(light && { light }), ...(examine && { examine }), ...(afterwards && { afterwards }), ...(contains && { contains }), ...(objective && { objective }), ...(hazard && { hazard }), ...(ambient && { ambient }),
   };
   return [prop, ...(copies ?? []).map((at, i) => ({ ...prop, id: `${id}-copy-${i + 1}`, position: at }))];
 }
@@ -200,12 +214,13 @@ function parsePart(r: Reader, value: unknown, path: string): PartSpec | undefine
 }
 
 function parsePickup(r: Reader, value: unknown, path: string): PickupSpec | undefined {
-  const o = r.object(value, path, ["id", "item", "position"]);
+  const o = r.object(value, path, ["id", "item", "position", "objective"]);
   if (!o) return undefined;
   const id = o.slug("id");
   if (!o.has("item")) o.error("item", "is required");
   const item = nested(o, "item", parseItem, r);
   const position = o.vec3("position");
+  const objective = o.slug("objective", { optional: true });
   if (o.failed || !id || !item || !position) return undefined;
-  return { id, item, position };
+  return { id, item, position, ...(objective && { objective }) };
 }

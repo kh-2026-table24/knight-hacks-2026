@@ -25,7 +25,7 @@ export function nested<T>(o: Obj, key: string, parse: (r: Reader, value: unknown
   return o.has(key) ? parse(r, o.raw(key), o.at(key)) : undefined;
 }
 
-const CHARACTER_FIELDS = ["id", "name", "position", "size", "art", "solid", "movement", "dialogue", "afterwards", "gives", "hostile", "light"];
+const CHARACTER_FIELDS = ["id", "name", "position", "size", "art", "solid", "movement", "dialogue", "afterwards", "gives", "objective", "hostile", "light"];
 
 export function parseCharacter(r: Reader, value: unknown, path: string): CharacterSpec | undefined {
   const o = r.object(value, path, CHARACTER_FIELDS);
@@ -48,12 +48,14 @@ export function parseCharacter(r: Reader, value: unknown, path: string): Charact
   const afterwards = parseLines(r, o, "afterwards", LIMITS.afterwardsLines);
   const gives = nested(o, "gives", parseItem, r);
   if (o.has("gives") && !o.has("dialogue")) o.error("gives", `needs "dialogue": the item is handed over when the player finishes talking`);
+  const objective = o.slug("objective", { optional: true });
+  if (objective && !o.has("dialogue")) o.error("objective", `needs "dialogue": the objective is set when the player finishes talking`);
   const hostile = nested(o, "hostile", parseDamage, r);
   const light = nested(o, "light", parseLight, r);
   if (o.failed || !id || !name || !position || !size || !art) return undefined;
   return {
     id, name, position, size, art, solid,
-    ...(movement && { movement }), ...(dialogue && { dialogue }), ...(afterwards && { afterwards }), ...(gives && { gives }),
+    ...(movement && { movement }), ...(dialogue && { dialogue }), ...(afterwards && { afterwards }), ...(gives && { gives }), ...(objective && { objective }),
     ...(hostile && { hostile }), ...(light && { light }),
   };
 }

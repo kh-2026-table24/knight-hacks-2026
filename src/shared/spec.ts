@@ -18,6 +18,19 @@ export interface GameSpec {
   /** rooms[0] is where the game starts. */
   rooms: RoomSpec[];
   connections: ConnectionSpec[];
+  /**
+   * The player's goals, in the order she meets them, shown one at a time on screen so she never gets
+   * stuck. objectives[0] is shown from the start. Each later one becomes current when she finishes
+   * interacting with a prop, character or pickup whose `objective` is its id. It never goes back to an
+   * earlier one.
+   */
+  objectives: ObjectiveSpec[];
+}
+
+export interface ObjectiveSpec {
+  id: string;
+  /** One short instruction that names what to do and where ("Search the keeper's desk for his logbook"). */
+  text: string;
 }
 
 export interface ConnectionSpec {
@@ -137,6 +150,8 @@ export interface PropSpec {
   afterwards?: string[];
   /** Dropped once, at the end of the first examine (or straight away on [E] Search if there is no examine). */
   contains?: ItemSpec;
+  /** Id of the objective that becomes current at the end of the first examine or search. */
+  objective?: string;
   /** Touching it hurts. */
   hazard?: Damage;
   /** Decorative particles it keeps giving off. */
@@ -156,15 +171,21 @@ export interface CharacterSpec {
   /** Blocks the player. */
   solid: boolean;
   movement?: Movement;
-  /** [E] Talk: one conversation, shown one line at a time, the first time the player talks to it. */
+  /**
+   * [E] Talk: its one conversation, shown one line at a time the first time the player talks to it.
+   * Required unless the character is hostile; a character the player can't talk to is left out of the
+   * game. The conversation ends in an outcome: it `gives` a key, sets an `objective`, or both.
+   */
   dialogue?: string[];
   /**
-   * What it says on every later talk. A character that gives a key should brush the player off here
-   * ("I've told you all I know, miss."). Without it, the dialogue repeats, unless the character gave an item.
+   * What it says on every later talk, the same every time: a brush-off that gives no further help
+   * ("I've told you all I know, miss."). The dialogue is never repeated.
    */
   afterwards?: string[];
   /** Handed over once, at the end of the first conversation. */
   gives?: ItemSpec;
+  /** Id of the objective that becomes current at the end of the first conversation. */
+  objective?: string;
   hostile?: Damage;
   /** Without a light of its own, a character carries the standard soft glow. */
   light?: LightSpec;
@@ -203,6 +224,8 @@ export interface PickupSpec {
   id: string;
   item: ItemSpec;
   position: Vec3;
+  /** Id of the objective that becomes current when the player picks it up. */
+  objective?: string;
 }
 
 export interface Damage {
@@ -238,6 +261,8 @@ export interface AmbientSpec {
 /** Hard limits the parser enforces. Deliberately looser than what the prompts ask for. */
 export const LIMITS = {
   rooms: 12,
+  objectives: 20,
+  objectiveLength: 80,
   roomSide: [6, 30],
   roomHeight: [3, 10],
   propsPerRoom: 250,
@@ -263,9 +288,9 @@ export const LIMITS = {
   characterHeight: [0.2, 4],
   ambientEvery: 0.5,
   ambientLifetime: 10,
-  // Images come from our own GPU now (a second or so each when warm), so games can use many more.
-  artJobsWarning: 360,
-  artJobs: 600,
+  /** Generation keeps a game to this many images; rooms over their share are asked to reuse more. */
+  artJobsWarning: 100,
+  artJobs: 300,
 } as const;
 
 export const DEFAULTS = {

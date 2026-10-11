@@ -63,10 +63,33 @@ body {
 }
 
 .hud-items[hidden],
+.hud-objective[hidden],
 .hud-hint[hidden],
 .hud-dialogue[hidden],
 .hud-message[hidden] {
   display: none;
+}
+
+/* The current objective, centered along the top between the items and the hearts. */
+.hud-objective {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: min(50vw, 560px);
+  text-align: center;
+}
+
+.hud-objective-label {
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.hud-objective-text {
+  font-size: 20px;
+  line-height: 1.25;
 }
 
 /* Loading and error messages, centered over a dimmed game. */

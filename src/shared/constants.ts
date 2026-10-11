@@ -36,6 +36,12 @@ export const DOOR = {
   edgeMargin: 1,
 } as const;
 
+/**
+ * The biggest room generation asks for: three quarters of what the parser accepts (spec.ts LIMITS), so
+ * rooms stay compact and full. Games saved with bigger rooms still load.
+ */
+export const GENERATED_ROOM = { maxSide: 22.5, maxHeight: 7.5 } as const;
+
 /** The engine builds walls itself, always this thick. */
 export const WALL_THICKNESS = 0.3;
 

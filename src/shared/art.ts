@@ -24,7 +24,7 @@ export interface ArtJob {
   builtinUrl?: string;
 }
 
-// Aspect ratios to draw at (the Modal endpoint takes any w:h up to 21). Cutouts use the closest one to what they're drawn on.
+// Aspect ratios Gemini can generate. Cutouts use the closest one to what they're drawn on.
 const ASPECT_RATIOS = ["1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9", "1:4", "4:1", "1:8", "8:1"];
 
 export function closestAspectRatio(aspect: number) {
