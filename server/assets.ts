@@ -5,16 +5,13 @@ import sharp from "sharp";
 import { collectArt, type ArtJob } from "../src/shared/art";
 import type { GameSpec } from "../src/shared/spec";
 import { gameDir } from "./games";
+import { getSecret } from "./secrets";
 
-// The key comes from .env.local (npm run dev loads it). The client is made on first use, so the server
-// can still serve games and already-generated assets without a key.
+// The key comes from .env.local locally and from Secret Manager on Cloud Run (see secrets.ts). The client
+// is made on first use, so the server can still serve games and already-generated assets without a key.
 let client: GoogleGenAI | undefined;
-function gemini() {
-  if (!client) {
-    const apiKey = process.env.GEMINI_IMAGE_KEY;
-    if (!apiKey) throw new Error("GEMINI_IMAGE_KEY is not set; add it to .env.local");
-    client = new GoogleGenAI({ apiKey });
-  }
+async function gemini() {
+  client ??= new GoogleGenAI({ apiKey: await getSecret("GEMINI_IMAGE_KEY", "gemini-image-key") });
   return client;
 }
 const MODEL = "gemini-nano-banana-2.1";
@@ -89,7 +86,7 @@ function promptFor(job: ArtJob) {
 }
 
 export async function askGemini(prompt: string, reference: string | undefined, aspectRatio: string): Promise<string> {
-  const interaction = await gemini().interactions.create({
+  const interaction = await (await gemini()).interactions.create({
     model: MODEL,
     input: reference
       ? [
