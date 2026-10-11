@@ -2,6 +2,7 @@ import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { collectScreams, type ScreamJob } from "../src/shared/screams";
 import type { GameSpec } from "../src/shared/spec";
+import { syncGame } from "./bucket";
 import { gameDir } from "./games";
 import { log } from "./log";
 import { getSecret } from "./secrets";
@@ -95,6 +96,7 @@ async function make(gameId: string, job: ScreamJob) {
   if (!response.ok) throw new Error(`ElevenLabs returned ${response.status}: ${(await response.text()).slice(0, 200)}`);
   await mkdir(assetsDir(gameId), { recursive: true });
   await writeFile(join(assetsDir(gameId), `${job.id}.mp3`), Buffer.from(await response.arrayBuffer()));
+  syncGame(gameId);
 }
 
 async function madeIds(gameId: string, game: GameSpec): Promise<string[]> {

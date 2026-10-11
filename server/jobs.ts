@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { progressOf, type GameStage, type GameStatus, type GameSummary, type TokenUsage } from "../src/shared/api";
 import type { GameSpec } from "../src/shared/spec";
 import { paintStatus, type PaintStatus } from "./assets";
+import { syncGame } from "./bucket";
 import { screamStatus } from "./screams";
 import { gameDir, generatedIds, getGame, listGames, readIfExists } from "./games";
 import { log, recentLog } from "./log";
@@ -80,6 +81,8 @@ async function make(gameId: string) {
     await saving;
     await rm(join(gameDir(gameId), STATUS_FILE), { force: true });
     making.delete(gameId);
+    // Made locally, it goes up to the live site's bucket now, and again as its art comes in (bucket.ts).
+    syncGame(gameId, { immediately: true });
     // Paints the copy games.ts serves, so the painting and every status report share one plan.
     const game = await getGame(gameId);
     if (game) await Promise.all([paintStatus(gameId, game, { start: true }), screamStatus(gameId, game, { start: true })]);

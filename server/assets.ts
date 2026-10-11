@@ -4,6 +4,7 @@ import { join } from "node:path";
 import sharp from "sharp";
 import { artInPlayOrder, collectArt, type ArtJob } from "../src/shared/art";
 import type { GameSpec } from "../src/shared/spec";
+import { syncGame } from "./bucket";
 import { gameDir } from "./games";
 import { log } from "./log";
 import { getSecret } from "./secrets";
@@ -129,7 +130,10 @@ function startPainting(gameId: string, game: GameSpec): Painting {
       }),
     );
     painting.running = false;
-    if (todo.length) log(gameId, `painting done: ${painting.ready.size} made, ${painting.failed.size} failed`);
+    if (todo.length) {
+      log(gameId, `painting done: ${painting.ready.size} made, ${painting.failed.size} failed`);
+      syncGame(gameId, { immediately: true });
+    }
   })();
   return painting;
 }
@@ -149,6 +153,7 @@ function make(gameId: string, game: GameSpec, job: ArtJob, priority: number): Pr
     const kind: Kind = job.kind === "surface" || job.kind === "picture" ? job.kind : "cutout";
     const png = await processImage(await original(gameId, game, job, priority), kind, job.kind === "scare" ? SCARE_LONG_SIDE : CUTOUT_LONG_SIDE);
     await writeFile(file, png);
+    syncGame(gameId);
     return png;
   });
 }

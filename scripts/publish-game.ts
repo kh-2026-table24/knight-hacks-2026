@@ -6,14 +6,13 @@
 //   npm run publish-game -- <game-id> [<game-id>...]
 //
 // Needs the gcloud CLI, logged in (gcloud auth login). GAMES_BUCKET overrides the bucket.
-import { execFileSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { errorsIn, formatIssues } from "../src/shared/issues";
 import { validateGame } from "../src/shared/validate";
+import { uploadGame } from "../server/bucket";
 import { gameDir, isSafeId } from "../server/games";
 
-const BUCKET = process.env.GAMES_BUCKET ?? "project-5566acbe-9477-4102-a25-paradise-games";
 const SITE = "https://hackathon-2026-637555496889.us-east1.run.app";
 
 const ids = process.argv.slice(2);
@@ -40,10 +39,13 @@ for (const id of ids) {
     continue;
   }
 
-  // Drafts are the generator's working files; the server never reads them.
-  execFileSync("gcloud", ["storage", "rsync", "--recursive", "--exclude", "game\\.draft\\.json$", gameDir(id), `gs://${BUCKET}/${id}`], {
-    stdio: "inherit",
-  });
+  try {
+    await uploadGame(id);
+  } catch (error) {
+    console.error(`✗ ${id}: ${error instanceof Error ? error.message : error}`);
+    failed = true;
+    continue;
+  }
   console.log(`✓ ${id} published: ${SITE}/?game=${id}`);
 }
 if (failed) process.exitCode = 1;
