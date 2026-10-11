@@ -1,0 +1,85 @@
+{
+  "input": 234218,
+  "cached": 76185,
+  "output": 106931,
+  "live": 0,
+  "calls": [
+    {
+      "label": "storyboard",
+      "input": 5022,
+      "cached": 0,
+      "output": 29995,
+      "seconds": 312.3
+    },
+    {
+      "label": "room mending-shed",
+      "input": 29734,
+      "cached": 0,
+      "output": 7197,
+      "seconds": 71.2
+    },
+    {
+      "label": "room canal-bank",
+      "input": 29890,
+      "cached": 0,
+      "output": 9851,
+      "seconds": 99.1
+    },
+    {
+      "label": "room shrine-hut",
+      "input": 30100,
+      "cached": 0,
+      "output": 10932,
+      "seconds": 105.5
+    },
+    {
+      "label": "room grove",
+      "input": 29848,
+      "cached": 0,
+      "output": 10812,
+      "seconds": 109.8
+    },
+    {
+      "label": "room keepers-cabin",
+      "input": 29596,
+      "cached": 0,
+      "output": 11111,
+      "seconds": 110.2
+    },
+    {
+      "label": "room chinampa-garden",
+      "input": 29875,
+      "cached": 0,
+      "output": 12528,
+      "seconds": 120.8
+    },
+    {
+      "label": "room landing",
+      "input": 26107,
+      "cached": 0,
+      "output": 12656,
+      "seconds": 129.3
+    },
+    {
+      "label": "room canal-bank (repair)",
+      "input": 6953,
+      "cached": 24524,
+      "output": 348,
+      "seconds": 4.8
+    },
+    {
+      "label": "room shrine-hut (repair)",
+      "input": 6354,
+      "cached": 24524,
+      "output": 642,
+      "seconds": 6.5
+    },
+    {
+      "label": "room chinampa-garden (repair)",
+      "input": 10739,
+      "cached": 27137,
+      "output": 859,
+      "seconds": 8.3
+    }
+  ]
+}

@@ -1,0 +1,546 @@
+{
+  "research": "**Documented record (what is reliably reported)**\n- The Isla de las Muñecas is a small chinampa, an artificial farming island, in the canals of Xochimilco at the southern edge of Mexico City. It sits near the Laguna de Teshuilo. Visitors reach it by trajinera, the flat, brightly painted canal boats whose name arches are painted with women's names. The trip from the embarcaderos, such as Cuemanco, takes a long while each way.\n- Xochimilco's canals and chinampas are a UNESCO World Heritage Site. The chinampas are edged with ahuejote willows planted to hold the banks. The canals are home to the axolotl, an endangered amphibian found only here.\n- A man named Don Julián Santana Barrera lived alone on the island for about fifty years, from around the 1950s. He grew vegetables and flowers on the chinampa and fished the canals.\n- He hung thousands of dolls on the trees, fences and sheds of the island. He fished dolls out of the canals and the trash. People also say he traded his produce for old dolls.\n- The dolls are now weathered to gray, missing limbs and heads, and full of cobwebs and insect nests. Many are tied up by wire and string. Some are decapitated heads strung up in clusters.\n- He died in 2001. He was found in the canal near the island. Reports differ on whether he drowned or had a heart attack while fishing. His nephew, Anastasio Velázquez, is usually named as the one who found him.\n- The family still keeps the island open to visitors, who bring new dolls as offerings. A small hut on the island serves as a shrine and museum. It holds a photo and memorial of Don Julián. Visitors report that it also holds his favorite doll, usually called \"Agustinita,\" surrounded by offerings.\n\n**Legend, his own account, and what the family reports (unverified)**\n- Don Julián said he found a girl drowned in the canal by the island, and soon after found a doll floating nearby. He hung the doll in a tree to honor or appease her spirit. After that he heard whispers and footsteps at night, and kept hanging dolls to please her. Some versions say three girls were playing and one drowned.\n- No name, record or grave for the girl has ever been publicly established. Some accounts attributed to relatives suggest she may never have existed, or that the story grew in the retelling.\n- In interviews attributed to his nephew, Don Julián is said to have spoken of a sirena (a mermaid) in the water who wanted to take him, and to have said so shortly before his death. Some versions add that he sang to keep her away.\n- The most repeated legend says he was found at the very spot where he had found the girl.\n- Visitors and locals claim the dolls whisper, turn their heads, open their eyes and move between trees at night.\n\n**Physical details I plan to use** (inventions are marked)\n- Thousands of grimy dolls wired to ahuejote willows: the great willow in the grove.\n- Decapitated heads hung in clusters: the great willow and the scarecrow's head.\n- Produce traded for dolls: the keeper's trade ledger (the ledger itself is invented).\n- Trajinera with a painted name arch: the landing.\n- Dolls fished from the canal: the fishing net and the staked doll on the bank.\n- His death in the canal, and the \"same spot\" legend: the two crosses on the bank.\n- The nephew who found him: Rufino, a fictional stand-in.\n- The sirena claim: the Lotería \"La Sirena\" card nailed over his door (the card is a real game card; nailing it up is invented).\n- Visitors' offerings: the offering bench and the offering wall.\n- The shrine hut with his memorial and favorite doll: the final room. The doll is renamed Florinda.\n- Axolotls: the stone trough in the garden.\n- Ahuejote willows and chinampa earth: the recurring materials.\n\n**Invented for the game, not fact**\n- His confession.\n- The doll-mender who sold him broken dolls.\n- The doll scarecrow.\n- The talking doll.\n- The note he left.\n- The keys.\n\nReal people from the last century are renamed:\n- Don Julián becomes Don Celestino.\n- Anastasio becomes Rufino.\n- Agustinita becomes Florinda.\n- The girl stays nameless, as she is in the record.",
+  "storyboard": {
+    "source": {
+      "story": "The Island of the Dolls (Xochimilco, Mexico)",
+      "account": "DOCUMENTED: For about fifty years, from around the 1950s until his death in 2001, a hermit named Don Julián Santana Barrera lived alone on a small chinampa (a man-made farming island) in the canals of Xochimilco, near the Laguna de Teshuilo, at the southern edge of Mexico City. He farmed, fished, and hung thousands of dolls on the trees, fences and sheds of the island. He pulled many from the canals and the garbage, and reportedly traded his vegetables for more. In 2001 he was found dead in the canal beside the island, reportedly by his nephew; accounts differ between drowning and a heart attack. His family still keeps the island open to visitors. They arrive by trajinera and leave new dolls as offerings, and a small hut holds his memorial and, by visitors' accounts, his favorite doll.\n\nLEGEND AND HIS OWN ACCOUNT: Don Julián said a little girl drowned in the canal by his island. He said he found her, and then found a doll floating nearby, which he hung in a tree to honor her spirit. After that he heard whispers and footsteps, and he kept hanging dolls to please her. No record of the girl has ever been publicly confirmed, and some accounts suggest she never existed. Accounts attributed to his family say he spoke of a sirena (mermaid) in the water who wanted to take him, shortly before he died. The most repeated legend says he was found at the very spot where he found the girl. Visitors claim the dolls whisper, turn their heads and open their eyes at night.\n\nIN THIS GAME: All names are fictional. The keeper's confession, the doll-mender, the doll scarecrow and the speaking doll are inventions built on the legend.",
+      "inspirations": [
+        "Thousands of weathered dolls wired to ahuejote willows: the Grove of Hanged Dolls and its great willow",
+        "Strings of severed doll heads: the great willow, and the head of the doll scarecrow in the garden",
+        "The keeper trading vegetables for dolls: the trade ledger in the keeper's cabin, and the doll-mender's own backstory",
+        "Dolls fished from the canals: the snagged fishing net and the doll staked in the water on the canal bank",
+        "His death in the canal at 'the same spot': the two crosses at the water's edge on the canal bank",
+        "The nephew who found him: Rufino, keeping vigil in the cabin",
+        "His reported fear of a sirena calling from the water: the scratched-out Lotería 'La Sirena' card over his door (the nailed card is invented), and Rufino's account",
+        "Doubts that the girl ever existed: Rufino's complaint that no one can name her",
+        "Visitors leaving dolls and offerings: the offering bench in the grove and the offering wall in the shrine",
+        "The shrine hut with his memorial and his favorite doll (reported as 'Agustinita'): the final room and Florinda, the first doll",
+        "Trajineras with painted name arches: the boat at the landing",
+        "Axolotls of Xochimilco: the stone trough in the chinampa garden"
+      ]
+    },
+    "title": "The Island of the Dolls",
+    "summary": "For fifty years Don Celestino lived alone on a chinampa in the dark canals of Xochimilco. He hung thousands of dolls from the willows for a little girl he said he found drowned beside his island. Three nights ago he was pulled from the canal himself, at the same spot. No one in Xochimilco can say the girl's name, and the dolls have started whispering again.",
+    "premise": "The player mends broken dolls at a market stall in Mexico City. For twenty years Don Celestino came on Sundays to buy the dolls she couldn't save, and paid in squash and corn. The day after he drowned, a boatman brought her a note in the keeper's hand: 'Señorita, if the water takes me, come for the first one. She cannot be left alone.' She has come by night to find Florinda, the first doll, and to learn what the old man was afraid of.",
+    "ending": "In the shrine hut she finds Florinda, the first doll, sitting in a tin washtub of canal water that has never dried. Florinda's porcelain head is cracked, and inside it is the keeper's folded confession. On the evening the girl drowned, he heard a child crying for help from the canal. He told himself it was the sirena singing, so he barred his door and sang until the crying stopped. He found her among the lilies the next morning. Every doll after that was penance, company to keep her from coming for him. Then the dolls ran out and she came anyway. 'She cannot be left alone' was never about the doll. As the player reads, water rises out of the washtub, and the drowned girl claims the woman who mends dolls as her new companion.",
+    "beats": [
+      "The boatman Chencho tells how Don Celestino was found face down three nights ago, where he always said he found the drowned girl. He hands over the keeper's gate key.",
+      "A hand-painted sign begs visitors for dolls, and a doll nailed to the mooring post faces out toward the water, like a lookout.",
+      "In the grove, a one-eyed doll whispers that the dolls were never decorations. They are the girl's company, brought so she would play with them and not with the living. Last night she counted one more.",
+      "Visitors' offerings show the legend has outgrown the island: fresh dolls and a child's note asking the girl to be happy.",
+      "In the cabin, the trade ledger records fifty years of squash and corn bartered for dolls. The last entries grow frantic: 'not enough.'",
+      "Over the cabin door, a Lotería card of La Sirena has been scratched out. Rufino says his uncle spent his last night saying the sirena was calling him.",
+      "Rufino doubts the girl ever existed. There is no name, no grave and no entry in the parish book. He says his uncle's keys were missing when he was found.",
+      "On the canal bank there are two crosses: a new one for the keeper, and an old, nameless one for the girl. The keeper's keys are tangled in his snagged fishing net.",
+      "In the mending shed, the keeper's ghost keeps wiring broken dolls back together. He insists he found the girl at dawn and gave her fifty years of company. He warns: 'Don't answer if she calls you from the water. I answered too late.'",
+      "He points the way to the shrine through the garden, which is guarded by a scarecrow he built from dolls. It no longer knows him.",
+      "In the garden, a coffee can of loose doll eyes holds the shrine key. The empty axolotl trough shows how long he stopped tending anything but dolls.",
+      "In the shrine, his memorial photo shows him young, holding Florinda, already afraid.",
+      "Florinda's cracked head holds his confession. He heard the girl crying for help and pretended it was the sirena. The drowned girl comes for the one who answered his note."
+    ],
+    "finale": {
+      "antagonist": "La Niña del Teshuilo, the drowned girl",
+      "appearance": "A barefoot girl of about eight, soaked and dripping. She wears a little dress gone gray-green with canal mud and duckweed. Her long black hair hangs like strands of lake weed. Her skin is pale gray and crazed with fine cracks like old porcelain, and some cracks are stitched shut with rusted wire, the way the keeper mended his dolls. Dead water lilies cling to her shoulders. One arm hangs at a wrong, doll-like angle.",
+      "jumpscare": "Her cracked porcelain face fills the screen. Two glass doll eyes roll loose in her sockets and snap forward to stare. Her jaw unhinges far too wide, like a broken doll's, and black canal water and duckweed pour out over her chin. Rusted wire stitches split open across her cheeks.",
+      "scream": "A little girl's scream gargled through a throat full of water, bubbling and choking. Under it, hundreds of doll voice boxes cry 'mamá' at once, rising into a shriek.",
+      "room": "shrine-hut",
+      "trigger": "Florinda, the first doll, in her tin washtub"
+    },
+    "intro": {
+      "art": "A trajinera with a faded painted name arch glides down a black Xochimilco canal at night. A single kerosene lantern hangs on its prow, and mist lies on the water. Ahead, the low island rises, its ahuejote willows silhouetted against a green-tinged moon. Hundreds of dolls hang from every branch, pale faces and dangling limbs catching the lantern light.",
+      "text": [
+        "You mend broken dolls at a market stall in Mexico City. For twenty years an old man from the canals of Xochimilco came on Sundays. He bought the dolls you couldn't save, armless, headless, burned, and he paid in squash and corn.",
+        "Three nights ago, Don Celestino was pulled from the canal beside his island, at the spot where, he always said, he once found a little girl drowned. For fifty years he hung dolls in the willows for her. Thousands of them.",
+        "This morning a boatman brought you a note in the old man's shaking hand: 'Señorita, if the water takes me, come for the first one. She cannot be left alone. Come at night. She only talks at night.'",
+        "The boatman would only bring you after dark. Now his trajinera knocks against the island landing, and in the trees above you a thousand dolls turn slowly in a wind you cannot feel."
+      ]
+    },
+    "artDirection": {
+      "style": "Low-poly PS1-era horror: chunky geometry, wobbling vertices and dithered, low-resolution textures with visible pixels. The world is mud, rot and grime: wet earth, weathered wood, rusted tin. Against it sit thousands of gray, cobwebbed dolls with staring glass eyes. The one warm color is faded marigold orange from cempasúchil offerings and candle flames. Faces are simple and slightly uncanny. Everything outdoors is wet, and everything indoors is lit by small flames.",
+      "palette": [
+        "canal-weed green",
+        "bone-white doll porcelain",
+        "faded marigold orange",
+        "rust brown",
+        "night indigo",
+        "candle amber"
+      ],
+      "materials": [
+        "weathered gray ahuejote bark wrapped in rusted wire",
+        "rough plank boards silvered by rain",
+        "corrugated tin streaked with orange rust",
+        "packed black chinampa earth strewn with marigold petals",
+        "whitewashed adobe stained green with damp",
+        "sun-bleached doll plastic gone gray under cobwebs",
+        "woven reed petate matting",
+        "black canal water skinned with green duckweed"
+      ],
+      "lighting": "Outdoors, a sickly greenish moonlight filters through low mist, with pools of amber from kerosene lanterns and marigold-ringed candles. Indoors, everything is lit by a few votive candles and one oil lamp, leaving deep shadows in the corners. Doll eyes catch the light and glint. The mood is damp, silent and watched."
+    },
+    "rooms": [
+      {
+        "id": "landing",
+        "name": "The Landing at Teshuilo",
+        "outdoor": true,
+        "grid": [
+          1,
+          2
+        ],
+        "size": "wide and shallow outdoor dock, 16 x 6 x 10 m",
+        "purpose": "Opening area. The boatman tells how the keeper died, frames the mission and hands over the gate key.",
+        "description": "A sagging plank dock juts out over black canal water, and a trajinera bumps softly against it. Its arch is painted with the faded name 'La Flor de Teshuilo' and its prow lantern is the brightest light here. Along the north edge runs the island's fence of willow poles and rusted wire, thick with hanging dolls. In the middle of the fence is a chained plank gate. To the left of the gate a hand-painted sign leans against the fence. At the end of the dock, a single mooring post has a doll nailed to it, facing out toward the lake. Old Chencho stands in his boat with his pole and will not step onto the dock.",
+        "walls": "Along the north edge, the island's fence of weathered gray ahuejote bark wrapped in rusted wire, hung with dolls of sun-bleached doll plastic gone gray under cobwebs",
+        "floor": "rough plank boards silvered by rain, with black canal water skinned with green duckweed along the south and east edges",
+        "lighting": "Dark. Green moonlight through mist, and the warm amber pool of the kerosene lantern on the trajinera's prow.",
+        "focalPoint": "The chained plank gate in the doll-hung fence at the center of the north edge",
+        "storyObjects": [
+          {
+            "name": "hand-painted sign reading 'ISLA DE LAS MUÑECAS — SE ACEPTAN MUÑECAS'",
+            "where": "leaning against the fence, left of the gate",
+            "reveals": "The keeper begged visitors to bring dolls. Under the welcome, a newer line is painted in shaky letters: 'NO DEJEN QUE SE ACABEN' (don't let them run out)."
+          },
+          {
+            "name": "doll nailed to the mooring post",
+            "where": "on the post at the east end of the dock",
+            "reveals": "A baby doll nailed through the chest, facing the open water like a lookout. Her painted eyes have been scratched away, as if someone did not want her to see what comes out of the lake."
+          }
+        ],
+        "dressing": [
+          "trajinera with faded painted name arch 'La Flor de Teshuilo'",
+          "kerosene lantern on the boat's prow",
+          "tall reeds along the water",
+          "two small dugout canoes tied to the dock",
+          "coils of wet rope",
+          "marigold petals floating on the water"
+        ],
+        "characters": [
+          {
+            "name": "Chencho the boatman",
+            "appearance": "A thin, weathered old trajinero in a sweat-stained straw hat and a faded red serape, with a long wooden punting pole. He has a gray mustache and frightened, watery eyes, and holds a rosary wrapped around one hand.",
+            "role": "witness",
+            "personality": "Gruff and fidgety. He speaks fast to get it over with and keeps glancing at the water. 'I took him vegetables to sell for forty years, señorita. I never once stepped on that island after sundown, and I won't start now.'",
+            "knows": "Don Celestino was found face down in the canal three nights ago, on the east bank, at the very spot where he always said he found a drowned girl fifty years ago. A week before, the old man gave Chencho the note and this key for 'the señorita who fixes dolls.' The keeper once told him that one doll in the big willow talks, the one with one eye. Outcome: hands over the Gate Padlock Key and sets the objective to unlock the gate and find the one-eyed doll.",
+            "brushOff": "I'll wait here until the lantern burns low. No longer.",
+            "behavior": "stands still in his boat at the dock's edge",
+            "hostile": false
+          }
+        ]
+      },
+      {
+        "id": "grove",
+        "name": "The Grove of Hanged Dolls",
+        "outdoor": true,
+        "grid": [
+          1,
+          1
+        ],
+        "size": "large and tall outdoor clearing, 20 x 7.5 x 18 m",
+        "purpose": "The heart of the island and the legend. A speaking doll explains what the dolls are for and sends the player to the nephew. It is the hub to the cabin, the canal bank and the garden.",
+        "description": "A clearing of packed black earth under a canopy of ahuejote willows. Every branch, trunk and fence post is hung with dolls: whole dolls tied by the neck or wrist, bunches of severed heads on wires, and arms and legs strung like charms. In the center stands the great willow, its trunk barely visible under the dolls, and somewhere in it a one-eyed doll in a blue dress is turned to face the player. Along the north edge stands the keeper's cabin, its tin-roofed doorway glowing with candlelight. A rough bench of fresh offerings sits by the path. A locked reed gate leads west to the garden, and an open path leads east to the canal bank.",
+        "walls": "Along the north edge, the front of the keeper's cabin in whitewashed adobe stained green with damp under corrugated tin streaked with orange rust. West and east, fences of weathered gray ahuejote bark wrapped in rusted wire.",
+        "floor": "packed black chinampa earth strewn with marigold petals",
+        "lighting": "Very dark under the canopy. Thin green moonlight breaks through the branches, with amber glow from the cabin doorway and a few guttering candles on the offering bench. Doll eyes glint everywhere.",
+        "focalPoint": "The great willow at the center of the clearing, smothered in dolls",
+        "storyObjects": [
+          {
+            "name": "the great willow hung with doll heads",
+            "where": "center of the clearing",
+            "reveals": "Hundreds of heads wired in bunches, the oldest gone gray and furred with cobwebs, some holding wasp nests. The wires are twisted the same careful way every time, by one patient hand, over fifty years."
+          },
+          {
+            "name": "bench of fresh offerings with a child's note",
+            "where": "beside the path, east of the great willow",
+            "reveals": "New dolls with price tags still on, candy and a crayon note from a visiting child: 'For the girl who drowned. I hope you like her. Please don't be sad anymore.' Strangers have made the girl's story their own."
+          }
+        ],
+        "dressing": [
+          "hundreds of dolls tied to every willow trunk and branch",
+          "bunches of severed doll heads on rusted wire",
+          "strings of doll arms and legs",
+          "a rusted bicycle wheel hung with dolls",
+          "candles in jars on the ground",
+          "a doll in a small wooden cradle nailed to a tree"
+        ],
+        "characters": [
+          {
+            "name": "The One-Eyed Doll",
+            "appearance": "A small old plastic doll in a faded blue dress, gray with grime and cobwebs, hanging by one wrist from a rusted wire. One arm is missing and her hair is matted. One blue glass eye is open; the other socket is empty and dark.",
+            "role": "ghost-touched doll, a witness",
+            "personality": "A child's sing-song whisper, cheerful in the wrong way. 'You came! He said you would. You have mending hands. I can smell the glue.'",
+            "knows": "The dolls are not decorations. They are the girl's company. The keeper brought them so she would play with them at night and not with the living. Every night she counts them, and she whispers when there are not enough. Last night she counted one more than before, and the keeper is not in his house anymore. His nephew Rufino is sitting with candles in the cabin to the north and knows how the old man died. Outcome: sets the objective to find Rufino in the cabin.",
+            "brushOff": "Shh. She's counting. Don't make me lose my place.",
+            "behavior": "hangs still in the great willow, her head slowly turning to follow the player",
+            "hostile": false
+          }
+        ]
+      },
+      {
+        "id": "keepers-cabin",
+        "name": "The Keeper's Cabin",
+        "outdoor": false,
+        "grid": [
+          1,
+          0
+        ],
+        "size": "small and low, 8 x 3.5 x 7 m",
+        "purpose": "The keeper's life and fear. The ledger, the sirena card and the nephew complicate the legend and point to the canal bank and the missing keys.",
+        "description": "A single cramped room where the old man slept, ate and kept count. Against the north wall stands a home altar crowded with candles and plastic saints. Above the doorframe is nailed a Lotería card of La Sirena, scratched almost through. A hammock sags in the corner, still holding the shape of a body. On a crate table by the west wall lies a fat ledger swollen with damp. Rufino sits on an upturned bucket beside the altar, a flashlight in his lap, keeping vigil with dozens of candles. Dolls watch from the rafters.",
+        "walls": "whitewashed adobe stained green with damp",
+        "floor": "packed black chinampa earth strewn with marigold petals",
+        "lighting": "Dim and warm. Dozens of votive candles on the north altar and floor throw jumping shadows; the corners are black.",
+        "focalPoint": "The candle-crowded home altar against the north wall, with Rufino keeping vigil beside it",
+        "storyObjects": [
+          {
+            "name": "the keeper's swollen trade ledger",
+            "where": "on the crate table by the west wall",
+            "reveals": "Fifty years of barter in pencil: '3 calabazas — 1 muñeca sin brazo', '1 costal de elote — 4 cabezas'. In the last pages the entries grow cramped and frantic, and the final line, written over and over, reads: 'no alcanzan' (they're not enough)."
+          },
+          {
+            "name": "scratched-out Lotería card of La Sirena",
+            "where": "nailed above the doorframe on the north wall",
+            "reveals": "The mermaid card from the old Lotería game, gouged with a nail until her face is gone. Under it the keeper wrote: 'No canta. Llora.' (She isn't singing. She's crying.)"
+          }
+        ],
+        "dressing": [
+          "a sagging woven hammock",
+          "home altar with plastic saints and votive candles",
+          "a battered transistor radio",
+          "a straw sombrero on a nail",
+          "clay cooking pots",
+          "a sleeping mat of woven reed petate matting",
+          "dolls sitting along the rafters"
+        ],
+        "characters": [
+          {
+            "name": "Rufino",
+            "appearance": "A heavyset man in his forties in a damp work shirt and jeans, rosary around his neck, red-eyed and unshaven. He holds a yellow flashlight.",
+            "role": "survivor, the keeper's nephew",
+            "personality": "Tired and torn between grief and doubt. He talks to keep from listening to the trees. 'Fifty years he hung dolls for her, and nobody in all of Xochimilco can tell me her name.'",
+            "knows": "There is no record of any drowned girl: no name, no grave, nothing in the parish book. Sometimes he thinks his uncle made her up. But on his last morning, the old man said the sirena had been calling him all night and she would not stop. Rufino found him that evening, face down at the east canal bank where the girl was supposedly found. His keys were not on him. He thinks they are tangled in the fishing net still snagged in the reeds there, but he won't go back out in the dark. Outcome: sets the objective to search the fishing net on the east canal bank.",
+            "brushOff": "I'm not leaving these candles. Not tonight.",
+            "behavior": "sits still beside the altar",
+            "hostile": false
+          }
+        ]
+      },
+      {
+        "id": "canal-bank",
+        "name": "The Bank Where He Drowned",
+        "outdoor": true,
+        "grid": [
+          2,
+          1
+        ],
+        "size": "wide outdoor bank, 16 x 6 x 12 m",
+        "purpose": "The site of both deaths. The two crosses tie the legend to the keeper's end, and the net holds the key to the mending shed.",
+        "description": "A muddy strip of chinampa where the island ends and the black canal begins, its water lying along the south and east edges, skinned with duckweed and water lilies. At the water's edge stand two crosses side by side. One is new and painted white, its marigolds still fresh. The other is old, gray and nameless, sinking into the mud. A torn fishing net is snagged in the reeds nearby, and further out a single doll is staked in the shallows, facing the lake. Along the north edge stands the keeper's plank mending shed with its rusted tin roof and padlocked door.",
+        "walls": "Along the north edge, the front of the mending shed in rough plank boards silvered by rain under corrugated tin streaked with orange rust",
+        "floor": "packed black chinampa earth strewn with marigold petals, giving way to black canal water skinned with green duckweed along the south and east",
+        "lighting": "Dark and misty. Green moonlight glows on the water, and two candles burn at the base of the crosses.",
+        "focalPoint": "The two crosses side by side at the water's edge, one new and white, one old and nameless",
+        "storyObjects": [
+          {
+            "name": "two crosses at the water's edge",
+            "where": "center of the bank, near the waterline",
+            "reveals": "The new white cross reads 'TÍO CELESTINO — ABRIL 2001' in Rufino's hand. The old gray cross beside it bears no name at all, only a tiny doll shoe nailed where a name should be. They stand close enough to touch."
+          },
+          {
+            "name": "torn fishing net snagged in the reeds",
+            "where": "in the reeds at the east waterline",
+            "reveals": "The keeper's own net, torn as if something pulled hard from below. Doll arms are tangled in the mesh. When searched, a slimy iron key drops out."
+          },
+          {
+            "name": "doll staked in the shallows",
+            "where": "out in the water off the southeast corner",
+            "reveals": "A doll on a willow stake, facing the open lake with arms outstretched. Fresh scratches on the stake run down into the water."
+          }
+        ],
+        "dressing": [
+          "tall reeds and cattails",
+          "floating water lilies",
+          "an overturned dugout canoe",
+          "a broken fishing pole in the mud",
+          "dolls wired to a low willow at the water's edge",
+          "marigold garlands on the crosses"
+        ],
+        "characters": []
+      },
+      {
+        "id": "mending-shed",
+        "name": "The Doll-Mender's Shed",
+        "outdoor": false,
+        "grid": [
+          2,
+          0
+        ],
+        "size": "small and cramped, 7 x 3 x 6 m",
+        "purpose": "The keeper's ghost gives his version of the legend, foreshadows his confession, warns of the scarecrow and hands over the garden key.",
+        "description": "A tight plank shed where the old man mended what the canals gave him. Against the north wall is a long workbench under an oil lamp, scattered with wire, pliers, glue pots and a half-repaired doll head. Crates of dolls stand stacked by the east wall, each chalked with a date. Hundreds of loose limbs hang from the ceiling on strings. At the bench sits Don Celestino, soaked and dripping, wiring a cracked head together. Water pools under his stool and never dries.",
+        "walls": "rough plank boards silvered by rain",
+        "floor": "rough plank boards silvered by rain",
+        "lighting": "Very dim. One smoky oil lamp hangs over the north workbench. Everything beyond its circle is black, and the hanging limbs sway in its light.",
+        "focalPoint": "The workbench under the oil lamp on the north wall, where the dripping ghost of the keeper sits mending",
+        "storyObjects": [
+          {
+            "name": "half-mended doll head on the workbench",
+            "where": "on the north workbench under the lamp",
+            "reveals": "A porcelain head with its cracks stitched shut in rusted wire. Its glass eyes have been set looking sideways, toward the water, as if the mender couldn't bear them looking at him."
+          },
+          {
+            "name": "crates of dolls chalked with dates",
+            "where": "stacked against the east wall",
+            "reveals": "Each crate is chalked with a date and the word 'para ella' (for her). The dates run back decades. The last crate is empty, and its date is the day he drowned."
+          }
+        ],
+        "dressing": [
+          "coils of rusted wire",
+          "pliers and glue pots",
+          "hundreds of doll limbs hanging on strings from the ceiling",
+          "a pile of headless doll bodies",
+          "a soaked straw sombrero on the bench",
+          "jars of buttons and doll hair"
+        ],
+        "characters": [
+          {
+            "name": "Don Celestino",
+            "appearance": "A small, bent old man in a soaked white cotton shirt and trousers, barefoot, with a sodden straw sombrero. His skin is gray, and lake weed and duckweed cling to his shoulders. Water drips steadily from his hair, sleeves and fingers. His hands keep working wire into a doll's head.",
+            "role": "ghost, the keeper",
+            "personality": "Gentle, tired and evasive. He never quite looks up from his work. 'Ah, señorita. You came. I knew those mending hands would come.'",
+            "knows": "He found the girl at dawn among the water lilies with her doll floating beside her, and hung the doll in the willow so she would have it. Then the whispers asked for more, and he gave her fifty years of company: dolls traded for squash and corn, dolls fished from the canals, dolls bought from the señorita's stall. It was never enough, and she called for him from the water. The first doll, Florinda, is in the shrine hut past the garden. The shrine key is in the coffee can of doll eyes nailed to the willow in the garden. He warns that his doll scarecrow walks the garden rows and no longer knows him: 'Keep moving. It is slow, but it holds tight.' Ominous line: 'Don't answer if she calls you from the water. I answered too late.' Outcome: hands over the Garden Gate Key and sets the objective to unlock the garden and find the can of doll eyes.",
+            "brushOff": "I have mending to do. She is waiting.",
+            "behavior": "sits still at the workbench, mending",
+            "hostile": false
+          }
+        ]
+      },
+      {
+        "id": "chinampa-garden",
+        "name": "The Chinampa Garden",
+        "outdoor": true,
+        "grid": [
+          0,
+          1
+        ],
+        "size": "large outdoor field, 18 x 6 x 16 m",
+        "purpose": "Threat and the final key. The doll scarecrow patrols the rows, and the coffee can holds the shrine key. The north edge shows the shrine hut.",
+        "description": "The keeper's farm plot, gone wild. Rows of withered corn and sprawling squash vines run east to west across black earth, with marigolds gone to seed between them. Lurching slowly up and down the rows is the scarecrow he built: a man-high frame of cornstalks and willow branches packed with wired dolls, under a straw hat. An old ahuejote stands at the west side, with a rusted coffee can nailed to its trunk. Near it sits a long stone trough of stagnant water where axolotls once swam. Along the north edge stands the small shrine hut, strung with marigold garlands, its door padlocked.",
+        "walls": "Along the north edge, the front of the shrine hut in rough plank boards silvered by rain under corrugated tin streaked with orange rust, hung with marigold garlands. West and south, fences of weathered gray ahuejote bark wrapped in rusted wire.",
+        "floor": "packed black chinampa earth strewn with marigold petals",
+        "lighting": "Dark and open. Pale green moonlight with drifting mist low over the rows, and a single candle flickering at the shrine door.",
+        "focalPoint": "The marigold-garlanded shrine hut along the north edge, with the doll scarecrow lurching through the rows in front of it",
+        "storyObjects": [
+          {
+            "name": "rusted coffee can of doll eyes nailed to the willow",
+            "where": "nailed to the trunk of the ahuejote on the west side",
+            "reveals": "A can filled to the brim with loose glass doll eyes, blue and brown and green, all of them staring up. When the player searches it, an orange-painted key spills out among them."
+          },
+          {
+            "name": "empty stone axolotl trough",
+            "where": "near the base of the willow, west side",
+            "reveals": "A long stone trough where the keeper kept axolotls, the little pink canal creatures, gone green and empty. Scratched into its rim: 'ya no tengo tiempo para nada más que ellas' (I have no time anymore for anything but them)."
+          }
+        ],
+        "dressing": [
+          "rows of withered corn",
+          "sprawling squash vines with rotting gourds",
+          "marigolds gone to seed",
+          "a broken wooden hand plow",
+          "dolls tied to bean poles",
+          "a rusted watering can"
+        ],
+        "characters": [
+          {
+            "name": "The Doll Scarecrow",
+            "appearance": "A tall, lurching scarecrow of dried cornstalks and willow branches, man-high, wrapped in a tattered striped serape. Its body is packed with dozens of gray, cobwebbed dolls wired together, their limbs sticking out at all angles. For a head it has a cluster of severed doll heads under a ragged straw hat.",
+            "role": "threat",
+            "personality": "Silent except for the creak of cornstalks and the clicking of plastic limbs as it moves.",
+            "knows": "Nothing. It does not speak. The keeper built it to guard the garden and the shrine, and now it guards them from everyone.",
+            "brushOff": "(Only the creak of stalks and the clicking of doll limbs.)",
+            "behavior": "patrols slowly up and down the garden rows, then turns toward the player when she comes near and pursues at a lurching walk. On catching her it jumpscares: dozens of tiny doll faces snapping their eyes open at once, with a chorus of crackling doll voice boxes.",
+            "hostile": true
+          }
+        ]
+      },
+      {
+        "id": "shrine-hut",
+        "name": "The Shrine of the First Doll",
+        "outdoor": false,
+        "grid": [
+          0,
+          0
+        ],
+        "size": "small and close, 9 x 4 x 8 m",
+        "purpose": "The final room. The keeper's memorial and the visitors' offerings build toward Florinda, whose cracked head holds his confession and summons the drowned girl.",
+        "description": "A cramped plank hut that feels like a chapel. Against the north wall, on a low table ringed with candles and marigolds, sits a tin washtub full of dark canal water, and in it, propped upright, sits Florinda, the first doll. She is old porcelain gone gray, her dress rotted to lace, a crack running across her forehead. The west wall is papered with visitors' offerings: photographs, letters, rosaries and dolls. On the east wall hangs the keeper's memorial: his straw hat on a nail above a framed photograph. The floor is always wet.",
+        "walls": "rough plank boards silvered by rain, papered on the west wall with letters and photographs",
+        "floor": "woven reed petate matting, dark and soaked",
+        "lighting": "Dim and close. A ring of votive candles around the washtub on the north table lights Florinda from below. The rest of the hut fades into shadow.",
+        "focalPoint": "Florinda, the first doll, sitting in her tin washtub on the candle-ringed table against the north wall",
+        "storyObjects": [
+          {
+            "name": "the keeper's memorial: straw hat and framed photograph",
+            "where": "hanging on the east wall",
+            "reveals": "A faded photograph of Don Celestino as a young man, standing by the canal and holding Florinda in both hands. His face is pale, and he is not smiling. On the back, in pencil: 'el primer día' (the first day)."
+          },
+          {
+            "name": "wall of visitors' offerings",
+            "where": "covering the west wall",
+            "reveals": "Hundreds of letters and photos from strangers, asking the drowned girl for protection, luck or forgiveness. Not one of them names her. Everyone came for her, and no one ever knew who she was."
+          },
+          {
+            "name": "Florinda, the first doll, in her tin washtub",
+            "where": "on the candle-ringed table against the north wall",
+            "reveals": "The keeper's confession, folded inside her cracked porcelain head: 'I heard her that evening. A little girl crying for help in the canal. I told myself it was the sirena singing, and I barred my door and sang until it stopped. In the morning I found her in the lilies. Every doll since is my apology. She cannot be left alone.' The water in the tub begins to rise."
+          }
+        ],
+        "dressing": [
+          "ring of votive candles",
+          "marigold garlands strung across the ceiling",
+          "plastic flowers and candy offerings",
+          "rosaries hanging from nails",
+          "dolls sitting along a low shelf",
+          "a puddle spreading across the floor from the washtub"
+        ],
+        "characters": []
+      }
+    ],
+    "doors": [
+      {
+        "id": "landing-gate",
+        "rooms": [
+          "landing",
+          "grove"
+        ],
+        "locked": true,
+        "description": "A sagging plank gate in the doll-hung willow fence, held shut with a rusted chain and padlock. Three dolls are tied to its crossbar."
+      },
+      {
+        "id": "grove-cabin",
+        "rooms": [
+          "grove",
+          "keepers-cabin"
+        ],
+        "locked": false,
+        "description": "The cabin's low wooden doorway under the tin eave, standing ajar, with candlelight spilling out."
+      },
+      {
+        "id": "grove-bank",
+        "rooms": [
+          "grove",
+          "canal-bank"
+        ],
+        "locked": false,
+        "description": "An open gap in the east fence where a muddy path leads down toward the water, framed by willow poles hung with doll heads."
+      },
+      {
+        "id": "bank-shed",
+        "rooms": [
+          "canal-bank",
+          "mending-shed"
+        ],
+        "locked": true,
+        "description": "The mending shed's narrow plank door with a heavy iron hasp and padlock, a doll arm hung on it like a door knocker."
+      },
+      {
+        "id": "grove-garden",
+        "rooms": [
+          "grove",
+          "chinampa-garden"
+        ],
+        "locked": true,
+        "description": "A gate of woven reeds bound with rusted wire in the west fence, wired shut with a twisted wire lock."
+      },
+      {
+        "id": "garden-shrine",
+        "rooms": [
+          "chinampa-garden",
+          "shrine-hut"
+        ],
+        "locked": true,
+        "description": "The shrine hut's small plank door, painted marigold orange long ago, hung with garlands and fastened with an old iron padlock."
+      }
+    ],
+    "keys": [
+      {
+        "name": "Gate Padlock Key",
+        "appearance": "A small brass padlock key on a loop of red yarn, with a tiny plastic doll shoe tied to it",
+        "unlocks": "landing-gate",
+        "room": "landing",
+        "howFound": "Chencho hands it over at the end of his conversation. The keeper gave it to him a week before he died, for 'the señorita who fixes dolls.'",
+        "hint": "Chencho"
+      },
+      {
+        "name": "Mending Shed Key",
+        "appearance": "A long iron key furred with green canal slime, a few strands of fishing net still tangled in its bow",
+        "unlocks": "bank-shed",
+        "room": "canal-bank",
+        "howFound": "It drops out of the torn fishing net snagged in the reeds the first time the player searches it, where it was lost when the keeper drowned.",
+        "hint": "Rufino says his uncle's keys weren't on him and are probably in the net snagged in the reeds on the east bank."
+      },
+      {
+        "name": "Garden Gate Key",
+        "appearance": "A crude key bent from heavy rusted wire, the same wire he hung his dolls with, dripping wet",
+        "unlocks": "grove-garden",
+        "room": "mending-shed",
+        "howFound": "Don Celestino's ghost twists it out of his workbench wire and hands it over at the end of his conversation.",
+        "hint": "Don Celestino"
+      },
+      {
+        "name": "Shrine Key",
+        "appearance": "An old iron skeleton key painted faded marigold orange, with a blue glass doll eye threaded on its ring",
+        "unlocks": "garden-shrine",
+        "room": "chinampa-garden",
+        "howFound": "It spills out among the glass eyes the first time the player searches the rusted coffee can nailed to the willow.",
+        "hint": "Don Celestino says the shrine key is in the coffee can of doll eyes nailed to the willow in the garden."
+      }
+    ],
+    "objectives": [
+      {
+        "id": "talk-to-chencho",
+        "text": "Talk to Chencho the boatman at the landing"
+      },
+      {
+        "id": "find-one-eyed-doll",
+        "text": "Unlock the island gate and find the one-eyed doll in the great willow",
+        "room": "landing",
+        "trigger": "Chencho the boatman"
+      },
+      {
+        "id": "find-rufino",
+        "text": "Find the keeper's nephew Rufino in the cabin north of the grove",
+        "room": "grove",
+        "trigger": "The One-Eyed Doll"
+      },
+      {
+        "id": "search-the-net",
+        "text": "Search the fishing net snagged in the reeds on the east canal bank",
+        "room": "keepers-cabin",
+        "trigger": "Rufino"
+      },
+      {
+        "id": "open-the-shed",
+        "text": "Unlock the keeper's mending shed at the north edge of the canal bank",
+        "room": "canal-bank",
+        "trigger": "Mending Shed Key"
+      },
+      {
+        "id": "find-the-eyes",
+        "text": "Unlock the garden west of the grove and find the can of doll eyes",
+        "room": "mending-shed",
+        "trigger": "Don Celestino"
+      },
+      {
+        "id": "open-the-shrine",
+        "text": "Unlock the shrine hut at the north end of the garden",
+        "room": "chinampa-garden",
+        "trigger": "Shrine Key"
+      },
+      {
+        "id": "find-florinda",
+        "text": "Find Florinda, the first doll, in her tin washtub",
+        "room": "shrine-hut",
+        "trigger": "the keeper's memorial: straw hat and framed photograph"
+      }
+    ]
+  }
+}
