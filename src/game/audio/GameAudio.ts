@@ -1,7 +1,8 @@
-import { SOUND_VARIATIONS, soundUrls, type FloorSound, type SoundName } from "./sounds";
-import { bats, eerieMusic, heartbeat, roomTone, staticBurst, wind } from "./synth";
+import type { Ambience, Footsteps } from "../../shared/spec";
+import { SOUND_VARIATIONS, soundUrls, type SoundName } from "./sounds";
+import { bats, drip, eerieMusic, heartbeat, rain, roomTone, staticBurst, wind } from "./synth";
 
-export type Ambience = "outdoor" | "indoor";
+const AMBIENCE_LOOPS: Record<Ambience, typeof wind> = { wind, rain, room: roomTone, drip };
 
 export interface PlayOptions {
   /** 0 to 1. */
@@ -19,7 +20,7 @@ const HOUSE_NOISE_GAP: [number, number] = [8, 22];
  *
  *   const audio = new GameAudio();
  *   await audio.load();
- *   audio.setAmbience("outdoor");
+ *   audio.setAmbience("wind");
  *   audio.startMusic();
  *   audio.footstep("grass");
  *   audio.play("door-open");
@@ -90,7 +91,7 @@ export class GameAudio {
     source.start();
   }
 
-  footstep(floor: FloorSound) {
+  footstep(floor: Footsteps) {
     this.play(`footstep-${floor}`, { volume: 0.5, pitchJitter: 0.1 });
   }
 
@@ -107,12 +108,12 @@ export class GameAudio {
     if (this.running) heartbeat(this.context, this.sfx, volume);
   }
 
-  /** Background loop for the current room: wind outdoors, room tone indoors. Crossfades between them. */
+  /** The current room's background loop. Crossfades from the last one; null fades to silence. */
   setAmbience(kind: Ambience | null) {
     if (kind === (this.currentAmbience ?? null)) return;
     this.stopAmbience?.();
     this.currentAmbience = kind ?? undefined;
-    this.stopAmbience = kind === "outdoor" ? wind(this.context, this.ambience) : kind === "indoor" ? roomTone(this.context, this.ambience) : undefined;
+    this.stopAmbience = kind ? AMBIENCE_LOOPS[kind](this.context, this.ambience) : undefined;
   }
 
   startMusic() {

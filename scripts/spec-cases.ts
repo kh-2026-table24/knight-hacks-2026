@@ -32,6 +32,18 @@ export const CASES: SpecCase[] = [
     mutate: (g) => delete room(g, "foyer").size,
   },
   {
+    name: "unknown footsteps",
+    expect: ['footsteps must be one of "wood", "stone"'],
+    room: "cellar",
+    mutate: (g) => (room(g, "cellar").footsteps = "gravel"),
+  },
+  {
+    name: "unknown ambience",
+    expect: ['ambience must be one of "wind", "rain"'],
+    room: "study",
+    mutate: (g) => (room(g, "study").ambience = "thunder"),
+  },
+  {
     name: "misspelled field",
     expect: ['unknown field "dialogues"'],
     room: "study",

@@ -1,8 +1,8 @@
 import type { Vector3 } from "three";
-import type { RoomSpec } from "../../shared/spec";
+import { guessFootsteps } from "../../shared/footsteps";
+import type { Footsteps, RoomSpec } from "../../shared/spec";
 import type { Room } from "../Room";
 import { GameAudio } from "./GameAudio";
-import { floorSoundFor, type FloorSound } from "./sounds";
 
 // A heartbeat starts when something hostile is this close (meters), and speeds up as it gets closer.
 const HEARTBEAT_RANGE = 6;
@@ -17,7 +17,7 @@ const STANDING_TOLERANCE = 0.15;
  */
 export class SoundDirector {
   readonly audio = new GameAudio();
-  private floor: FloorSound = "concrete";
+  private floor: Footsteps = "stone";
   private heartbeatIn = 0;
   private muted = false;
 
@@ -36,15 +36,15 @@ export class SoundDirector {
   }
 
   enterRoom(spec: RoomSpec) {
-    this.floor = floorSoundFor(spec.floor);
-    this.audio.setAmbience(spec.outdoor ? "outdoor" : "indoor");
+    this.floor = spec.footsteps;
+    this.audio.setAmbience(spec.ambience);
     // Creaks and distant doors belong inside the house.
     if (spec.outdoor) this.audio.stopHouseNoises();
     else this.audio.startHouseNoises();
     this.heartbeatIn = 0;
   }
 
-  /** The player put a foot down. On a prop (stairs, a rug), its name says what it sounds like; otherwise the room's floor. */
+  /** The player put a foot down. On a prop (stairs, a rug), its name suggests the sound; otherwise it's the room's footsteps. */
   footstep(room: Room | null, feet: Vector3) {
     const under = room?.props.find(
       (prop) =>
@@ -55,7 +55,7 @@ export class SoundDirector {
         feet.z >= prop.bounds.min.z &&
         feet.z <= prop.bounds.max.z,
     );
-    this.audio.footstep(under ? floorSoundFor(under.name, this.floor) : this.floor);
+    this.audio.footstep(under ? guessFootsteps(under.name, this.floor) : this.floor);
   }
 
   /** Runs every frame the game isn't paused. */

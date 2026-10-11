@@ -44,11 +44,23 @@ export interface RoomSpec {
   /** Material descriptions ("damp green-black fieldstone"); they become tiled surface textures. */
   walls: string;
   floor: string;
+  /** What walking on the floor sounds like. Defaults to a guess from `floor`. */
+  footsteps: Footsteps;
+  /** The room's background sound. Defaults to "wind" outdoors and "room" indoors. */
+  ambience: Ambience;
   doors: DoorSpec[];
   props: PropSpec[];
   characters: CharacterSpec[];
   pickups: PickupSpec[];
 }
+
+/** wood: boards, planks. stone: stone, tile, concrete, metal. grass: grass, dirt, mud, leaves. carpet: rugs, fabric. snow: snow, ice. */
+export const FOOTSTEPS = ["wood", "stone", "grass", "carpet", "snow"] as const;
+export type Footsteps = (typeof FOOTSTEPS)[number];
+
+/** wind: open air. rain: a storm outside, or on the roof. room: the low hum of a quiet building. drip: water dripping (cellars, caves, crypts). */
+export const AMBIENCES = ["wind", "rain", "room", "drip"] as const;
+export type Ambience = (typeof AMBIENCES)[number];
 
 export interface DoorSpec {
   connection: string;
@@ -233,5 +245,6 @@ export const LIMITS = {
 
 export const DEFAULTS = {
   baseLight: 0.25,
+  ambience: { outdoor: "wind", indoor: "room" },
   idle: ["standing still"],
 } as const;
