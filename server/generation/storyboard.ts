@@ -173,9 +173,19 @@ These are facts about the engine. A storyboard that ignores them can't be built.
 - The camera looks north from the south side of each room. Indoors, the north, west and east walls
   are built and the south side is open to the camera, so the north wall is the stage. Outdoor areas
   (yards, gardens, graveyards, the street) show only the building's face along the north edge.
+- Grid cells are [x, z]: x grows to the east and z grows to the south, toward the camera. So [1, 0] is
+  directly north of [1, 1], and [2, 1] is directly east of [1, 1].
+- Lay the map out the way the camera sees it. An outdoor area shows its building along its north edge,
+  so the rooms inside that building lie north of it (smaller z), and the way in is a door in its north
+  edge: a front yard at [1, 1] leads north into an entrance hall at [1, 0]. A door on a room's south
+  side is the edge nearest the camera, so it leads back out toward the viewer; an outdoor area's door
+  into the building is never on its south side.
 - A room is ${LIMITS.roomSide[0]} to ${GENERATED_ROOM.maxSide} m wide and deep and ${LIMITS.roomHeight[0]} to ${GENERATED_ROOM.maxHeight} m tall. A room holds at most 4 characters.
 - The whole game is drawn from at most ${LIMITS.artJobsWarning} generated images: every distinct material, object
   picture and character pose is one, and a description repeated word for word is drawn once.
+- Before play starts, the game shows the intro: one picture and a few short paragraphs of the story so
+  far, in the game's voice. It tells the player who she is, why she has come, and what happened here,
+  and it ends where play begins, at the first room. It sets up the mystery; it doesn't give it away.
 - Plan 4 to 8 rooms and 2 to 5 locked doors. At most 12 rooms.
 </the_game>
 
@@ -222,6 +232,10 @@ physical details you plan to use. Then write the storyboard as one JSON object i
   "premise": "why the player is here and what she's looking for",
   "ending": "what the final room reveals and how the story resolves",
   "beats": ["what the player learns, in the order she learns it"],
+  "intro": {
+    "art": "what the opening picture shows: one wide scene that sets the mood, e.g. the house from the road at night",
+    "text": ["2 to 4 short paragraphs (under ${LIMITS.introParagraphLength} characters each), shown one at a time over the picture"]
+  },
   "artDirection": {
     "style": "one paragraph that sets the look for every piece of art",
     "palette": ["4-6 colors as words"],

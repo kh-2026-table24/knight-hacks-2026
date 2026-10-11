@@ -1,14 +1,17 @@
 import { doorSides, playOrder } from "./checkGame";
 import { DOOR } from "./constants";
-import type { CharacterArt, DoorSpec, GameSpec, ItemSpec, PartSpec, PropSpec, RoomSpec, AmbientSpec, Vec2 } from "./spec";
+import type { CharacterArt, DoorSpec, GameSpec, IntroSpec, ItemSpec, PartSpec, PropSpec, RoomSpec, AmbientSpec, Vec2 } from "./spec";
 
 // Art is described inline in a GameSpec ("material": "dark oak planks"), so there's no texture table to
 // keep in sync. These functions derive every image a game needs and a stable id for each. The server
 // generates images by id and the client requests them by id, both from the same derivation, so a
 // reference can't dangle. Identical descriptions share one image, even across rooms.
 
-/** surface: a seamless tile. cutout: a picture on a transparent background. character: a cutout of a figure facing right. */
-export type ArtKind = "surface" | "cutout" | "character";
+/**
+ * surface: a seamless tile. cutout: a picture on a transparent background. character: a cutout of a
+ * figure facing right. picture: a whole scene, edge to edge (the intro's).
+ */
+export type ArtKind = "surface" | "cutout" | "character" | "picture";
 
 export interface ArtJob {
   id: string;
@@ -86,6 +89,8 @@ export const artFor = {
   item: (item: ItemSpec) => job("cutout", item.art, 1),
 
   ambient: (ambient: Pick<AmbientSpec, "art" | "size">) => job("cutout", ambient.art, ambient.size[0] / ambient.size[1]),
+
+  intro: (intro: IntroSpec) => job("picture", intro.art, 16 / 9),
 };
 
 /** Every image one room needs, in the order worth loading them: surfaces, then the rest. */
@@ -115,15 +120,26 @@ export function roomArt(spec: Pick<GameSpec, "rooms" | "connections">, room: Roo
 }
 
 /** Every image the game needs, by id. */
-export function collectArt(spec: Pick<GameSpec, "rooms" | "connections">): Map<string, ArtJob> {
+export function collectArt(spec: Pick<GameSpec, "rooms" | "connections" | "intro">): Map<string, ArtJob> {
   const jobs = new Map<string, ArtJob>();
+  if (spec.intro) {
+    const intro = artFor.intro(spec.intro);
+    jobs.set(intro.id, intro);
+  }
   for (const room of spec.rooms) for (const art of roomArt(spec, room)) jobs.set(art.id, art);
   return jobs;
 }
 
-/** Every image the game needs, once each, with the play-order position of the first room that needs it (0 is the start). */
-export function artInPlayOrder(spec: Pick<GameSpec, "rooms" | "connections">): { job: ArtJob; room: number }[] {
+/**
+ * Every image the game needs, once each, with the play-order position of the first room that needs it
+ * (0 is the start). The intro's picture comes first: it's on screen before any room.
+ */
+export function artInPlayOrder(spec: Pick<GameSpec, "rooms" | "connections" | "intro">): { job: ArtJob; room: number }[] {
   const seen = new Map<string, { job: ArtJob; room: number }>();
+  if (spec.intro) {
+    const intro = artFor.intro(spec.intro);
+    seen.set(intro.id, { job: intro, room: 0 });
+  }
   playOrder(spec).forEach((room, i) => {
     for (const job of roomArt(spec, room)) if (!seen.has(job.id)) seen.set(job.id, { job, room: i });
   });

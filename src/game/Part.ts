@@ -23,7 +23,7 @@ import type { LightSpec, PartSpec, Shape } from "../shared/spec";
 import { applyWorldUVs } from "./worldUVs";
 
 // Panels have no depth, so their collider gets some to stop the player clipping through.
-const PLANE_COLLIDER_DEPTH = 0.3;
+export const PLANE_COLLIDER_DEPTH = 0.3;
 // Meters covered by one repeat of a box or wedge's surface texture, so pixels are the same size on
 // every face instead of one texture stretched across each face whatever its size.
 const SURFACE_TILE_SIZE = 2;

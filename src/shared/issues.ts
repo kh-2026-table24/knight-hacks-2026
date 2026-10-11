@@ -8,6 +8,8 @@ export interface Issue {
   room?: string;
   /** Where in the JSON, e.g. rooms[2](study).props[3](oak-desk).parts[1].size */
   path: string;
+  /** A warning generation still asks Claude to fix while it has repair rounds left. */
+  repair?: boolean;
   message: string;
 }
 

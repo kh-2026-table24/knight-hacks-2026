@@ -29,8 +29,9 @@ const isKeyColor = (r: number, g: number, b: number) => g >= 180 && r <= 120 && 
 
 const CUTOUT_LONG_SIDE = 128; // pixels along a cutout's longer side
 const SURFACE_SIZE = 64; // surfaces are square tiles
+const PICTURE_WIDTH = 320; // the intro's picture, scaled up on screen with hard pixel edges
 
-type Kind = "cutout" | "surface";
+type Kind = "cutout" | "surface" | "picture";
 
 const assetsDir = (gameId: string) => join(gameDir(gameId), "assets");
 
@@ -144,7 +145,8 @@ function make(gameId: string, game: GameSpec, job: ArtJob, priority: number): Pr
   return once(file, async () => {
     const existing = await readIfExists(file);
     if (existing) return existing;
-    const png = await processImage(await original(gameId, game, job, priority), job.kind === "surface" ? "surface" : "cutout");
+    const kind: Kind = job.kind === "surface" || job.kind === "picture" ? job.kind : "cutout";
+    const png = await processImage(await original(gameId, game, job, priority), kind);
     await writeFile(file, png);
     return png;
   });
@@ -186,6 +188,7 @@ function original(gameId: string, game: GameSpec, job: ArtJob, priority: number)
 /** The prompt for drawing a job from scratch, without a reference frame. */
 function promptFor(job: ArtJob) {
   if (job.kind === "surface") return surfacePrompt(job.prompt);
+  if (job.kind === "picture") return picturePrompt(job.prompt);
   if (job.kind === "character") return characterPrompt(job.subject ?? job.prompt, job.prompt);
   return cutoutPrompt(job.subject ? `${job.subject}, ${job.prompt}` : job.prompt);
 }
@@ -207,8 +210,8 @@ export async function askGemini(prompt: string, reference: string | undefined, a
   return data;
 }
 
-// Shrinks Gemini's 512px+ JPEG to pixel-art size with nearest-neighbor sampling, and for cutouts
-// makes the green screen transparent. Removes green everywhere, not just from the edges, so gaps
+// Shrinks Gemini's 512px+ JPEG to pixel-art size with nearest-neighbor sampling (pictures to
+// PICTURE_WIDTH across), and for cutouts makes the green screen transparent. Removes green everywhere, not just from the edges, so gaps
 // (between legs, inside handles) come out transparent too.
 export async function processImage(jpeg: Buffer, kind: Kind, longSide = CUTOUT_LONG_SIDE): Promise<Buffer> {
   const { width = 1, height = 1 } = await sharp(jpeg).metadata();
@@ -216,7 +219,9 @@ export async function processImage(jpeg: Buffer, kind: Kind, longSide = CUTOUT_L
   const [w, h] =
     kind === "surface"
       ? [SURFACE_SIZE, SURFACE_SIZE]
-      : aspect >= 1
+      : kind === "picture"
+        ? [PICTURE_WIDTH, Math.round(PICTURE_WIDTH / aspect)]
+        : aspect >= 1
         ? [longSide, Math.round(longSide / aspect)]
         : [Math.round(longSide * aspect), longSide];
 
@@ -299,6 +304,16 @@ function surfacePrompt(prompt: string) {
     // cutouts and the room's contrast read, and keep the stated color so rooms aren't all one hue.
     "Simple and low in detail: one material with a subtle repeating pattern and a narrow range of tones, in the color described.",
     "No single objects, no border, no frame, no text, no perspective.",
+  ].join(" ");
+}
+
+// The intro's picture: a whole scene, not a cutout, so no green screen.
+function picturePrompt(prompt: string) {
+  return [
+    STYLE,
+    `A wide establishing scene for the opening of the game: ${prompt}.`,
+    "A complete illustration filling the entire image edge to edge, with its setting and sky or background, moody and atmospheric.",
+    "No text, no title, no border, no frame, no interface.",
   ].join(" ");
 }
 

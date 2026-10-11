@@ -11,6 +11,7 @@ import {
   type ConnectionSpec,
   type DoorSpec,
   type GameSpec,
+  type IntroSpec,
   type ObjectiveSpec,
   type PartSpec,
   type PickupSpec,
@@ -38,7 +39,7 @@ export interface ParsedGame {
 export function parseGameSpec(value: unknown): ParsedGame {
   const r = new Reader();
   const parsedRooms: ParsedGame["rooms"] = [];
-  const game = r.object(value, "", ["version", "title", "summary", "rooms", "connections", "objectives"]);
+  const game = r.object(value, "", ["version", "title", "summary", "rooms", "connections", "objectives", "intro"]);
   if (!game) return { spec: undefined, issues: r.issues, rooms: parsedRooms, connections: [], objectives: [], complete: false };
 
   const version = game.num("version");
@@ -58,11 +59,12 @@ export function parseGameSpec(value: unknown): ParsedGame {
   );
   const connections = game.array("connections", (v, path) => parseConnection(r, v, path), { optional: true }) ?? [];
   const objectives = game.array("objectives", (v, path) => parseObjective(r, v, path), { optional: true, max: LIMITS.objectives }) ?? [];
+  const intro = game.has("intro") ? parseIntro(r, game.raw("intro"), game.at("intro")) : undefined;
   const [rawRooms, rawConnections] = [game.raw("rooms"), game.raw("connections") ?? []];
   const complete =
     Array.isArray(rawRooms) && parsedRooms.length === rawRooms.length && Array.isArray(rawConnections) && connections.length === rawConnections.length;
 
-  const spec = r.errorCount === 0 && title && summary && rooms ? { version: 1 as const, title, summary, rooms, connections, objectives } : undefined;
+  const spec = r.errorCount === 0 && title && summary && rooms ? { version: 1 as const, title, summary, rooms, connections, objectives, ...(intro && { intro }) } : undefined;
   return { spec, issues: r.issues, rooms: parsedRooms, connections, objectives, complete };
 }
 
@@ -132,6 +134,15 @@ function parseObjective(r: Reader, value: unknown, path: string): ObjectiveSpec 
   const text = o.text("text", { max: LIMITS.objectiveLength });
   if (o.failed || !id || !text) return undefined;
   return { id, text };
+}
+
+function parseIntro(r: Reader, value: unknown, path: string): IntroSpec | undefined {
+  const o = r.object(value, path, ["art", "text"]);
+  if (!o) return undefined;
+  const art = o.text("art");
+  const text = o.strings("text", { min: 1, max: LIMITS.introParagraphs, maxLength: LIMITS.introParagraphLength });
+  if (o.failed || !art || !text) return undefined;
+  return { art, text };
 }
 
 function parseDoor(r: Reader, value: unknown, path: string): DoorSpec | undefined {

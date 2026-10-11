@@ -2,6 +2,7 @@ import "./style.css";
 import { init as initPhysics } from "@dimforge/rapier3d-compat";
 import { GameComposer } from "./game/GameComposer";
 import { Game } from "./game/Game";
+import { IntroScreen } from "./game/ui/IntroScreen";
 import { LoadingScreen } from "./game/ui/LoadingScreen";
 import { TitleScreen } from "./game/ui/TitleScreen";
 import { PLAYABLE_SHARE, progressOf, type GameStatus } from "./shared/api";
@@ -68,9 +69,10 @@ async function loadFinished(game: Game, status: GameStatus) {
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// The server writes the story, builds the rooms, then paints every image, the rooms the player reaches
-// first first. The game opens once PLAYABLE_SHARE of the images are made and the first room has all of
-// its own; any other room opens once its images are in (Interactions.useDoor checks).
+// The server writes the story, builds the rooms, then paints every image: the intro's picture, then the
+// rooms the player reaches first first. The game opens once PLAYABLE_SHARE of the images are made and the
+// intro and first room have all of theirs; any other room opens once its images are in
+// (Interactions.useDoor checks).
 let game: Game | undefined;
 for (;;) {
   const status = await fetchStatus();
@@ -80,7 +82,7 @@ for (;;) {
     if (status.stage === "art" || status.stage === "ready") {
       game ??= await fetchGame();
       await loadFinished(game, status);
-      if (progressOf(status) >= PLAYABLE_SHARE && game.isRoomReady(game.startRoom.id)) {
+      if (progressOf(status) >= PLAYABLE_SHARE && game.isIntroReady() && game.isRoomReady(game.startRoom.id)) {
         loading.show(status, true);
         break;
       }
@@ -90,8 +92,13 @@ for (;;) {
 }
 
 const playing = game;
-composer.loadGame(playing);
+// The intro plays over the loading screen as it leaves, then fades out over the first room.
+const { intro } = playing.spec;
+const introScreen = intro && new IntroScreen(playing.introArt && playing.textures.urlOf(id, playing.introArt));
 loading.hide();
+if (intro && introScreen) await introScreen.play(intro.text);
+composer.loadGame(playing);
+introScreen?.hide();
 
 // Keep following the painting while the player plays, until every image is in.
 for (;;) {

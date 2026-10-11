@@ -526,3 +526,55 @@ body {
     animation: none;
   }
 }
+
+/* The intro (src/game/ui/IntroScreen.ts): the opening picture, with the story a paragraph at a time
+   below it. Above the loading screen, which leaves underneath it. */
+.intro-screen {
+  z-index: 11;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding: 24px 16px;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.intro-picture {
+  width: min(92vw, 960px, calc((100vh - 240px) * 16 / 9));
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  image-rendering: pixelated;
+}
+
+.intro-text {
+  margin: 0;
+  max-width: 760px;
+  min-height: 4.2em;
+  font-family: "IM Fell English", Georgia, serif;
+  font-size: 22px;
+  line-height: 1.4;
+  text-align: center;
+  color: var(--bone);
+  text-shadow: 0 2px 0 #000;
+  opacity: 0;
+}
+
+.intro-text-shown {
+  animation: intro-fade-in 1.2s ease forwards;
+}
+
+@keyframes intro-fade-in {
+  to {
+    opacity: 1;
+  }
+}
+
+.intro-more {
+  margin: 0;
+  font-size: 19px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+}

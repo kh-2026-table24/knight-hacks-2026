@@ -1,4 +1,4 @@
-import { artIdsForRoom, collectArt } from "../shared/art";
+import { artFor, artIdsForRoom, collectArt } from "../shared/art";
 import { doorSides } from "../shared/checkGame";
 import type { GameSpec } from "../shared/spec";
 import { Connection } from "./Connection";
@@ -13,6 +13,8 @@ export class Game {
   readonly connections: Map<string, Connection>;
   readonly rooms: Map<string, Room>;
   readonly startRoom: Room;
+  /** The art id of the intro's picture, if the game has an intro. */
+  readonly introArt: string | undefined;
   /** The art ids each room needs, by room id. */
   private readonly roomArt: Map<string, string[]>;
 
@@ -27,11 +29,17 @@ export class Game {
     this.rooms = new Map(spec.rooms.map((room) => [room.id, new Room(room, this.textures, sides.get(room.id) ?? new Map(), this.state)]));
     this.startRoom = this.rooms.get(spec.rooms[0].id)!;
     this.roomArt = new Map(spec.rooms.map((room) => [room.id, artIdsForRoom(spec, room)]));
+    this.introArt = spec.intro && artFor.intro(spec.intro).id;
   }
 
   /** The text of the objective on screen, if the game has any. */
   get objective(): string | undefined {
     return this.spec.objectives[this.state.objective]?.text;
+  }
+
+  /** The game can start once the intro's picture has loaded (or been given up on), if there is one. */
+  isIntroReady() {
+    return !this.introArt || this.textures.isSettled(this.introArt);
   }
 
   /** A room can be entered once every image it needs has loaded (or been given up on). */

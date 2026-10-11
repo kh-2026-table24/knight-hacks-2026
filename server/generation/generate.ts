@@ -80,7 +80,7 @@ export async function generateGame(gameId: string, hooks: GenerateHooks = {}): P
     if (warnings.length) log(gameId, `${warnings.length} warning${warnings.length === 1 ? "" : "s"}:\n${formatIssues(warnings)}`, "warn");
     const problems = problemsByRoom(game, errorsIn(issues), artBudget);
     // Asked for while there are repair rounds left, but not worth failing a playable game over.
-    const wishes = wishesByRoom(game, storyboard, artBudget);
+    const wishes = wishesByRoom(game, storyboard, artBudget, issues);
     if (spec && (wishes.size === 0 || round === MAX_REPAIRS)) {
       await saveGame(gameId, spec);
       log(gameId, `saved "${spec.title}"`);
@@ -119,7 +119,7 @@ async function writeStoryboard(gameId: string, meter: TokenMeter | undefined): P
   log(gameId, `story: ${story}`);
   let repair: RepairContext | undefined;
   for (let attempt = 0; ; attempt++) {
-    const prompt = storyboardPrompt(story) + (repair ? repairSection(repair, "storyboard", "fix the rooms, doors, keys and objectives so the map works, and keep the story") : "");
+    const prompt = storyboardPrompt(story) + (repair ? repairSection(repair, "storyboard", "fix the rooms, doors, keys, objectives and intro so the map works, and keep the story") : "");
     const text = await askClaude(prompt, { label: `storyboard${attempt ? ` (fix ${attempt})` : ""}`, gameId, effort: STORYBOARD_EFFORT, meter });
 
     let json: unknown;
@@ -210,6 +210,7 @@ function assemble(storyboard: Storyboard, rooms: Map<string, unknown>) {
     rooms: storyboard.rooms.map((room) => rooms.get(room.id)),
     connections: storyboard.doors.map(({ id, rooms, locked }) => ({ id, rooms, locked })),
     objectives: storyboard.objectives.map(({ id, text }) => ({ id, text })),
+    intro: storyboard.intro,
   };
 }
 
@@ -236,12 +237,13 @@ function problemsByRoom(game: unknown, errors: Issue[], artBudget: number): Map<
 
 /**
  * Rooms that are valid but fall short of what generation asks for: 1 to 5 things to interact with, a
- * compact size, characters whose conversations lead somewhere, the storyboard's objectives, and the
- * room's share of the image budget.
+ * compact size, characters whose conversations lead somewhere, the storyboard's objectives, the room's
+ * share of the image budget, and the warnings marked for repair (stairs that can't be climbed).
  */
-function wishesByRoom(game: unknown, storyboard: Storyboard, artBudget: number): Map<string, string[]> {
+function wishesByRoom(game: unknown, storyboard: Storyboard, artBudget: number, issues: Issue[]): Map<string, string[]> {
   const wishes = new Map<string, string[]>();
   const add = (room: string, wish: string) => wishes.set(room, [...(wishes.get(room) ?? []), wish]);
+  for (const issue of issues) if (issue.repair && issue.room) add(issue.room, issue.message);
   const parsed = parseGameSpec(game);
   const rooms = parsed.rooms.map(({ room }) => room);
   const totalArt = collectArt({ rooms, connections: parsed.connections }).size;

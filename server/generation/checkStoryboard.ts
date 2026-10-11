@@ -1,7 +1,7 @@
 import { solveLocks } from "../../src/shared/checkGame";
 import { sideToward } from "../../src/shared/geometry";
 import { isFields, SLUG } from "../../src/shared/reader";
-import { LIMITS, type Vec2 } from "../../src/shared/spec";
+import { LIMITS, type IntroSpec, type Vec2 } from "../../src/shared/spec";
 
 // The storyboard is mostly prose that the room prompts read as-is, so only the parts code relies on
 // are typed and checked here: the room ids and cells, the doors between them, which room holds each
@@ -47,6 +47,7 @@ export interface Storyboard {
   doors: StoryboardDoor[];
   keys: StoryboardKey[];
   objectives: StoryboardObjective[];
+  intro: IntroSpec;
   raw: Record<string, unknown>;
 }
 
@@ -96,6 +97,14 @@ export function checkStoryboard(value: unknown): { storyboard?: Storyboard; prob
       return problems.push(`${at}(${id}) joins "${a.id}" [${a.grid.join(", ")}] and "${b.id}" [${b.grid.join(", ")}], which aren't neighbors; their cells must differ by 1 in exactly one coordinate`);
     }
     if (doors.some((door) => door.rooms.includes(a.id) && door.rooms.includes(b.id))) return problems.push(`${at}(${id}) joins "${a.id}" and "${b.id}", which another door already joins`);
+    // Outdoor areas show their building along the north edge, so the way in can't be the camera's side.
+    const [outside, inside] = a.outdoor && !b.outdoor ? [a, b] : b.outdoor && !a.outdoor ? [b, a] : [];
+    if (outside && inside && sideToward(outside.grid, inside.grid) === "south") {
+      problems.push(
+        `${at}(${id}) leads from the outdoor area "${outside.id}" [${outside.grid.join(", ")}] south into "${inside.id}" [${inside.grid.join(", ")}], toward the camera. ` +
+          `Outdoor areas show their building along their north edge, so the way inside must lead north: put the building's rooms at a smaller z than "${outside.id}" (north is z - 1).`,
+      );
+    }
     doors.push({ id, rooms: [a.id, b.id], locked: d.locked === true, ...(str(d.description) && { description: str(d.description) }) });
   });
   const doorById = new Map(doors.map((door) => [door.id, door]));
@@ -132,6 +141,18 @@ export function checkStoryboard(value: unknown): { storyboard?: Storyboard; prob
   if (objectives.length === 0) problems.push(`"objectives" needs at least one objective, the one shown at the start`);
   if (objectives.length > LIMITS.objectives) problems.push(`The storyboard has ${objectives.length} objectives; the limit is ${LIMITS.objectives}`);
 
+  let intro: IntroSpec | undefined;
+  if (!isFields(value.intro)) problems.push(`"intro" must be an object with "art" and "text"`);
+  else {
+    const art = str(value.intro.art);
+    const text = Array.isArray(value.intro.text) ? value.intro.text.map(str).filter((line): line is string => !!line) : [];
+    if (!art) problems.push(`intro.art is missing: what the opening picture shows`);
+    if (text.length === 0 || text.length > LIMITS.introParagraphs) problems.push(`intro.text must be a list of 1 to ${LIMITS.introParagraphs} paragraphs`);
+    const long = text.filter((line) => line.length > LIMITS.introParagraphLength).length;
+    if (long) problems.push(`intro.text has ${long} paragraph${long === 1 ? "" : "s"} over ${LIMITS.introParagraphLength} characters; shorten or split them`);
+    if (art && text.length > 0) intro = { art, text };
+  }
+
   // Walk the map the way a player would, opening each locked door once its key's room is reached.
   if (rooms.length > 0) {
     const keyRooms = new Map<string, string[]>();
@@ -144,6 +165,6 @@ export function checkStoryboard(value: unknown): { storyboard?: Storyboard; prob
     for (const room of rooms) if (!reached.has(room.id)) problems.push(`Room "${room.id}" can't be reached from the first room, "${rooms[0].id}"`);
   }
 
-  if (problems.length > 0 || !title || !summary) return { problems };
-  return { storyboard: { title, summary, rooms, doors, keys, objectives, raw: value }, problems };
+  if (problems.length > 0 || !title || !summary || !intro) return { problems };
+  return { storyboard: { title, summary, rooms, doors, keys, objectives, intro, raw: value }, problems };
 }

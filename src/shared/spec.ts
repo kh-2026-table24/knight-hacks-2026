@@ -25,6 +25,15 @@ export interface GameSpec {
    * earlier one.
    */
   objectives: ObjectiveSpec[];
+  /** Shown before play starts: a picture with the story so far. */
+  intro?: IntroSpec;
+}
+
+export interface IntroSpec {
+  /** What the opening picture shows: one wide scene that sets up the story ("the farmhouse at dusk, one window lit"). */
+  art: string;
+  /** The story so far, shown over the picture one paragraph at a time. */
+  text: string[];
 }
 
 export interface ObjectiveSpec {
@@ -263,6 +272,8 @@ export const LIMITS = {
   rooms: 12,
   objectives: 20,
   objectiveLength: 80,
+  introParagraphs: 5,
+  introParagraphLength: 400,
   roomSide: [6, 30],
   roomHeight: [3, 10],
   propsPerRoom: 250,

@@ -99,8 +99,11 @@ Building structures
 - Structures also make the architecture the player moves through: platforms, balconies, stairs, pillars, low
   walls, a raised stage, a sunken floor, a collapsed beam, a gallery. Give each room one or two memorable
   pieces like this, whatever suits the story.
-- Stairs: step boxes rising ${(PLAYER.stepHeight - 0.05).toFixed(2)} m or less each over treads at least 0.45 m deep, or a wedge
-  whose depth is at least its height.
+- Stairs and ramps need room to use, so give them their space before placing anything around them. Leave
+  at least 1.2 m of open floor in front of the bottom step, in the direction the steps climb, so the player
+  can walk straight onto it: never start a flight against a wall or another prop. Make the flight at least
+  1 m wide, and open its top onto floor at least 1 m deep. Steps rise ${(PLAYER.stepHeight - 0.05).toFixed(2)} m or less each over
+  treads at least 0.45 m deep; a wedge needs a depth at least its height.
 
 Sprites
 - A sprite's picture is generated from its description: the prop's name, or the part's own "art". Name each

@@ -1,6 +1,6 @@
 import { Box3, Vector3 } from "three";
 import { DOOR, INTERACT, PICKUP, PLAYER, REACH, WALL_THICKNESS } from "./constants";
-import { arrivalPoint, boundsOf, distanceXZ, placeProp, roomWalls, wallLength, type Side } from "./geometry";
+import { arrivalPoint, boundsOf, distanceXZ, placeProp, roomWalls, wallLength, type PlacedPart, type Side } from "./geometry";
 import type { Issue } from "./issues";
 import { LIMITS, type DoorSpec, type RoomSpec, type Vec2 } from "./spec";
 import { buildWalkGrid, type WalkGrid } from "./walkGrid";
@@ -17,6 +17,11 @@ const MIN_PROPS = 5;
 const HOSTILE_MARGIN = 2;
 const HAZARD_MARGIN = 0.5;
 const MAX_STEP = PLAYER.stepHeight;
+// A prop rising from the floor a step at a time to a surface at least this high is meant to be climbed.
+const STAIR_MIN_HEIGHT = 1;
+// Narrower than this, a part is a rail or a board, not something to step on.
+const MIN_TREAD = 0.25;
+const GRID_STEP = 0.25;
 
 export interface RoomContext {
   /** Where the room sits in the game, e.g. rooms[2](study). Every message starts with it. */
@@ -59,10 +64,29 @@ function describeOutside(b: Box3, room: Box3): string[] {
 const canInteract = (grid: WalkGrid, box: Box3) =>
   grid.someReached((x, z, y) => distanceXZ(box, x, z) <= INTERACT.range && box.min.y <= y + INTERACT.maxHeightAboveFeet + TOLERANCE);
 
+/**
+ * How high a prop lets the player climb, if it looks like stairs or a ramp: treads rising from the floor
+ * no more than a step at a time, or a wedge no steeper than it is deep. Undefined for anything else.
+ */
+function climbHeight(solids: PlacedPart[]): number | undefined {
+  const upright = solids.filter(({ quaternion: q }) => Math.abs(q.x) < 1e-3 && Math.abs(q.z) < 1e-3);
+  const ramps = upright.filter(({ part, box }) => part.shape === "wedge" && part.size[2] >= part.size[1] && box.min.y <= TOLERANCE).map(({ box }) => box.max.y);
+  const treads = upright.filter(({ part }) => part.shape === "box" && Math.min(part.size[0], part.size[2]) >= MIN_TREAD).map(({ box }) => Math.round(box.max.y * 100) / 100);
+  let top = 0;
+  let levels = 0;
+  for (const height of [...new Set(treads)].sort((a, b) => a - b)) {
+    if (height - top > MAX_STEP + TOLERANCE) break;
+    top = height;
+    levels++;
+  }
+  const highest = Math.max(levels >= 3 ? top : 0, ...ramps);
+  return highest >= STAIR_MIN_HEIGHT ? highest : undefined;
+}
+
 export function checkRoom(room: RoomSpec, ctx: RoomContext): Issue[] {
   const issues: Issue[] = [];
   const error = (path: string, message: string) => issues.push({ severity: "error", room: room.id, path, message });
-  const warn = (path: string, message: string) => issues.push({ severity: "warning", room: room.id, path, message });
+  const warn = (path: string, message: string, repair?: boolean) => issues.push({ severity: "warning", room: room.id, path, message, ...(repair && { repair }) });
   const at = (sub: string) => `${ctx.path}.${sub}`;
   const [w, h, d] = room.size;
   const sideWall = room.outdoor ? 0 : WALL_THICKNESS;
@@ -142,6 +166,30 @@ export function checkRoom(room: RoomSpec, ctx: RoomContext): Issue[] {
     } else if (!grid.someReached((x, z) => distanceXZ(p.bounds, x, z) <= REACH)) {
       // Scenery the player can't walk up to doesn't stop the game, so it's only worth a mention.
       warn(p.label, `${p.label} can't be reached: nowhere the player can walk comes within ${REACH} m of it. Open a path at least 1.2 m wide, or add stairs (steps up to ${MAX_STEP} m, slopes up to ${PLAYER.maxSlopeDeg}°).`);
+    }
+  }
+
+  // Stairs whose top the player could stand on but can't get to: usually the bottom step is against a
+  // wall or a prop, or the flight is too narrow to walk up.
+  for (const p of props) {
+    const height = climbHeight(p.solids);
+    if (height === undefined) continue;
+    let standable = false;
+    let reached = false;
+    for (let x = p.bounds.min.x; x <= p.bounds.max.x; x += GRID_STEP) {
+      for (let z = p.bounds.min.z; z <= p.bounds.max.z; z += GRID_STEP) {
+        standable ||= grid.heightsAt(x, z).some((y) => Math.abs(y - height) <= TOLERANCE);
+        reached ||= grid.reachedHeightsAt(x, z).some((y) => Math.abs(y - height) <= TOLERANCE);
+      }
+    }
+    if (standable && !reached) {
+      warn(
+        p.label,
+        `${p.label} looks like stairs or a ramp up to ${fmt(height)} m, but the player can't climb it. Leave at least 1.2 m of open floor in front of the bottom step, in the direction the steps climb (never against a wall or another prop), ` +
+          `make the flight at least 1 m wide, rise at most ${MAX_STEP} m per step over treads at least 0.45 m deep, and leave open floor at least 1 m deep at the top. ` +
+          `If it isn't meant to be climbed, make its lowest part taller than ${MAX_STEP} m so it doesn't read as steps.`,
+        true,
+      );
     }
   }
 

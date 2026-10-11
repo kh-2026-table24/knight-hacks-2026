@@ -3,7 +3,7 @@ import { PLAYER } from "../shared/constants";
 import type { ItemSpec } from "../shared/spec";
 import type { GameAudio } from "./audio/GameAudio";
 import { Character } from "./Character";
-import { Door } from "./Door";
+import type { Door } from "./Door";
 import type { Game } from "./Game";
 import { stateKey } from "./GameState";
 import type { Player } from "./Player";
@@ -32,8 +32,8 @@ const NOTHING_MORE = { character: "I've told you all I know.", prop: "There's no
 // characters hurt, and pickups are collected by walking up to them. [E] is deliberate: talk to a
 // character, examine a prop, or search one for what it holds.
 export class Interactions {
-  /** What the player was touching last step, so a door only triggers once on contact. */
-  private touching = new Set<Touchable>();
+  /** The door the player was walking into last step, so walking into one only uses it once. */
+  private atDoor: Door | null = null;
 
   constructor(private readonly host: InteractionHost) {
     window.addEventListener("keydown", (e) => {
@@ -44,7 +44,7 @@ export class Interactions {
 
   /** Forgets what was being touched, e.g. after moving to another room. */
   reset() {
-    this.touching.clear();
+    this.atDoor = null;
   }
 
   /** Runs every step while no dialogue is open. */
@@ -59,8 +59,9 @@ export class Interactions {
       const owner = room.ownerOf(collider.handle);
       if (owner) now.add(owner);
     }
-    const started = [...now].filter((owner) => !this.touching.has(owner));
-    this.touching = now;
+    const door = room.doors.find((d) => d.isEnteredFrom(player.position)) ?? null;
+    const enteredDoor = door !== this.atDoor ? door : null;
+    this.atDoor = door;
 
     // Checked every step: something hostile keeps hurting while you stay in contact, once the blinking from the last hit ends.
     for (const owner of now) {
@@ -82,10 +83,7 @@ export class Interactions {
     const target = room.interactTarget(player.position);
     hud.setHint(target ? `[E] ${verb(target)}` : null);
 
-    for (const owner of started) {
-      if (owner instanceof Door) void this.useDoor(owner);
-      if (this.host.room() !== room) return; // went through a door
-    }
+    if (enteredDoor) void this.useDoor(enteredDoor);
   }
 
   /** Takes hearts unless the player is still blinking from the last hit. Returns whether it landed. */
