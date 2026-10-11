@@ -49,11 +49,11 @@ export function parseCharacter(r: Reader, value: unknown, path: string): Charact
   const gives = nested(o, "gives", parseItem, r);
   if (o.has("gives") && !o.has("dialogue")) o.error("gives", `needs "dialogue": the item is handed over when the player finishes talking`);
   const hostile = nested(o, "hostile", parseDamage, r);
-  // Only hostile characters scream; on anyone else it's ignored.
-  const chosenScream = o.text("scream", { optional: true, max: 200 });
+  // Only hostile characters scream; on anyone else it's ignored. Left out, screamFor makes one from the art.
+  const chosenScream = o.text("scream", { optional: true });
   const light = nested(o, "light", parseLight, r);
   if (o.failed || !id || !name || !position || !size || !art) return undefined;
-  const scream = hostile && (chosenScream ?? `${art.description}, screaming`);
+  const scream = hostile && chosenScream;
   return {
     id, name, position, size, art, solid,
     ...(movement && { movement }), ...(dialogue && { dialogue }), ...(gives && { gives }), ...(hostile && { hostile }), ...(scream && { scream }), ...(light && { light }),

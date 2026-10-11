@@ -18,10 +18,10 @@ export interface ScreamJob {
   voice: ScreamVoice;
 }
 
-/** The scream of a hostile character, or undefined if it doesn't scream. */
-export function screamFor(character: Pick<CharacterSpec, "scream" | "art" | "name">): ScreamJob | undefined {
-  if (!character.scream) return undefined;
-  const prompt = character.scream;
+/** The scream of a hostile character (its own, or its art description screaming), or undefined if it isn't hostile. */
+export function screamFor(character: Pick<CharacterSpec, "scream" | "art" | "name" | "hostile">): ScreamJob | undefined {
+  if (!character.hostile) return undefined;
+  const prompt = character.scream ?? `${character.art.description}, screaming`;
   return { id: `scream-${slug(prompt)}-${hash(`scream|${prompt}`)}`, prompt, voice: guessVoice(`${prompt} ${character.art.description} ${character.name}`) };
 }
 
