@@ -114,13 +114,18 @@ export class Player {
     return this.mesh.position;
   }
 
-  reset(position: Vector3, world: World) {
+  /**
+   * Puts the player at `position`. Walking through a door keeps the keys she's holding (`keepKeys`): the
+   * browser only repeats the last key pressed, so a held key that's forgotten here stays forgotten until
+   * it's pressed again, and she'd stand still in the new room while the player holds it.
+   */
+  reset(position: Vector3, world: World, { keepKeys = false } = {}) {
     // Start just above the given point and let gravity settle it.
     this.mesh.position.copy(position).setY(position.y + SPAWN_LIFT);
     this.body.setTranslation(this.mesh.position, true);
     world.propagateModifiedBodyPositionsToColliders();
     this.verticalVelocity = 0;
-    this.keys.clear();
+    if (!keepKeys) this.keys.clear();
   }
 
   /** Draws the player at the brightness characters have in a room with this lightLevel. */

@@ -33,6 +33,8 @@ export class GameComposer {
   private readonly interactions: Interactions;
   private game: Game | null = null;
   private room: Room | null = null;
+  /** A room was swapped in since the last frame. */
+  private justSwapped = false;
 
   constructor(canvas: HTMLCanvasElement) {
     // No antialiasing: the scene is drawn at low resolution and upscaled with hard pixel edges.
@@ -85,7 +87,10 @@ export class GameComposer {
     const spec = this.game?.spec.rooms.find((room) => room.id === next.id);
     if (spec) this.sounds.enterRoom(spec);
     this.interactions.reset();
-    this.player.reset(arrivalConnectionId ? next.arrivalPoint(arrivalConnectionId) : next.start, this.world);
+    // Through a door she keeps walking; at the start (a new game, or after dying) she stands still.
+    const position = arrivalConnectionId ? next.arrivalPoint(arrivalConnectionId) : next.start;
+    this.player.reset(position, this.world, { keepKeys: arrivalConnectionId !== undefined });
+    this.justSwapped = true;
   }
 
   get currentRoom() {
@@ -94,7 +99,10 @@ export class GameComposer {
 
   private frameUpdate(time: number) {
     this.timer.update(time);
-    const dt = Math.min(this.timer.getDelta(), 0.1);
+    // The frame after a room swap is often long (the new room's first draw), and a full step would move
+    // the player half a meter at once; it counts as a normal frame instead.
+    const dt = Math.min(this.timer.getDelta(), this.justSwapped ? 1 / 60 : 0.1);
+    this.justSwapped = false;
 
     if (dt > 0) {
       this.player.update(dt);
