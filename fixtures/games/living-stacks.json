@@ -1,0 +1,995 @@
+{
+  "version": 1,
+  "title": "The Living Stacks",
+  "summary": "Years after the collapse, a private library called the Aldous Reserve took in scholars and promised to preserve humanity's knowledge. Its keepers developed a method of imprinting memory into cultivated fungal-neural tissue grown inside book bindings, so that a book would not just hold words but remember them. The experiment worked too well: the books began to absorb readers, and then to take them. The quarantine tents outside, the abandoned evacuation, and the reading hall full of figures bound into the shelves show that the keepers sealed themselves in to contain it. The player pieces together that the library is still growing, and that the last volume being written is the one they are about to open.",
+  "rooms": [
+    {
+      "id": "grounds",
+      "name": "Quarantine Grounds",
+      "outdoor": true,
+      "grid": [
+        0,
+        0
+      ],
+      "size": [
+        16,
+        6,
+        14
+      ],
+      "start": [
+        8,
+        12.5
+      ],
+      "baseLight": 0.3,
+      "walls": "pale grey weathered limestone blocks",
+      "floor": "dark wet black-green packed earth",
+      "doors": [
+        {
+          "connection": "grounds-reading-hall",
+          "offset": 8
+        }
+      ],
+      "props": [
+        {
+          "id": "dry-fountain-with-a-marble-statu",
+          "name": "dry fountain with a marble statue of a robed reader holding an open book, choked with glowing pale fungal tendrils",
+          "position": [
+            8,
+            0,
+            6.5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                3,
+                0.6,
+                3
+              ],
+              "solid": true,
+              "material": "glowing pale cyan fungus-veined white marble"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0.6,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.8,
+                1.2,
+                0.8
+              ],
+              "solid": true,
+              "material": "glowing pale cyan fungus-veined white marble"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                1.8,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.6,
+                1.4,
+                0.5
+              ],
+              "solid": true,
+              "material": "glowing pale cyan fungus-veined white marble"
+            }
+          ]
+        },
+        {
+          "id": "iron-lantern-on-a-hook-post-its",
+          "name": "iron lantern on a hook post, its flame still burning beside the open door",
+          "position": [
+            9.4,
+            0,
+            0.6
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.2,
+                1.6,
+                0.2
+              ],
+              "solid": true,
+              "material": "soot-blackened wrought iron"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                1.6,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.3,
+                0.4,
+                0.2
+              ],
+              "solid": true,
+              "material": "warm amber glowing glass in brass frame"
+            }
+          ]
+        },
+        {
+          "id": "stack-of-swollen-leather-bound-b",
+          "name": "stack of swollen leather-bound books wedging the front door open from inside",
+          "position": [
+            7,
+            0,
+            0.55
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.3,
+                0.3,
+                0.3
+              ],
+              "solid": true,
+              "material": "mottled oxblood leather with pale fungal bloom"
+            }
+          ]
+        },
+        {
+          "id": "tall-arched-library-windows-boar",
+          "name": "tall arched library windows boarded over from inside, faint glow behind the planks",
+          "position": [
+            8,
+            2,
+            0.31
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                -4.5,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.6,
+                2.4,
+                0
+              ],
+              "solid": false
+            },
+            {
+              "shape": "panel",
+              "position": [
+                4.5,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.6,
+                2.4,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "hand-painted-warning-sign-readin",
+          "name": "hand-painted warning sign reading 'DO NOT READ ALOUD' in dripping red letters",
+          "position": [
+            5.5,
+            0,
+            3
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.15,
+                1.2,
+                0.15
+              ],
+              "solid": true,
+              "material": "weathered grey splintered pine"
+            },
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                1.2,
+                0.08
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.2,
+                0.6,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "sagging-quarantine-tent-with-a-b",
+          "name": "sagging quarantine tent with a biohazard stencil, flap hanging open",
+          "position": [
+            2.5,
+            0,
+            5.5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                2.8,
+                1.6,
+                3.2
+              ],
+              "solid": true,
+              "material": "stained sagging yellowed canvas"
+            },
+            {
+              "shape": "wedge",
+              "position": [
+                0,
+                1.6,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                2.8,
+                0.6,
+                3.2
+              ],
+              "solid": true,
+              "material": "stained sagging yellowed canvas"
+            }
+          ]
+        },
+        {
+          "id": "collapsed-quarantine-tent-poles",
+          "name": "collapsed quarantine tent, poles snapped, canvas furred with pale spores",
+          "position": [
+            13.5,
+            0,
+            5.5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                2.8,
+                0.9,
+                3
+              ],
+              "solid": true,
+              "material": "torn grey-green military canvas"
+            }
+          ]
+        },
+        {
+          "id": "empty-triage-stretcher-with-rest",
+          "name": "empty triage stretcher with restraint straps cut, blanket shaped like a missing body",
+          "position": [
+            4.5,
+            0,
+            8.8
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                2,
+                0.6,
+                0.8
+              ],
+              "solid": true,
+              "material": "scuffed olive drab vinyl"
+            }
+          ]
+        },
+        {
+          "id": "abandoned-evacuation-handcart-pi",
+          "name": "abandoned evacuation handcart piled with bundled books tied shut",
+          "position": [
+            2.5,
+            0,
+            9.8
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.2,
+                1.1,
+                2
+              ],
+              "solid": true,
+              "material": "chipped red-painted steel"
+            }
+          ]
+        },
+        {
+          "id": "scattered-suitcases-burst-open-c",
+          "name": "scattered suitcases burst open, coated in pale spores",
+          "position": [
+            11,
+            0,
+            9.5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                -0.6,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.7,
+                0.25,
+                0.5
+              ],
+              "solid": true,
+              "material": "spore-dusted cracked tan leather"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0.4,
+                0,
+                0.3
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.6,
+                0.4,
+                0.3
+              ],
+              "solid": true,
+              "material": "spore-dusted cracked tan leather"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0.2,
+                0,
+                -0.6
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.5,
+                0.2,
+                0.4
+              ],
+              "solid": true,
+              "material": "spore-dusted cracked tan leather"
+            }
+          ]
+        },
+        {
+          "id": "cracked-gate-pillar-and-toppled",
+          "name": "cracked gate pillar and toppled wrought-iron gate lying in the weeds",
+          "position": [
+            12.5,
+            0,
+            12.3
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                -1.6,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.6,
+                1.4,
+                0.6
+              ],
+              "solid": true,
+              "material": "cracked mossy sandstone"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0.6,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                2.6,
+                0.15,
+                1.2
+              ],
+              "solid": true,
+              "material": "rusted black wrought iron"
+            }
+          ]
+        },
+        {
+          "id": "trail-of-glowing-pale-spores-lea",
+          "name": "trail of glowing pale spores leading from the fountain to the open door",
+          "position": [
+            8,
+            0.01,
+            4.9
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                -1.5708,
+                0,
+                0
+              ],
+              "size": [
+                1,
+                3.5,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        }
+      ],
+      "characters": [],
+      "pickups": []
+    },
+    {
+      "id": "reading-hall",
+      "name": "The Reading Hall",
+      "outdoor": false,
+      "grid": [
+        0,
+        -1
+      ],
+      "size": [
+        16,
+        7,
+        14
+      ],
+      "start": [
+        5,
+        11.2
+      ],
+      "baseLight": 0.3,
+      "walls": "faded mustard-ochre plaster",
+      "floor": "dark charcoal slate flagstones",
+      "doors": [
+        {
+          "connection": "grounds-reading-hall",
+          "offset": 4
+        }
+      ],
+      "props": [
+        {
+          "id": "central-lectern-on-a-dais-of-gro",
+          "name": "central lectern on a dais of grown fungal root, holding one open warm blank book with a ribbon marking the reader's own name",
+          "position": [
+            11.5,
+            0,
+            5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                3,
+                0.3,
+                3
+              ],
+              "solid": true,
+              "material": "pale bone-white fungal growth"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0.3,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.8,
+                1.1,
+                0.6
+              ],
+              "solid": true,
+              "material": "tarnished verdigris brass"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                1.4,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.6,
+                0.08,
+                0.45
+              ],
+              "solid": true,
+              "material": "glowing warm flesh-pink vellum"
+            }
+          ]
+        },
+        {
+          "id": "towering-bookcase-pulsing-with-f",
+          "name": "towering bookcase pulsing with fungal veins, two human outlines grown into its shelves",
+          "position": [
+            12,
+            0,
+            0.3
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0.4
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                7,
+                5,
+                0.8
+              ],
+              "solid": true,
+              "material": "blackened walnut veined with glowing teal fungus"
+            }
+          ]
+        },
+        {
+          "id": "whispering-bookcase-with-a-kneel",
+          "name": "whispering bookcase with a kneeling reader half-absorbed into the spines",
+          "position": [
+            15.3,
+            0,
+            5.5
+          ],
+          "rotationY": -1.5708,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                5,
+                4.5,
+                0.8
+              ],
+              "solid": true,
+              "material": "blackened walnut veined with glowing teal fungus"
+            }
+          ]
+        },
+        {
+          "id": "reading-desk-chained-to-the-floo",
+          "name": "reading desk chained to the floor, book torn open on it",
+          "position": [
+            9,
+            0,
+            3
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.6,
+                0.8,
+                0.9
+              ],
+              "solid": true,
+              "material": "scuffed red-brown mahogany"
+            }
+          ]
+        },
+        {
+          "id": "reading-desk-chained-to-the-4",
+          "name": "reading desk chained to the floor, chair pulled toward the lectern",
+          "position": [
+            9,
+            0,
+            6.5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.6,
+                0.8,
+                0.9
+              ],
+              "solid": true,
+              "material": "scuffed red-brown mahogany"
+            }
+          ]
+        },
+        {
+          "id": "trail-of-glowing-fungal-roots-cr",
+          "name": "trail of glowing fungal roots creeping from the stacks toward the lectern",
+          "position": [
+            11.5,
+            0.01,
+            3.5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                -1.5708,
+                0,
+                0
+              ],
+              "size": [
+                1.5,
+                2.4,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "keeper-s-log-nailed-to-the-wall",
+          "name": "keeper's log nailed to the wall, final entry trailing off mid-sentence",
+          "position": [
+            5,
+            1.3,
+            0.31
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.2,
+                1.6,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "second-keeper-s-log-nailed-up-pa",
+          "name": "second keeper's log nailed up, page scrawled with tally marks of the taken",
+          "position": [
+            6.8,
+            1.6,
+            0.31
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1,
+                1.3,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "tall-arched-stained-glass-window",
+          "name": "tall arched stained-glass window bricked over from the inside",
+          "position": [
+            2.5,
+            2,
+            0.31
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.6,
+                3.2,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "overturned-book-cart-evacuation",
+          "name": "overturned book cart, evacuation ledgers spilled and abandoned",
+          "position": [
+            3.5,
+            0,
+            7
+          ],
+          "rotationY": 0.4,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.2,
+                0.6,
+                0.9
+              ],
+              "solid": true,
+              "material": "dented grey riveted tin"
+            }
+          ]
+        }
+      ],
+      "characters": [],
+      "pickups": []
+    }
+  ],
+  "connections": [
+    {
+      "id": "grounds-reading-hall",
+      "rooms": [
+        "grounds",
+        "reading-hall"
+      ],
+      "locked": false
+    }
+  ]
+}

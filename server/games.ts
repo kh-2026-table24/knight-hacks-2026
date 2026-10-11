@@ -1,5 +1,6 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import type { GameSummary } from "../src/shared/api";
 import { errorsIn, formatIssues } from "../src/shared/issues";
 import type { GameSpec } from "../src/shared/spec";
 import { validateGame } from "../src/shared/validate";
@@ -38,6 +39,25 @@ export async function getGame(gameId: string): Promise<GameSpec | undefined> {
   if (!spec) throw new InvalidGameError(`Game ${gameId} has problems:\n${formatIssues(errorsIn(issues))}`);
   validated.set(gameId, { text, spec });
   return spec;
+}
+
+/** Every game that validates: fixtures first, then generated ones. Ones that don't validate are left out. */
+export async function listGames(): Promise<GameSummary[]> {
+  const fixtures = (await readdir(FIXTURES_DIR).catch(() => [] as string[])).filter((n) => n.endsWith(".json")).map((n) => n.slice(0, -5));
+  const generated = await readdir(GAMES_DIR).catch(() => [] as string[]);
+  const ids = [...new Set([...fixtures.sort(), ...generated.sort()])].filter(isSafeId);
+  const games = await Promise.all(
+    ids.map(async (id) => {
+      try {
+        const spec = await getGame(id);
+        return spec && { id, title: spec.title, summary: spec.summary, rooms: spec.rooms.length };
+      } catch (error) {
+        console.warn(`Leaving ${id} out of the game list: ${error instanceof Error ? error.message.split("\n")[0] : error}`);
+        return undefined;
+      }
+    }),
+  );
+  return games.filter((g): g is GameSummary => g !== undefined);
 }
 
 /** Saves a generated game, already validated, as server/games/<id>/game.json. */

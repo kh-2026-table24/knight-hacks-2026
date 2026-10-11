@@ -146,3 +146,157 @@ body {
     opacity: 0;
   }
 }
+
+/* Title screen (src/game/ui/TitleScreen.ts): the name and the list of games, over the empty canvas. */
+.title-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: max(48px, 8vh) 16px 24px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  background: radial-gradient(ellipse at 50% 30%, #1b1a24 0%, #08080c 60%, #000 100%);
+  font-family: "IM Fell English", Georgia, serif;
+  color: #e8e2d6;
+  text-shadow: 0 2px 0 #000;
+  transition: opacity 0.6s ease;
+}
+
+.title-screen-leaving {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.title-heading {
+  text-align: center;
+}
+
+.title-name {
+  margin: 0;
+  font-size: clamp(44px, 9vw, 96px);
+  font-weight: normal;
+  letter-spacing: 0.04em;
+  color: #f1e7d2;
+  text-shadow:
+    0 0 24px rgba(255, 190, 120, 0.25),
+    0 3px 0 #000;
+  animation: title-flicker 7s infinite;
+}
+
+.title-tagline {
+  margin: 8px 0 0;
+  font-size: clamp(16px, 2.4vw, 21px);
+  font-style: italic;
+  color: #a39b8c;
+}
+
+.title-status {
+  margin: 24px 0 0;
+  font-size: 20px;
+  color: #a39b8c;
+}
+
+.title-status[hidden] {
+  display: none;
+}
+
+.title-games {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 600px;
+  margin-top: 8px;
+}
+
+.title-game {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  padding: 0 8px;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  text-shadow: inherit;
+  background: none;
+  cursor: pointer;
+  filter: brightness(0.75);
+  transition:
+    filter 0.15s ease,
+    transform 0.15s ease;
+}
+
+.title-game:hover,
+.title-game:focus-visible,
+.title-game-chosen {
+  filter: brightness(1.1);
+  transform: translateX(4px);
+  outline: none;
+}
+
+.title-game:disabled:not(.title-game-chosen) {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.title-game-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.title-game-name {
+  font-size: 22px;
+}
+
+.title-game-rooms {
+  flex: none;
+  font-size: 14px;
+  color: #a39b8c;
+}
+
+.title-game-summary {
+  font-size: 15px;
+  line-height: 1.35;
+  color: #c9c1b2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.title-controls {
+  margin: auto 0 0;
+  padding-top: 16px;
+  font-size: 14px;
+  color: #6f6a61;
+  text-align: center;
+}
+
+/* A failing bulb: mostly steady, with two quick dips. */
+@keyframes title-flicker {
+  0%, 90%, 94%, 100% {
+    opacity: 1;
+  }
+  91% {
+    opacity: 0.55;
+  }
+  92.5% {
+    opacity: 0.9;
+  }
+  93% {
+    opacity: 0.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .title-name {
+    animation: none;
+  }
+}

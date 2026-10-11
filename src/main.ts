@@ -2,6 +2,7 @@ import "./style.css";
 import { init as initPhysics } from "@dimforge/rapier3d-compat";
 import { GameComposer } from "./game/GameComposer";
 import { Game } from "./game/Game";
+import { TitleScreen } from "./game/ui/TitleScreen";
 import { artIdsForRoom } from "./shared/art";
 import { errorsIn, formatIssues } from "./shared/issues";
 import { validateGame } from "./shared/validate";
@@ -17,8 +18,21 @@ function fail(message: string): never {
   throw new Error(message);
 }
 
-// ?game=<id> picks the game; the games in fixtures/games are served under their file names.
-const gameId = new URLSearchParams(location.search).get("game") ?? "haunted";
+// ?game=<id> goes straight into a game (the games in fixtures/games are served under their file names);
+// without it, the title screen lists them. The pick goes into the address, so reloading stays in it.
+let gameId = new URLSearchParams(location.search).get("game");
+if (!gameId) {
+  const title = new TitleScreen();
+  gameId = await title.choose();
+  history.replaceState(null, "", `?game=${encodeURIComponent(gameId)}`);
+  title.hide();
+}
+
+// Esc goes back to the title screen, unless it's closing a dialogue.
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !e.defaultPrevented && !composer.hud.dialogue.isOpen) location.assign("/");
+});
+
 const response = await fetch(`/api/games/${encodeURIComponent(gameId)}`);
 if (!response.ok) fail(`Couldn't load game "${gameId}":\n${await response.text()}`);
 
