@@ -58,8 +58,9 @@ function job(kind: ArtKind, prompt: string, aspect: number, extra: Pick<ArtJob, 
   return { id: `${kind}-${slug(extra.subject ?? prompt)}-${hash(key)}`, kind, prompt, aspectRatio, ...extra };
 }
 
-/** What a solid part is made of: its own material, else its prop's. The parser guarantees one exists. */
-export const materialOf = (prop: Pick<PropSpec, "material" | "name">, part: Pick<PartSpec, "material">) => part.material ?? prop.material ?? prop.name;
+/** What a solid part is made of: its own material, else its prop's. Undefined for a plain-colored part (a color and no material). */
+export const materialOf = (prop: Pick<PropSpec, "material" | "name">, part: Pick<PartSpec, "material" | "color">) =>
+  part.material ?? prop.material ?? (part.color ? undefined : prop.name);
 
 /** The art behind each thing in a game. The engine asks these for texture ids; collectArt gathers all of them. */
 export const artFor = {
@@ -97,7 +98,10 @@ export function roomArt(spec: Pick<GameSpec, "rooms" | "connections">, room: Roo
     if (side && side !== "south") out.push(artFor.door(room, door));
   }
   for (const prop of room.props) {
-    for (const part of prop.parts) out.push(...(part.shape === "panel" ? artFor.panel(prop, part) : [artFor.surface(materialOf(prop, part))]));
+    for (const part of prop.parts) {
+      const material = materialOf(prop, part);
+      out.push(...(part.shape === "panel" ? artFor.panel(prop, part) : material ? [artFor.surface(material)] : []));
+    }
     if (prop.contains) out.push(artFor.item(prop.contains));
     if (prop.ambient) out.push(artFor.ambient(prop.ambient));
   }

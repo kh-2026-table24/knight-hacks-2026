@@ -1,8 +1,8 @@
 import { BoxGeometry, Mesh, MeshStandardMaterial, Vector3, type Scene, type Vector3Tuple } from "three";
 import { ColliderDesc, RigidBodyDesc, type RigidBody, type World } from "@dimforge/rapier3d-compat";
 import { artFor } from "../shared/art";
-import { INTERACT, PICKUP, PLAYER } from "../shared/constants";
-import { distanceXZ, roomWalls, type Side } from "../shared/geometry";
+import { INTERACT, PICKUP, PLAYER, WALL_THICKNESS } from "../shared/constants";
+import { distanceXZ, placeProp, roomWalls, type PlacedPart, type Side } from "../shared/geometry";
 import type { AmbientSpec, ItemSpec, RoomSpec } from "../shared/spec";
 import { Character } from "./Character";
 import { Door } from "./Door";
@@ -11,8 +11,13 @@ import { Part } from "./Part";
 import { Pickup } from "./Pickup";
 import { Prop } from "./Prop";
 import type { TextureLibrary } from "./TextureLibrary";
+import { CAMERA_PITCH } from "./camera";
 
 const FLOOR_THICKNESS = 0.2;
+// A leaning sprite keeps this far from whatever is behind it.
+const LEAN_MARGIN = 0.05;
+// Sprites at least this far in front of the north wall are freestanding (not hung on it) and get a contact shadow.
+const FREESTANDING = 0.15;
 // Meters covered by one repeat of the floor texture.
 const FLOOR_TILE_SIZE = 4;
 // Dropped items and particles appear this far in front of (toward the camera from) what they come out of.
@@ -77,6 +82,7 @@ export class Room {
       .filter((p) => !state.collected.has(stateKey(spec.id, p.id)))
       .map((p) => new Pickup(p.item, p.position, textures, { stateKey: stateKey(spec.id, p.id) }));
     this.emitters = this.props.flatMap((prop) => (prop.ambient ? [{ prop, ambient: prop.ambient, wait: prop.ambient.everySeconds * Math.random() }] : []));
+    this.leanSprites(spec);
 
     const [w, h, d] = spec.size;
     const floorGeometry = new BoxGeometry(w, FLOOR_THICKNESS, d);
@@ -237,11 +243,34 @@ export class Room {
       { shape: "panel", position: this.spawnPoint(prop).toArray(), rotation: [0, 0, 0], size: [ambient.size[0], ambient.size[1], 0], solid: false },
       { texture: this.textures.get(artFor.ambient(ambient).id) },
     );
+    part.leanBack(CAMERA_PITCH);
     part.dynamic = true;
     part.gravityScale = ambient.gravity ? 1 : 0;
     part.addTo(this.mounted.scene, this.mounted.world);
     part.setVelocity(ambient.velocity);
     this.particles.push({ part, expiresAt: this.time + ambient.lifetimeSeconds });
+  }
+
+  /**
+   * Leans each upright sprite back to face the camera, as far as the space behind it allows, so it never
+   * tips into a wall or a box: a freestanding barrel leans all the way, a picture hung on the wall stays
+   * flat against it. Freestanding sprites resting on the floor or on something get a contact shadow.
+   */
+  private leanSprites(spec: RoomSpec) {
+    const placed = spec.props.map((prop) => placeProp(prop, prop.id));
+    const blocks = [...roomWalls(spec).flatMap((wall) => placeProp(wall, wall.id)), ...placed.flat()].filter((p) => p.part.shape !== "panel");
+    placed.forEach((parts, i) => {
+      parts.forEach((placedPart, j) => {
+        const { part, box, quaternion: q } = placedPart;
+        // Only sprites facing the camera straight on; turned or tilted panels stay as placed.
+        if (part.shape !== "panel" || Math.abs(q.x) > 1e-3 || Math.abs(q.y) > 1e-3 || Math.abs(q.z) > 1e-3) return;
+        const z = box.max.z;
+        const bottom = box.min.y;
+        const freestanding = z - WALL_THICKNESS > FREESTANDING;
+        const resting = bottom <= TOLERANCE || blocks.some(({ box: b }) => Math.abs(b.max.y - bottom) <= TOLERANCE && distanceXZ(b, (box.min.x + box.max.x) / 2, z) === 0);
+        this.props[i].parts[j].leanBack(leanAngle(placedPart, blocks), freestanding && resting);
+      });
+    });
   }
 
   // Halfway up whatever it comes out of, just in front of it.
@@ -255,4 +284,25 @@ export class Room {
     const handle = part.colliderHandle;
     if (handle !== undefined) this.byCollider.set(handle, owner);
   }
+}
+
+/**
+ * How far a sprite can lean back before it touches anything behind it. Leaning by `a`, a point `s` up the
+ * sprite moves back s * sin(a), so each box behind it limits the lean by how high it reaches up the sprite.
+ */
+function leanAngle({ box }: PlacedPart, blocks: PlacedPart[]) {
+  const z = box.max.z;
+  const bottom = box.min.y;
+  const height = box.max.y - bottom;
+  let angle = CAMERA_PITCH;
+  for (const { box: b } of blocks) {
+    const behind = b.min.z < z;
+    const across = b.min.x < box.max.x && b.max.x > box.min.x;
+    const level = b.max.y > bottom + TOLERANCE && b.min.y < box.max.y;
+    if (!behind || !across || !level) continue;
+    const clearance = z - b.max.z - LEAN_MARGIN;
+    if (clearance <= 0) return 0;
+    angle = Math.min(angle, Math.asin(Math.min(1, clearance / Math.min(height, b.max.y - bottom))));
+  }
+  return angle;
 }

@@ -10,7 +10,6 @@ import {
   type AmbientSpec,
   type CharacterArt,
   type CharacterSpec,
-  type Conversation,
   type Damage,
   type ItemSpec,
   type LightSpec,
@@ -18,7 +17,7 @@ import {
   type Vec2,
 } from "./spec";
 
-// Parsers for the building blocks that props and characters share: conversations, items, damage,
+// Parsers for the building blocks that props and characters share: dialogue lines, items, damage,
 // lights and ambient effects, plus characters themselves. parseSpec.ts handles the game and room level.
 
 /** Parses an optional nested object field with `parse`, if present. */
@@ -26,7 +25,7 @@ export function nested<T>(o: Obj, key: string, parse: (r: Reader, value: unknown
   return o.has(key) ? parse(r, o.raw(key), o.at(key)) : undefined;
 }
 
-const CHARACTER_FIELDS = ["id", "name", "position", "size", "art", "solid", "movement", "dialogue", "gives", "hostile", "light"];
+const CHARACTER_FIELDS = ["id", "name", "position", "size", "art", "solid", "movement", "dialogue", "afterwards", "gives", "hostile", "light"];
 
 export function parseCharacter(r: Reader, value: unknown, path: string): CharacterSpec | undefined {
   const o = r.object(value, path, CHARACTER_FIELDS);
@@ -45,7 +44,8 @@ export function parseCharacter(r: Reader, value: unknown, path: string): Charact
   const art = nested(o, "art", parseCharacterArt, r);
   const solid = o.bool("solid", { optional: true }) ?? false;
   const movement = nested(o, "movement", parseMovement, r);
-  const dialogue = o.array("dialogue", (v, p) => parseConversation(r, v, p), { optional: true, min: 1, max: LIMITS.conversations });
+  const dialogue = parseLines(r, o, "dialogue", LIMITS.dialogueLines);
+  const afterwards = parseLines(r, o, "afterwards", LIMITS.afterwardsLines);
   const gives = nested(o, "gives", parseItem, r);
   if (o.has("gives") && !o.has("dialogue")) o.error("gives", `needs "dialogue": the item is handed over when the player finishes talking`);
   const hostile = nested(o, "hostile", parseDamage, r);
@@ -53,7 +53,8 @@ export function parseCharacter(r: Reader, value: unknown, path: string): Charact
   if (o.failed || !id || !name || !position || !size || !art) return undefined;
   return {
     id, name, position, size, art, solid,
-    ...(movement && { movement }), ...(dialogue && { dialogue }), ...(gives && { gives }), ...(hostile && { hostile }), ...(light && { light }),
+    ...(movement && { movement }), ...(dialogue && { dialogue }), ...(afterwards && { afterwards }), ...(gives && { gives }),
+    ...(hostile && { hostile }), ...(light && { light }),
   };
 }
 
@@ -102,13 +103,14 @@ function point(r: Reader, value: unknown, path: string): Vec2 | undefined {
   return undefined;
 }
 
-export function parseConversation(r: Reader, value: unknown, path: string): Conversation | undefined {
-  const o = r.object(value, path, ["speaker", "lines"]);
-  if (!o) return undefined;
-  const speaker = o.text("speaker", { optional: true, max: 60 });
-  const lines = o.strings("lines", { min: 1, max: LIMITS.linesPerConversation, maxLength: LIMITS.lineLength });
-  if (o.failed || !lines) return undefined;
-  return { ...(speaker && { speaker }), lines };
+/** An optional list of lines the player reads one at a time: dialogue, examine text, afterwards. */
+export function parseLines(r: Reader, o: Obj, key: string, max: number): string[] | undefined {
+  const raw = o.raw(key);
+  // Games saved before dialogue became one conversation have a list of { speaker, lines }; they play as one.
+  if (Array.isArray(raw) && raw.length > 0 && raw.every(isFields)) {
+    return o.array(key, (v, p) => r.object(v, p, ["speaker", "lines"])?.strings("lines", { min: 1, maxLength: LIMITS.lineLength }))?.flat();
+  }
+  return o.strings(key, { optional: true, min: 1, max, maxLength: LIMITS.lineLength });
 }
 
 const ITEM_FIELDS: Record<ItemSpec["kind"], string[]> = {

@@ -25,6 +25,8 @@ export interface InteractionHost {
 
 const verb = (target: Interactable) => (target instanceof Character ? "Talk" : target.examine ? "Examine" : "Search");
 const describe = (item: ItemSpec) => `the ${item.name}`;
+// Said on later visits by something that already handed over its item and has no "afterwards" of its own.
+const NOTHING_MORE = { character: "I've told you all I know.", prop: "There's nothing more here." };
 
 // What the player does to the world. Touching is passive: doors go through, hazards and hostile
 // characters hurt, and pickups are collected by walking up to them. [E] is deliberate: talk to a
@@ -70,7 +72,7 @@ export class Interactions {
       this.host.audio?.play(pickup.item.kind === "key" ? "key-pickup" : "pickup");
       if (pickup.item.kind === "key") {
         game.state.keys.push(pickup.item);
-        hud.setItems(game.state.keys.map((key) => ({ name: key.name })));
+        this.showKeys(game);
       }
       if (pickup.stateKey) game.state.collected.add(pickup.stateKey);
       room.take(pickup);
@@ -97,8 +99,8 @@ export class Interactions {
     return true;
   }
 
-  // Each press plays the next conversation and the last one repeats. A held item comes out once the
-  // player has first heard everything there is to hear.
+  // The first press plays the whole conversation (or examine text) and hands over any item at the end.
+  // Later presses play "afterwards": a brush-off once the item is gone, or the same lines again.
   private async interact() {
     const room = this.host.room();
     const game = this.host.game();
@@ -106,17 +108,21 @@ export class Interactions {
     if (!room || !game || !target) return;
 
     const key = stateKey(room.id, target.id);
-    const conversations = (target instanceof Character ? target.dialogue : target.examine) ?? [];
-    const finished = game.state.conversations.get(key) ?? 0;
-    if (conversations.length > 0) {
-      const { speaker, lines } = conversations[Math.min(finished, conversations.length - 1)];
-      await this.show(lines, speaker ?? (target instanceof Character ? target.name : ""));
-      game.state.conversations.set(key, finished + 1);
+    const character = target instanceof Character;
+    const lines = character ? target.dialogue : target.examine;
+    const item = character ? target.gives : target.contains;
+    const speaker = character ? target.name : "";
+    if (game.state.heard.has(key)) {
+      const fallback = item ? [character ? NOTHING_MORE.character : NOTHING_MORE.prop] : lines;
+      const later = target.afterwards ?? fallback;
+      if (later) await this.show(later, speaker);
+      return;
     }
 
-    const item = target instanceof Character ? target.gives : target.contains;
-    if (!item || game.state.given.has(key) || finished + 1 < conversations.length || this.host.room() !== room) return;
-    if (conversations.length === 0) await this.show([`You find ${describe(item)}.`]);
+    if (lines) await this.show(lines, speaker);
+    game.state.heard.add(key);
+    if (!item || game.state.given.has(key) || this.host.room() !== room) return;
+    if (!lines) await this.show([`You find ${describe(item)}.`]);
     game.state.given.add(key);
     room.drop(target, item);
     this.host.audio?.play("drop");
@@ -146,12 +152,19 @@ export class Interactions {
 
     if (key) {
       connection.unlock();
+      // Each key opens one door, so it's used up.
+      game.state.keys.splice(game.state.keys.indexOf(key), 1);
+      this.showKeys(game);
       this.host.audio?.play("unlock");
       await this.show([`You unlock it with ${describe(key)}.`]);
     }
     if (this.host.room() !== room) return;
     this.host.audio?.play("door-open");
     this.host.swapRooms(next, connection.id);
+  }
+
+  private showKeys(game: Game) {
+    this.host.hud.setItems(game.state.keys.map((key) => ({ name: key.name })));
   }
 
   /** Shows lines in the dialogue box with the player held still until they're read. */

@@ -29,7 +29,8 @@ const STATUS_FILE = "status.json";
 // Log lines sent with each status, for the loading screen.
 const LOG_LINES = 8;
 const making = new Map<string, Making>();
-// Claude tokens each game cost, kept as usage.json beside it so the count outlives the server.
+// Claude tokens each game cost, kept as usage.json beside it so the count outlives the server, with a
+// line per call (storyboard, each room, each repair) showing where they went.
 const USAGE_FILE = "usage.json";
 const usage = new Map<string, TokenUsage>();
 
@@ -58,7 +59,7 @@ async function make(gameId: string) {
   // Live totals stay in memory for the loading screen; the file is written as each call finishes.
   const meter: TokenMeter = new TokenMeter((total, final) => {
     usage.set(gameId, total);
-    if (final) saving = saving.then(() => writeFile(join(gameDir(gameId), USAGE_FILE), JSON.stringify(meter.finished, null, 2))).catch(() => {});
+    if (final) saving = saving.then(() => writeFile(join(gameDir(gameId), USAGE_FILE), JSON.stringify({ ...meter.finished, calls: meter.calls }, null, 2))).catch(() => {});
   });
 
   log(gameId, "new game: writing the storyboard");
@@ -107,7 +108,9 @@ async function tokensOf(gameId: string): Promise<TokenUsage | undefined> {
     const text = await readIfExists(join(gameDir(gameId), USAGE_FILE));
     if (text === undefined) return undefined;
     try {
-      usage.set(gameId, JSON.parse(text) as TokenUsage);
+      // The file also lists every call; only the totals go to the loading screen.
+      const { input, cached, output } = JSON.parse(text) as TokenUsage;
+      usage.set(gameId, { input, cached, output, live: 0 });
     } catch {
       return undefined;
     }

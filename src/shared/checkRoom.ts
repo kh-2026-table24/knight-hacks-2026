@@ -35,7 +35,8 @@ function penetratesOnAxis(aMin: number, aMax: number, bMin: number, bMax: number
   return depth > Math.min(MIN_OVERLAP, 0.5 * Math.min(aMax - aMin, bMax - bMin));
 }
 
-function overlaps(a: Box3, b: Box3) {
+/** Whether two solids pass through each other (resting on or touching doesn't count). */
+export function overlaps(a: Box3, b: Box3) {
   return (
     penetratesOnAxis(a.min.x, a.max.x, b.min.x, b.max.x) &&
     penetratesOnAxis(a.min.y, a.max.y, b.min.y, b.max.y) &&
@@ -139,7 +140,8 @@ export function checkRoom(room: RoomSpec, ctx: RoomContext): Issue[] {
         error(p.label, `${p.label} can't be ${verb}: the player must be able to stand within ${INTERACT.range} m of it, with its bottom no more than ${INTERACT.maxHeightAboveFeet} m above their feet. Open a path to it, or lower it.`);
       }
     } else if (!grid.someReached((x, z) => distanceXZ(p.bounds, x, z) <= REACH)) {
-      error(p.label, `${p.label} can't be reached: nowhere the player can walk comes within ${REACH} m of it. Open a path at least 1.2 m wide, or add stairs (steps up to ${MAX_STEP} m, slopes up to ${PLAYER.maxSlopeDeg}°).`);
+      // Scenery the player can't walk up to doesn't stop the game, so it's only worth a mention.
+      warn(p.label, `${p.label} can't be reached: nowhere the player can walk comes within ${REACH} m of it. Open a path at least 1.2 m wide, or add stairs (steps up to ${MAX_STEP} m, slopes up to ${PLAYER.maxSlopeDeg}°).`);
     }
   }
 

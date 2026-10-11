@@ -1,7 +1,7 @@
 import { guessFootsteps } from "./footsteps";
 import type { Issue } from "./issues";
-import { nested, parseAmbient, parseCharacter, parseConversation, parseDamage, parseItem, parseLight } from "./parseFeatures";
-import { isFields, Reader } from "./reader";
+import { nested, parseAmbient, parseCharacter, parseDamage, parseItem, parseLight, parseLines } from "./parseFeatures";
+import { isFields, isNumber, Reader } from "./reader";
 import {
   AMBIENCES,
   DEFAULTS,
@@ -15,6 +15,7 @@ import {
   type PickupSpec,
   type PropSpec,
   type RoomSpec,
+  type Vec3,
 } from "./spec";
 
 // Turns untrusted JSON into a GameSpec: every field's type and range, unknown fields (a misspelled field
@@ -99,7 +100,8 @@ export function parseRoom(r: Reader, value: unknown, path: string): RoomSpec | u
   const footsteps = o.oneOf("footsteps", FOOTSTEPS, { optional: true }) ?? guessFootsteps(floor ?? "");
   const ambience = o.oneOf("ambience", AMBIENCES, { optional: true }) ?? DEFAULTS.ambience[outdoor ? "outdoor" : "indoor"];
   const doors = o.array("doors", (v, p) => parseDoor(r, v, p), { optional: true }) ?? [];
-  const props = o.array("props", (v, p) => parseProp(r, v, p), { optional: true, max: LIMITS.propsPerRoom }) ?? [];
+  const props = (o.array("props", (v, p) => parseProp(r, v, p), { optional: true }) ?? []).flat();
+  if (props.length > LIMITS.propsPerRoom) o.error("props", `has ${props.length} props (counting copies); the limit is ${LIMITS.propsPerRoom}`);
   const characters = o.array("characters", (v, p) => parseCharacter(r, v, p), { optional: true, max: LIMITS.charactersPerRoom }) ?? [];
   const pickups = o.array("pickups", (v, p) => parsePickup(r, v, p), { optional: true, max: LIMITS.pickupsPerRoom }) ?? [];
 
@@ -130,9 +132,10 @@ function parseDoor(r: Reader, value: unknown, path: string): DoorSpec | undefine
   return { connection, offset, ...(art && { art }) };
 }
 
-const PROP_FIELDS = ["id", "name", "position", "rotationY", "material", "parts", "light", "examine", "contains", "hazard", "ambient"];
+const PROP_FIELDS = ["id", "name", "position", "rotationY", "material", "parts", "copies", "light", "examine", "afterwards", "contains", "hazard", "ambient"];
 
-function parseProp(r: Reader, value: unknown, path: string): PropSpec | undefined {
+/** A prop, followed by one prop per entry of its "copies". */
+function parseProp(r: Reader, value: unknown, path: string): PropSpec[] | undefined {
   const o = r.object(value, path, PROP_FIELDS);
   if (!o) return undefined;
   const id = o.slug("id");
@@ -141,23 +144,33 @@ function parseProp(r: Reader, value: unknown, path: string): PropSpec | undefine
   const rotationY = o.num("rotationY", { optional: true }) ?? 0;
   const material = o.text("material", { optional: true });
   const parts = o.array("parts", (v, p) => parsePart(r, v, p), { min: 1, max: LIMITS.partsPerProp });
+  const copies = o.array("copies", (v, p) => parsePosition(r, v, p), { optional: true, min: 1 });
   const light = nested(o, "light", parseLight, r);
-  const examine = o.array("examine", (v, p) => parseConversation(r, v, p), { optional: true, min: 1, max: LIMITS.conversations });
+  const examine = parseLines(r, o, "examine", LIMITS.dialogueLines);
+  const afterwards = parseLines(r, o, "afterwards", LIMITS.afterwardsLines);
   const contains = nested(o, "contains", parseItem, r);
   const hazard = nested(o, "hazard", parseDamage, r);
   const ambient = nested(o, "ambient", parseAmbient, r);
-  if (parts && !material && parts.some((part) => part.shape !== "panel" && !part.material)) {
-    r.error(path, `${path} needs a "material" (what its box and wedge parts are made of), unless every box and wedge part has its own`);
+  if (parts && !material && parts.some((part) => part.shape !== "panel" && !part.material && !part.color)) {
+    r.error(path, `${path} needs a "material" (what its box and wedge parts are made of), unless every box and wedge part has its own "material" or "color"`);
   }
+  if (copies && (examine || contains)) o.error("copies", `can't be used on a prop with "examine" or "contains"; each thing the player can examine or search is its own prop`);
   if (o.failed || !id || !name || !position || !parts) return undefined;
-  return {
+  const prop: PropSpec = {
     id, name, position, rotationY, ...(material && { material }), parts,
-    ...(light && { light }), ...(examine && { examine }), ...(contains && { contains }), ...(hazard && { hazard }), ...(ambient && { ambient }),
+    ...(light && { light }), ...(examine && { examine }), ...(afterwards && { afterwards }), ...(contains && { contains }), ...(hazard && { hazard }), ...(ambient && { ambient }),
   };
+  return [prop, ...(copies ?? []).map((at, i) => ({ ...prop, id: `${id}-copy-${i + 1}`, position: at }))];
+}
+
+function parsePosition(r: Reader, value: unknown, path: string): Vec3 | undefined {
+  if (Array.isArray(value) && value.length === 3 && value.every(isNumber)) return [value[0], value[1], value[2]];
+  r.error(path, `${path} must be an [x, y, z] position`);
+  return undefined;
 }
 
 function parsePart(r: Reader, value: unknown, path: string): PartSpec | undefined {
-  const o = r.object(value, path, ["shape", "position", "rotation", "size", "solid", "material", "art", "frames", "tint"]);
+  const o = r.object(value, path, ["shape", "position", "rotation", "size", "solid", "material", "color", "art", "frames", "tint"]);
   if (!o) return undefined;
   const shape = o.oneOf("shape", SHAPES);
   const position = o.vec3("position");
@@ -169,7 +182,9 @@ function parsePart(r: Reader, value: unknown, path: string): PartSpec | undefine
   const art = o.text("art", { optional: true });
   const frames = o.strings("frames", { optional: true, min: 1, max: LIMITS.framesPerState - 1 });
   const tint = o.color("tint", { optional: true });
+  const color = o.color("color", { optional: true });
   if (shape && panel && material) o.error("material", `is only for box and wedge parts; a panel's picture comes from "art" (or the prop's name)`);
+  if (shape && panel && color) o.error("color", `is only for box and wedge parts; use "tint" to recolor a panel's picture`);
   if (shape && !panel && art) o.error("art", `is only for panels; box and wedge parts take a "material"`);
   if (shape && !panel && frames) o.error("frames", "is only for panels");
   if (size) {
@@ -177,7 +192,10 @@ function parsePart(r: Reader, value: unknown, path: string): PartSpec | undefine
     if (w <= 0 || h <= 0 || d < 0 || (!panel && d <= 0)) o.error("size", `must be positive (panels use depth 0), got [${size.join(", ")}]`);
   }
   if (o.failed || !shape || !position || !size) return undefined;
-  return { shape, position, rotation, size, solid, ...(material && { material }), ...(art && { art }), ...(frames && { frames }), ...(tint && { tint }) };
+  return {
+    shape, position, rotation, size, solid,
+    ...(material && { material }), ...(color && { color }), ...(art && { art }), ...(frames && { frames }), ...(tint && { tint }),
+  };
 }
 
 function parsePickup(r: Reader, value: unknown, path: string): PickupSpec | undefined {

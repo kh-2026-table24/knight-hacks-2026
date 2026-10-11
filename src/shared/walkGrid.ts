@@ -58,6 +58,8 @@ export interface WalkGrid {
   heightsAt(x: number, z: number): number[];
   /** Flood fill from a floor-level start; false if the start isn't standable. */
   floodFrom(x: number, z: number): boolean;
+  /** The heights reached by the last flood fill in the cell containing (x, z). */
+  reachedHeightsAt(x: number, z: number): number[];
   /** Whether any reached spot satisfies the test (floor-cell center x, z and standing height y). */
   someReached(test: (x: number, z: number, y: number) => boolean): boolean;
   /** Whether a character can walk from one point to another on level ground at height y, as characters do. */
@@ -162,6 +164,10 @@ export function buildWalkGrid(solids: PlacedPart[], width: number, depth: number
         }
       }
       return true;
+    },
+    reachedHeightsAt(x, z) {
+      const cell = cellOf(x, z);
+      return cell >= 0 ? heights[cell].filter((_, i) => reached[cell][i]) : [];
     },
     someReached(test) {
       for (let cell = 0; cell < heights.length; cell++) {

@@ -7,7 +7,7 @@ import type { KeySpec } from "../shared/spec";
  */
 export class GameState {
   hearts: number = PLAYER.maxHearts;
-  /** Keys the player carries. */
+  /** Keys the player carries. A key is used up when it opens its door. */
   readonly keys: KeySpec[] = [];
   /** Locked connections the player has opened. */
   readonly unlocked = new Set<string>();
@@ -15,8 +15,8 @@ export class GameState {
   readonly collected = new Set<string>();
   /** Props and characters that have already dropped their item. */
   readonly given = new Set<string>();
-  /** How many conversations the player has finished with each prop or character. */
-  readonly conversations = new Map<string, number>();
+  /** Props and characters the player has already examined or talked to once. */
+  readonly heard = new Set<string>();
 }
 
 export const stateKey = (roomId: string, id: string) => `${roomId}/${id}`;

@@ -2,7 +2,7 @@ import { Vector3, type Object3D, type Texture } from "three";
 import { QueryFilterFlags, type KinematicCharacterController, type World } from "@dimforge/rapier3d-compat";
 import { artFor } from "../shared/art";
 import { ART_FRAME_SECONDS } from "../shared/constants";
-import { DEFAULTS, type CharacterSpec, type Conversation, type Damage, type ItemSpec, type Movement } from "../shared/spec";
+import { DEFAULTS, type CharacterSpec, type Damage, type ItemSpec, type Movement } from "../shared/spec";
 import { CHARACTER_STRETCH, characterBrightness, createCharacterGlow } from "./characters";
 import { Part, PLAYER_GROUP } from "./Part";
 import type { TextureLibrary } from "./TextureLibrary";
@@ -16,6 +16,9 @@ const PAUSE_SECONDS: Record<Movement["type"], [number, number]> = { wander: [1, 
 // A chaser gives up once the player is this many times its detectRadius away.
 const CHASE_GIVE_UP = 1.5;
 // Characters walk through the player rather than getting blocked by them: their movement ignores colliders in the player's group.
+// Their art faces right; they turn to face left or right only when moving at least this much sideways
+// (as a share of the step), so walking mostly north or south doesn't make them flicker.
+const TURN_SHARE = 0.3;
 const NPC_QUERY_GROUPS = (0xffff << 16) | (0xffff & ~PLAYER_GROUP);
 
 /**
@@ -26,7 +29,8 @@ const NPC_QUERY_GROUPS = (0xffff << 16) | (0xffff & ~PLAYER_GROUP);
 export class Character extends Part {
   readonly id: string;
   readonly name: string;
-  readonly dialogue: Conversation[] | undefined;
+  readonly dialogue: string[] | undefined;
+  readonly afterwards: string[] | undefined;
   readonly gives: ItemSpec | undefined;
   readonly hostile: Damage | undefined;
   readonly movement: Movement | undefined;
@@ -50,6 +54,7 @@ export class Character extends Part {
     this.id = spec.id;
     this.name = spec.name;
     this.dialogue = spec.dialogue;
+    this.afterwards = spec.afterwards;
     this.gives = spec.gives;
     this.hostile = spec.hostile;
     this.movement = spec.movement;
@@ -63,6 +68,9 @@ export class Character extends Part {
     // Unaffected by nearby lights (which make cutouts look like lit cardboard): black base color, with
     // the picture drawn as emission at a brightness the room sets.
     this.mesh.material.color.set(0x000000);
+    // A black base color still catches a specular sheen from lights this close (its own glow sits just in
+    // front of it), so lighting is left out of its shader entirely.
+    this.setShaders({ unlit: true });
     this.mesh.material.emissive.set(0xffffff);
     this.mesh.material.emissiveIntensity = characterBrightness(DEFAULTS.baseLight);
     this.mesh.geometry.scale(1, CHARACTER_STRETCH, 1);
@@ -144,6 +152,7 @@ export class Character extends Part {
     this.stuckFor = Math.hypot(mx, mz) < step * 0.25 ? this.stuckFor + dt : 0;
     if (this.stuckFor > STUCK_SECONDS) return this.arrive(movement);
 
+    if (Math.abs(mx) >= step * TURN_SHARE) this.mesh.scale.x = mx < 0 ? -1 : 1;
     position.x += mx;
     position.z += mz;
     this.body?.setNextKinematicTranslation(position);

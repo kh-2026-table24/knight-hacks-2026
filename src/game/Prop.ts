@@ -3,7 +3,7 @@ import type { World } from "@dimforge/rapier3d-compat";
 import { artFor, materialOf } from "../shared/art";
 import { ART_FRAME_SECONDS } from "../shared/constants";
 import { boundsOf, lightPartIndex, placeProp } from "../shared/geometry";
-import type { AmbientSpec, Conversation, Damage, ItemSpec, PropSpec } from "../shared/spec";
+import type { AmbientSpec, Damage, ItemSpec, PropSpec } from "../shared/spec";
 import { Part } from "./Part";
 import type { TextureLibrary } from "./TextureLibrary";
 
@@ -18,7 +18,8 @@ export class Prop {
   readonly parts: Part[];
   /** Room-space box around it: how close the player must get to use it. */
   readonly bounds: Box3;
-  readonly examine: Conversation[] | undefined;
+  readonly examine: string[] | undefined;
+  readonly afterwards: string[] | undefined;
   readonly contains: ItemSpec | undefined;
   readonly hazard: Damage | undefined;
   readonly ambient: AmbientSpec | undefined;
@@ -31,6 +32,7 @@ export class Prop {
     this.id = spec.id;
     this.name = spec.name;
     this.examine = spec.examine;
+    this.afterwards = spec.afterwards;
     this.contains = spec.contains;
     this.hazard = spec.hazard;
     this.ambient = spec.ambient;
@@ -39,9 +41,10 @@ export class Prop {
 
     const lightIndex = spec.light ? lightPartIndex(spec) : -1;
     this.parts = spec.parts.map((part, i) => {
-      const art = part.shape === "panel" ? artFor.panel(spec, part) : [artFor.surface(materialOf(spec, part))];
+      const material = materialOf(spec, part);
+      const art = part.shape === "panel" ? artFor.panel(spec, part) : material ? [artFor.surface(material)] : [];
       const frames = art.flatMap((a) => textures.get(a.id) ?? []);
-      const built = new Part(part, { texture: frames[0], light: i === lightIndex ? spec.light : undefined, tint: part.tint });
+      const built = new Part(part, { texture: frames[0], light: i === lightIndex ? spec.light : undefined, tint: part.tint, color: part.color });
       // Touching a hazard hurts even where it isn't solid (flames, a pool of something).
       if (spec.hazard && !part.solid) built.sensor = true;
       if (frames.length > 1) this.animated.push({ part: built, frames });

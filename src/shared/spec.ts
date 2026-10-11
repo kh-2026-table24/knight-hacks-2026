@@ -94,6 +94,12 @@ export interface PartSpec {
   /** Panels only: what the picture shows. Defaults to the prop's name. */
   art?: string;
   /**
+   * Boxes and wedges only: a base color, "#rrggbb". With a material, its texture is recolored to this
+   * color and keeps its pattern (unlike tint, it can lighten as well as darken). Without one, the part
+   * is plain color and needs no image: painted trim, a plain beam, a dark plinth.
+   */
+  color?: string;
+  /**
    * Panels only: further animation frames after `art`, described as changes ("the rope swings left").
    * Played slowly (about 3 a second), looping. Only for things that move; a whole animation is 4 to 6 frames.
    */
@@ -114,14 +120,22 @@ export interface PropSpec {
   position: Vec3;
   /** Its front faces south (+z) at 0. */
   rotationY: number;
-  /** What its boxes and wedges are made of. Required unless each of them has its own. */
+  /** What its boxes and wedges are made of. Required unless each of them has its own material or color. */
   material?: string;
   parts: PartSpec[];
+  /**
+   * More of the same prop at these positions, each with the same parts, rotation and look: a row of
+   * gravestones, scattered tussocks, a stack of crates. Not for props with examine or contains. The
+   * parser turns each into its own prop (id "<id>-copy-1" and so on).
+   */
+  copies?: Vec3[];
   /** Given off from its tallest part. */
   light?: LightSpec;
-  /** [E] Examine: each press plays the next conversation, and the last one repeats. */
-  examine?: Conversation[];
-  /** Dropped once, when the player first finishes the last examine conversation (or straight away on [E] Search if there is none). */
+  /** [E] Examine: what the player notices, shown one line at a time. The first look also drops `contains`. */
+  examine?: string[];
+  /** Shown on every later [E] instead of `examine`. Without it, `examine` repeats, unless the prop held an item. */
+  afterwards?: string[];
+  /** Dropped once, at the end of the first examine (or straight away on [E] Search if there is no examine). */
   contains?: ItemSpec;
   /** Touching it hurts. */
   hazard?: Damage;
@@ -142,9 +156,14 @@ export interface CharacterSpec {
   /** Blocks the player. */
   solid: boolean;
   movement?: Movement;
-  /** [E] Talk: each press plays the next conversation, and the last one repeats. */
-  dialogue?: Conversation[];
-  /** Dropped once, when the player first finishes the last conversation. */
+  /** [E] Talk: one conversation, shown one line at a time, the first time the player talks to it. */
+  dialogue?: string[];
+  /**
+   * What it says on every later talk. A character that gives a key should brush the player off here
+   * ("I've told you all I know, miss."). Without it, the dialogue repeats, unless the character gave an item.
+   */
+  afterwards?: string[];
+  /** Handed over once, at the end of the first conversation. */
   gives?: ItemSpec;
   hostile?: Damage;
   /** Without a light of its own, a character carries the standard soft glow. */
@@ -167,13 +186,6 @@ export type Movement =
   | { type: "patrol"; speed: number; points: Vec2[] }
   /** Locks on to the player within detectRadius, gives up beyond 1.5 times that, then walks home. */
   | { type: "chase"; speed: number; detectRadius: number };
-
-export interface Conversation {
-  /** Defaults to the character's name; examine text has no speaker. */
-  speaker?: string;
-  /** Shown one at a time. */
-  lines: string[];
-}
 
 export const ITEM_KINDS = ["key"] as const;
 export interface KeySpec {
@@ -228,15 +240,16 @@ export const LIMITS = {
   rooms: 12,
   roomSide: [6, 30],
   roomHeight: [3, 10],
-  propsPerRoom: 80,
+  propsPerRoom: 150,
   partsPerProp: 16,
   charactersPerRoom: 4,
   pickupsPerRoom: 6,
   propLightsPerRoom: 8,
   /** Prop lights plus character lights and glows; each is a real light, and they cost shader time. */
   lightsPerRoom: 12,
-  conversations: 6,
-  linesPerConversation: 8,
+  /** The prompts ask for 8 at most; this is the old 6 conversations of 8 lines, which saved games play as one. */
+  dialogueLines: 48,
+  afterwardsLines: 3,
   lineLength: 220,
   lightIntensity: 10,
   lightRange: 20,
@@ -250,8 +263,8 @@ export const LIMITS = {
   characterHeight: [0.2, 4],
   ambientEvery: 0.5,
   ambientLifetime: 10,
-  artJobsWarning: 120,
-  artJobs: 200,
+  artJobsWarning: 180,
+  artJobs: 300,
 } as const;
 
 export const DEFAULTS = {

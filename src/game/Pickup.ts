@@ -2,6 +2,7 @@ import { artFor } from "../shared/art";
 import type { ItemSpec, Vec3 } from "../shared/spec";
 import { Part } from "./Part";
 import type { TextureLibrary } from "./TextureLibrary";
+import { CAMERA_PITCH } from "./camera";
 
 // Every pickup is drawn this big, whatever the item.
 const SIZE = 0.4;
@@ -23,5 +24,6 @@ export class Pickup extends Part {
     this.stateKey = "stateKey" in origin ? origin.stateKey : undefined;
     this.droppedAt = "droppedAt" in origin ? origin.droppedAt : undefined;
     this.dynamic = this.droppedAt !== undefined;
+    this.leanBack(CAMERA_PITCH);
   }
 }

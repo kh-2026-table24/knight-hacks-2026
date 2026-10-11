@@ -15,6 +15,14 @@ const CHARS_PER_TOKEN = 4;
 const HEARTBEAT_MS = 20_000;
 const count = (n: number) => n.toLocaleString("en-US");
 
+/** One finished Claude call, for the per-call breakdown saved with a game. */
+export interface CallUsage extends Omit<TokenUsage, "live"> {
+  label: string;
+  seconds: number;
+  /** It threw (declined, cut off, network); its output is an estimate. */
+  failed?: boolean;
+}
+
 /**
  * Adds up a game's tokens across its Claude calls, including calls still streaming. Those count their
  * input as soon as it's known and an estimate of their output so far, until the exact count arrives.
@@ -22,6 +30,7 @@ const count = (n: number) => n.toLocaleString("en-US");
 export class TokenMeter {
   private done: TokenUsage = { input: 0, cached: 0, output: 0, live: 0 };
   private readonly streaming = new Map<number, TokenUsage>();
+  private readonly finishedCalls: CallUsage[] = [];
   private nextCall = 0;
 
   /** `onChange` hears the new total after every update; `final` is when a call's exact count came in. */
@@ -30,6 +39,11 @@ export class TokenMeter {
   /** Only the calls that have finished, with exact counts. */
   get finished(): TokenUsage {
     return this.done;
+  }
+
+  /** Every finished call, in the order they finished. */
+  get calls(): readonly CallUsage[] {
+    return this.finishedCalls;
   }
 
   get total(): TokenUsage {
@@ -42,12 +56,15 @@ export class TokenMeter {
     return total;
   }
 
-  /** Starts counting one call. Report its running usage; `final` the last time. */
-  call() {
+  /** Starts counting one call. Report its running usage; `final` the last time (`failed` if it threw). */
+  call(label: string) {
     const id = this.nextCall++;
-    return (usage: Omit<TokenUsage, "live">, final = false) => {
+    const started = Date.now();
+    return (usage: Omit<TokenUsage, "live">, final = false, failed = false) => {
       if (final) {
         this.streaming.delete(id);
+        const seconds = Math.round((Date.now() - started) / 100) / 10;
+        this.finishedCalls.push({ label, ...usage, seconds, ...(failed && { failed }) });
         this.done = { input: this.done.input + usage.input, cached: this.done.cached + usage.cached, output: this.done.output + usage.output, live: 0 };
       } else {
         this.streaming.set(id, { ...usage, live: 1 });
@@ -67,12 +84,14 @@ export interface AskOptions {
   gameId?: string;
   /** Counts what the call costs as it streams, even if it then throws (a refusal or a cut-off answer still spent them). */
   meter?: TokenMeter;
+  /** Called once the answer starts streaming, which is when the prompt cache it wrote can be read. */
+  onStart?: () => void;
 }
 
 /** Sends one prompt and returns the text of Claude's answer. Throws if it was cut off or declined. */
-export async function askClaude(prompt: string, { system, effort = "high", label, gameId, meter }: AskOptions): Promise<string> {
+export async function askClaude(prompt: string, { system, effort = "high", label, gameId, meter, onStart }: AskOptions): Promise<string> {
   const started = Date.now();
-  const report = meter?.call();
+  const report = meter?.call(label);
   const live = { input: 0, cached: 0, output: 0 };
   let thinkingTokens = 0;
   let textChars = 0;
@@ -101,6 +120,7 @@ export async function askClaude(prompt: string, { system, effort = "high", label
       const usage = event.message.usage;
       live.input = usage.input_tokens + (usage.cache_creation_input_tokens ?? 0);
       live.cached = usage.cache_read_input_tokens ?? 0;
+      onStart?.();
     } else if (event.type === "content_block_delta" && event.delta.type === "thinking_delta") {
       thinkingTokens += event.delta.estimated_tokens ?? 0;
     } else if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
@@ -117,7 +137,7 @@ export async function askClaude(prompt: string, { system, effort = "high", label
     message = await stream.finalMessage();
   } catch (error) {
     // The exact count never came; keep the estimate.
-    report?.(live, true);
+    report?.(live, true, true);
     log(gameId, `claude ${label}: failed after ${Math.round((Date.now() - started) / 1000)}s: ${error instanceof Error ? error.message : String(error)}`, "error");
     throw error;
   } finally {
