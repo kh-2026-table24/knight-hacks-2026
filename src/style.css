@@ -147,23 +147,18 @@ body {
   }
 }
 
-/* Title screen (src/game/ui/TitleScreen.ts): the name and the list of games, over the empty canvas. */
+/* Title screen (src/game/ui/TitleScreen.ts): a glowing scrawled name and a short menu on the left, a
+   blurred figure reaching out of the dark on the right, under film grain. */
 .title-screen {
+  --glow: #8dff74;
+  --ink: #d8ffc9;
+  --menu: #b9c4b0;
   position: fixed;
   inset: 0;
   z-index: 10;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  padding: max(48px, 8vh) 16px 24px;
-  box-sizing: border-box;
-  overflow-y: auto;
-  background: radial-gradient(ellipse at 50% 30%, #1b1a24 0%, #08080c 60%, #000 100%);
-  font-family: "IM Fell English", Georgia, serif;
-  color: #e8e2d6;
-  text-shadow: 0 2px 0 #000;
-  transition: opacity 0.6s ease;
+  overflow: hidden;
+  background: #000;
+  transition: opacity 0.9s ease;
 }
 
 .title-screen-leaving {
@@ -171,132 +166,242 @@ body {
   pointer-events: none;
 }
 
-.title-heading {
-  text-align: center;
+.title-figure {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  height: 100%;
+  min-width: 70%;
+  object-fit: cover;
+  object-position: 70% 50%;
+  transform: translateY(-50%);
+  /* Fade the figure's left side into the dark, under the name and menu. */
+  mask-image: linear-gradient(to right, transparent 0%, #000 45%);
+  opacity: 0.85;
+  animation: title-breathe 9s ease-in-out infinite;
+}
+
+/* Film grain: animated noise, plus a vignette. */
+.title-grain {
+  position: absolute;
+  inset: -50%;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.13;
+  mix-blend-mode: screen;
+  animation: title-grain 0.5s steps(4) infinite;
+}
+
+.title-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 45% 50%, transparent 40%, rgba(0, 0, 0, 0.85) 100%);
+}
+
+.title-column {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: clamp(40px, 10vh, 110px) 16px 24px clamp(16px, 8vw, 140px);
+  box-sizing: border-box;
 }
 
 .title-name {
-  margin: 0;
-  font-size: clamp(44px, 9vw, 96px);
+  position: relative;
+  /* The arch lifts the middle letters about an em above the line. */
+  margin: 1.1em 0 clamp(36px, 9vh, 90px);
+  font-family: "Rock Salt", "IM Fell English", cursive;
   font-weight: normal;
-  letter-spacing: 0.04em;
-  color: #f1e7d2;
-  text-shadow:
-    0 0 24px rgba(255, 190, 120, 0.25),
-    0 3px 0 #000;
-  animation: title-flicker 7s infinite;
+  font-size: clamp(26px, 5.2vw, 64px);
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
-.title-tagline {
-  margin: 8px 0 0;
-  font-size: clamp(16px, 2.4vw, 21px);
-  font-style: italic;
-  color: #a39b8c;
+.title-name-text,
+.title-name-smear {
+  display: block;
+}
+
+.title-name-smear {
+  position: absolute;
+  inset: 0;
+  transform: translateX(-0.5em) scaleX(1.08);
+  filter: blur(10px);
+  opacity: 0.4;
+}
+
+.title-letter {
+  display: inline-block;
+  color: var(--ink);
+  transform: translateY(var(--lift)) rotate(var(--tilt));
+  text-shadow:
+    0 0 4px var(--glow),
+    0 0 14px var(--glow),
+    0 0 36px rgba(80, 230, 60, 0.6);
+  animation: title-flicker 9s infinite;
 }
 
 .title-status {
-  margin: 24px 0 0;
-  font-size: 20px;
-  color: #a39b8c;
+  margin: 0;
+  font-family: "Special Elite", monospace;
+  font-size: 16px;
+  letter-spacing: 0.12em;
+  color: var(--menu);
 }
 
 .title-status[hidden] {
   display: none;
 }
 
-.title-games {
+.title-menu {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  width: 100%;
-  max-width: 600px;
-  margin-top: 8px;
+  gap: 18px;
+  max-width: min(460px, 100%);
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 4px 4px 0;
 }
 
-.title-game {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  width: 100%;
-  padding: 0 8px;
-  text-align: left;
-  font: inherit;
-  color: inherit;
-  text-shadow: inherit;
+.title-item {
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  align-items: center;
+  column-gap: 14px;
+  padding: 0;
+  border: 0;
   background: none;
+  text-align: left;
   cursor: pointer;
-  filter: brightness(0.75);
+  font-family: "Special Elite", monospace;
+  color: var(--menu);
+  opacity: 0.7;
   transition:
-    filter 0.15s ease,
-    transform 0.15s ease;
+    opacity 0.15s ease,
+    color 0.15s ease;
 }
 
-.title-game:hover,
-.title-game:focus-visible,
-.title-game-chosen {
-  filter: brightness(1.1);
-  transform: translateX(4px);
+.title-item:focus {
   outline: none;
 }
 
-.title-game:disabled:not(.title-game-chosen) {
-  opacity: 0.4;
+.title-item-selected {
+  opacity: 1;
+  color: #eef6e8;
+}
+
+.title-item:disabled {
   cursor: default;
 }
 
-.title-game-top {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
+.title-item-label {
+  font-size: 18px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.9);
 }
 
-.title-game-name {
-  font-size: 22px;
+/* The ring that marks the selected item. */
+.title-item-marker {
+  grid-row: span 2;
+  width: 26px;
+  height: 26px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  box-sizing: border-box;
+  visibility: hidden;
 }
 
-.title-game-rooms {
-  flex: none;
-  font-size: 14px;
-  color: #a39b8c;
+.title-item-marker::after {
+  content: "";
+  display: block;
+  width: 0;
+  height: 0;
+  margin: 6px 0 0 8px;
+  border-style: solid;
+  border-width: 5px 0 5px 8px;
+  border-color: transparent transparent transparent currentColor;
 }
 
-.title-game-summary {
+.title-item-selected .title-item-marker {
+  visibility: visible;
+}
+
+.title-item-detail {
+  grid-column: 2;
+  display: none;
+  margin-top: 6px;
+  font-family: "IM Fell English", Georgia, serif;
+  font-style: italic;
   font-size: 15px;
   line-height: 1.35;
-  color: #c9c1b2;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  letter-spacing: 0;
+  color: #95a08c;
 }
 
-.title-controls {
-  margin: auto 0 0;
-  padding-top: 16px;
-  font-size: 14px;
-  color: #6f6a61;
-  text-align: center;
+.title-item-selected .title-item-detail {
+  display: block;
 }
 
-/* A failing bulb: mostly steady, with two quick dips. */
+.title-menu-browse {
+  gap: 14px;
+}
+
+.title-menu-browse .title-item-label {
+  font-size: 15px;
+}
+
 @keyframes title-flicker {
-  0%, 90%, 94%, 100% {
+  0%, 88%, 92%, 100% {
     opacity: 1;
   }
+  89% {
+    opacity: 0.45;
+  }
+  90.5% {
+    opacity: 0.95;
+  }
   91% {
-    opacity: 0.55;
+    opacity: 0.3;
   }
-  92.5% {
-    opacity: 0.9;
+}
+
+@keyframes title-breathe {
+  0%, 100% {
+    transform: translateY(-50%) scale(1);
+    filter: blur(0);
   }
-  93% {
-    opacity: 0.4;
+  50% {
+    transform: translateY(-50%) scale(1.025);
+    filter: blur(1.5px);
+  }
+}
+
+@keyframes title-grain {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-6%, 4%); }
+  50% { transform: translate(5%, -7%); }
+  75% { transform: translate(-3%, -4%); }
+  100% { transform: translate(4%, 6%); }
+}
+
+/* On narrow screens the figure sits behind the menu, so dim it to keep the text readable. */
+@media (max-width: 700px) {
+  .title-figure {
+    opacity: 0.45;
+    mask-image: none;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .title-name {
+  .title-letter,
+  .title-figure,
+  .title-grain {
     animation: none;
   }
 }
