@@ -92,6 +92,7 @@ Story and progression
   a key, and give hints that name the object as it looks, so the player can find it.
 - Characters speak in their own voice, briefly; one thought per line. A hostile character or a hazard
   should belong to the story. Keep threats away from the start and the doorways, and leave a way around.
+  Give every hostile character a "scream" that fits who or what it was in the story.
 
 Fitting it together
 - Keep open paths at least 1.2 m wide from the start to every door, character, key and story object, and

@@ -2,10 +2,12 @@ import { readFile } from "node:fs/promises";
 import { createServer, type ServerResponse } from "node:http";
 import { extname, join, normalize } from "node:path";
 import type { CreatedGame } from "../src/shared/api";
+import { isScreamId } from "../src/shared/screams";
 import { getAsset } from "./assets";
 import { getGame, InvalidGameError, isSafeId } from "./games";
 import { createGame, gameStatus, resumePainting, summarizeGames } from "./jobs";
 import { log } from "./log";
+import { getScream } from "./screams";
 import { onCloudRun } from "./secrets";
 
 // Game server. Vite proxies /api here (see vite.config.ts); `npm run dev` starts both.
@@ -13,7 +15,7 @@ import { onCloudRun } from "./secrets";
 //   POST /api/games                        -> starts making a new game (story, rooms, then art): { id }
 //   GET  /api/games/:gameId                -> the game's GameSpec JSON, once its rooms are built
 //   GET  /api/games/:gameId/status         -> GameStatus; also starts painting a game whose art isn't all made
-//   GET  /api/games/:gameId/assets/:artId  -> PNG, once it's been made (404 until then)
+//   GET  /api/games/:gameId/assets/:artId  -> PNG, once it's been made (404 until then); a scream's id gives its MP3
 // In production (`npm run build && npm start`) it also serves the built client from dist/.
 const PORT = Number(process.env.PORT) || 3002;
 const DIST_DIR = join(import.meta.dirname, "..", "dist");
@@ -80,6 +82,10 @@ const server = createServer(async (req, res) => {
     const game = await getGame(gameId);
     if (!game) return send(res, 404, `No game "${gameId}"`);
     if (parts.length === 3) return send(res, 200, JSON.stringify(game), "application/json");
+    if (parts.length === 5 && assets === "assets" && isSafeId(artId) && isScreamId(artId)) {
+      const mp3 = await getScream(gameId, game, artId);
+      return mp3 ? send(res, 200, mp3, "audio/mpeg", "public, max-age=31536000, immutable") : send(res, 404, `Scream ${artId} of game ${gameId} isn't made yet`);
+    }
     if (parts.length === 5 && assets === "assets" && isSafeId(artId)) {
       const png = await getAsset(gameId, game, artId);
       // An id names its exact prompt, so a made image never changes.

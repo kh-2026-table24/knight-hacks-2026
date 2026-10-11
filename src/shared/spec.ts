@@ -147,6 +147,13 @@ export interface CharacterSpec {
   /** Dropped once, when the player first finishes the last conversation. */
   gives?: ItemSpec;
   hostile?: Damage;
+  /**
+   * Hostile characters only: the scream it lets out when it catches the player, as its face fills the
+   * screen. Generated as a sound effect while the game is painted, so describe the sound itself: who or
+   * what screams, and how ("a drowned woman's gurgling shriek through seawater", "a rat's shrill
+   * chittering squeal"). Left out, it's made from its art description.
+   */
+  scream?: string;
   /** Without a light of its own, a character carries the standard soft glow. */
   light?: LightSpec;
 }
@@ -159,7 +166,7 @@ export interface CharacterArt {
   moving?: string[];
 }
 
-export const MOVEMENT_TYPES = ["wander", "patrol", "chase"] as const;
+export const MOVEMENT_TYPES =["wander", "patrol", "chase"] as const;
 export type Movement =
   /** Drifts around where it was placed. */
   | { type: "wander"; speed: number; radius: number }
