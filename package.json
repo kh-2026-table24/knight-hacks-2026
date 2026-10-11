@@ -18,7 +18,8 @@
     "server": "tsx scripts/server.ts",
     "sprite": "tsx --env-file=.env.local scripts/gemini.ts",
     "gemini-text": "tsx --env-file=.env.local scripts/gemini-text.ts",
-    "start": "tsx server/index.ts"
+    "start": "tsx server/index.ts",
+    "music": "tsx --env-file=.env.local scripts/gen-music.ts"
   },
   "devDependencies": {
     "@types/node": "^26.6.5",

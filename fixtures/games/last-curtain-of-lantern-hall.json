@@ -1,0 +1,973 @@
+{
+  "version": 1,
+  "title": "The Last Curtain of Lantern Hall",
+  "summary": "Lantern Marionette Theater, a solar-vine playhouse, was holding its Bloom Jubilee, the yearly celebration of the troupe that taught its puppets to move without strings. Decades of neglected maintenance let the living roof rot and its biolight grids dim, but the town gathered anyway for one last show. Moments ago, as the finale began, the old stage-vine seized up and the puppets rose on their own, all turning to face the audience. The crowd fled mid-song, leaving warm cups, spilled petals, and a stage still humming. The player pieces together that the puppeteers never controlled the show at the end; the puppets have been performing for an audience that left them behind.",
+  "rooms": [
+    {
+      "id": "grounds",
+      "name": "Jubilee Courtyard",
+      "outdoor": true,
+      "grid": [
+        0,
+        0
+      ],
+      "size": [
+        16,
+        6,
+        14
+      ],
+      "start": [
+        8,
+        12
+      ],
+      "baseLight": 0.3,
+      "walls": "The mossy, vine-choked front face of the Lantern Marionette Theater, with weathered timber and cracked plaster. A banner reading 'Bloom Jubilee' hangs half torn above the central door.",
+      "floor": "Cracked stone plaza choked with moss and weeds. A broad mosaic path runs straight from the south to the theater door, scattered with fallen petals and trampled confetti.",
+      "doors": [
+        {
+          "connection": "grounds-backstage",
+          "offset": 8
+        }
+      ],
+      "props": [
+        {
+          "id": "cracked-petal-mosaic-processiona",
+          "name": "cracked petal-mosaic processional path, moss in the seams",
+          "position": [
+            8,
+            0.01,
+            13
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                -1.5708,
+                0,
+                0
+              ],
+              "size": [
+                3,
+                12.7,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "half-torn-bloom-jubilee-banner-o",
+          "name": "half-torn 'Bloom Jubilee' banner, one corner dangling",
+          "position": [
+            8,
+            3.4,
+            0.31
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                4,
+                1.2,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "rusted-lantern-post-with-glowing",
+          "name": "rusted lantern post with glowing paper lanterns, west of the path",
+          "position": [
+            5.5,
+            0,
+            2.5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.4,
+                3.2,
+                0.4
+              ],
+              "solid": true,
+              "material": "rusted lantern post with glowing paper lanterns, west of the path"
+            }
+          ]
+        },
+        {
+          "id": "rusted-lantern-post-with-glo-3",
+          "name": "rusted lantern post with glowing paper lanterns, east of the path",
+          "position": [
+            10.5,
+            0,
+            2.5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.4,
+                3.2,
+                0.4
+              ],
+              "solid": true,
+              "material": "rusted lantern post with glowing paper lanterns, east of the path"
+            }
+          ]
+        },
+        {
+          "id": "tall-marionette-statue-cut-strin",
+          "name": "tall marionette statue, cut strings dangling, head turned to face the empty plaza (west)",
+          "position": [
+            4.8,
+            0,
+            6
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1,
+                0.5,
+                1
+              ],
+              "solid": true,
+              "material": "tall marionette statue, cut strings dangling, head turned to face the empty plaza (west)"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0.5,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.6,
+                1.9,
+                0.5
+              ],
+              "solid": true,
+              "material": "tall marionette statue, cut strings dangling, head turned to face the empty plaza (west)"
+            }
+          ]
+        },
+        {
+          "id": "tall-marionette-statue-cut-s-5",
+          "name": "tall marionette statue, cut strings dangling, head turned to face the empty plaza (east)",
+          "position": [
+            11.2,
+            0,
+            6
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1,
+                0.5,
+                1
+              ],
+              "solid": true,
+              "material": "tall marionette statue, cut strings dangling, head turned to face the empty plaza (east)"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0.5,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.6,
+                1.9,
+                0.5
+              ],
+              "solid": true,
+              "material": "tall marionette statue, cut strings dangling, head turned to face the empty plaza (east)"
+            }
+          ]
+        },
+        {
+          "id": "overgrown-hedge-hung-with-dim-la",
+          "name": "overgrown hedge hung with dim lanterns, west",
+          "position": [
+            1.2,
+            0,
+            2.2
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.4,
+                1.2,
+                3.6
+              ],
+              "solid": true,
+              "material": "overgrown hedge hung with dim lanterns, west"
+            }
+          ]
+        },
+        {
+          "id": "overgrown-hedge-hung-with-di-7",
+          "name": "overgrown hedge hung with dim lanterns, east",
+          "position": [
+            14.8,
+            0,
+            2.2
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.4,
+                1.2,
+                3.6
+              ],
+              "solid": true,
+              "material": "overgrown hedge hung with dim lanterns, east"
+            }
+          ]
+        },
+        {
+          "id": "tea-table-with-still-steaming-cu",
+          "name": "tea table with still-steaming cups and a dropped program",
+          "position": [
+            2.8,
+            0,
+            7
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.2,
+                0.75,
+                0.8
+              ],
+              "solid": true,
+              "material": "tea table with still-steaming cups and a dropped program"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0.75,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.4,
+                0.12,
+                0.3
+              ],
+              "solid": true,
+              "material": "tea table with still-steaming cups and a dropped program"
+            }
+          ]
+        },
+        {
+          "id": "pile-of-overturned-folding-chair",
+          "name": "pile of overturned folding chairs, abandoned mid-song (west)",
+          "position": [
+            3.5,
+            0,
+            9.5
+          ],
+          "rotationY": 0.3,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.6,
+                0.6,
+                1.2
+              ],
+              "solid": true,
+              "material": "pile of overturned folding chairs, abandoned mid-song (west)"
+            }
+          ]
+        },
+        {
+          "id": "tipped-over-audience-chairs-and",
+          "name": "tipped-over audience chairs and a spilled tea tray (east)",
+          "position": [
+            12.5,
+            0,
+            8.5
+          ],
+          "rotationY": -0.4,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.6,
+                0.6,
+                1.2
+              ],
+              "solid": true,
+              "material": "tipped-over audience chairs and a spilled tea tray (east)"
+            }
+          ]
+        },
+        {
+          "id": "rusted-solar-petal-array-one-pan",
+          "name": "rusted solar petal array, one panel snapped and drooping",
+          "position": [
+            13.5,
+            0,
+            11.2
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                2.4,
+                1.2,
+                1
+              ],
+              "solid": true,
+              "material": "rusted solar petal array, one panel snapped and drooping"
+            }
+          ]
+        },
+        {
+          "id": "drift-of-trampled-confetti-and-p",
+          "name": "drift of trampled confetti and petals streaming toward the exit",
+          "position": [
+            11.5,
+            0.02,
+            13
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                -1.5708,
+                0,
+                0
+              ],
+              "size": [
+                4,
+                3,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        }
+      ],
+      "characters": [],
+      "pickups": []
+    },
+    {
+      "id": "backstage",
+      "name": "Backstage Rigging Hall",
+      "outdoor": false,
+      "grid": [
+        0,
+        -1
+      ],
+      "size": [
+        14,
+        5,
+        12
+      ],
+      "start": [
+        6,
+        10.5
+      ],
+      "baseLight": 0.3,
+      "walls": "Damp plank walls choked with glowing green vines, patched with faded Bloom Jubilee bunting and peeling painted scenery flats.",
+      "floor": "Worn dark wooden boards, strewn with trampled petals, loose thread and drifting cut strings.",
+      "doors": [
+        {
+          "connection": "grounds-backstage",
+          "offset": 6
+        }
+      ],
+      "props": [
+        {
+          "id": "raised-wooden-rigging-gallery-wa",
+          "name": "raised wooden rigging gallery walkway, vine-draped",
+          "position": [
+            12.1,
+            0,
+            3.5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                3.2,
+                2.4,
+                6
+              ],
+              "solid": true,
+              "material": "raised wooden rigging gallery walkway, vine-draped"
+            }
+          ]
+        },
+        {
+          "id": "steep-plank-stairs-up-to-the-rig",
+          "name": "steep plank stairs up to the rigging gallery",
+          "position": [
+            12.9,
+            0,
+            7.75
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "wedge",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.6,
+                2.4,
+                2.5
+              ],
+              "solid": true,
+              "material": "steep plank stairs up to the rigging gallery"
+            }
+          ]
+        },
+        {
+          "id": "overhead-fly-rail-hung-with-mari",
+          "name": "overhead fly rail hung with marionettes, several strings freshly snapped",
+          "position": [
+            12.9,
+            2.4,
+            3
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.4,
+                2.2,
+                3
+              ],
+              "solid": true,
+              "material": "overhead fly rail hung with marionettes, several strings freshly snapped"
+            }
+          ]
+        },
+        {
+          "id": "wall-of-dying-sap-batteries-puls",
+          "name": "wall of dying sap-batteries pulsing with green light in the rhythm of the show",
+          "position": [
+            7,
+            0,
+            0.7
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                4,
+                2.2,
+                0.8
+              ],
+              "solid": true,
+              "material": "wall of dying sap-batteries pulsing with green light in the rhythm of the show"
+            }
+          ]
+        },
+        {
+          "id": "workbench-with-half-eaten-celebr",
+          "name": "workbench with half-eaten celebration cake and the puppeteer's cold control gloves",
+          "position": [
+            6,
+            0,
+            5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                2.2,
+                0.9,
+                1.2
+              ],
+              "solid": true,
+              "material": "workbench with half-eaten celebration cake and the puppeteer's cold control gloves"
+            },
+            {
+              "shape": "box",
+              "position": [
+                -0.5,
+                0.9,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.5,
+                0.2,
+                0.5
+              ],
+              "solid": true,
+              "material": "workbench with half-eaten celebration cake and the puppeteer's cold control gloves"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0.6,
+                0.9,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.4,
+                0.08,
+                0.3
+              ],
+              "solid": true,
+              "material": "workbench with half-eaten celebration cake and the puppeteer's cold control gloves"
+            }
+          ]
+        },
+        {
+          "id": "three-life-size-marionettes-stan",
+          "name": "three life-size marionettes standing upright on their own, heads turned toward the stage",
+          "position": [
+            3,
+            0,
+            3
+          ],
+          "rotationY": 3.1416,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                2.4,
+                1.9,
+                0.6
+              ],
+              "solid": true,
+              "material": "three life-size marionettes standing upright on their own, heads turned toward the stage"
+            }
+          ]
+        },
+        {
+          "id": "costume-rail-of-limp-spare-mario",
+          "name": "costume rail of limp spare marionettes",
+          "position": [
+            0.9,
+            0,
+            5
+          ],
+          "rotationY": 1.5708,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                2.5,
+                1.8,
+                0.5
+              ],
+              "solid": true,
+              "material": "costume rail of limp spare marionettes"
+            }
+          ]
+        },
+        {
+          "id": "string-spool-winch-with-cut-line",
+          "name": "string spool winch with cut lines trailing off",
+          "position": [
+            2,
+            0,
+            7
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1,
+                1,
+                1
+              ],
+              "solid": true,
+              "material": "string spool winch with cut lines trailing off"
+            }
+          ]
+        },
+        {
+          "id": "overturned-stool-beside-spilled",
+          "name": "overturned stool beside spilled warm cups",
+          "position": [
+            8.5,
+            0,
+            7.5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.8,
+                0.4,
+                0.8
+              ],
+              "solid": true,
+              "material": "overturned stool beside spilled warm cups"
+            }
+          ]
+        },
+        {
+          "id": "rotted-skylight-with-dying-vine",
+          "name": "rotted skylight with dying vine overgrowth",
+          "position": [
+            3,
+            2.2,
+            0.31
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.6,
+                1.8,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "torn-bloom-jubilee-banner-hangin",
+          "name": "torn Bloom Jubilee banner hanging by one corner",
+          "position": [
+            7,
+            2.8,
+            0.31
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                3,
+                1.6,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "trail-of-spilled-petals-and-tram",
+          "name": "trail of spilled petals and trampled confetti",
+          "position": [
+            6,
+            0.01,
+            4.2
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                -1.5708,
+                0,
+                0
+              ],
+              "size": [
+                2,
+                2,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        }
+      ],
+      "characters": [],
+      "pickups": []
+    }
+  ],
+  "connections": [
+    {
+      "id": "grounds-backstage",
+      "rooms": [
+        "grounds",
+        "backstage"
+      ],
+      "locked": false
+    }
+  ]
+}

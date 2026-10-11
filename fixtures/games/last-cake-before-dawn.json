@@ -1,0 +1,4409 @@
+{
+  "version": 1,
+  "title": "The Last Cake Before Dawn",
+  "summary": "On the eve of the princess's wedding, a baker and her apprentice worked through the night on an enormous towering cake, racing the sunrise. Drawn by the scent of honey and spun sugar, a starving giant who had been driven from the hills by a failed harvest smashed through the kitchen wall. In a panic the pair tried to scare, then bribe it, and finally lured it away with the cake itself, leaving a trail of crumbs and flour into the woods. The player pieces together that the giant never meant harm, and that the baker's last frantic act was one of kindness, not flight.",
+  "rooms": [
+    {
+      "id": "grounds",
+      "name": "The Trampled Garden",
+      "outdoor": true,
+      "grid": [
+        0,
+        0
+      ],
+      "size": [
+        16,
+        6,
+        14
+      ],
+      "start": [
+        9,
+        12.5
+      ],
+      "baseLight": 0.2,
+      "walls": "warm cream lime plaster",
+      "floor": "dark slate-grey cobblestone",
+      "doors": [
+        {
+          "connection": "grounds-kitchen",
+          "offset": 6
+        }
+      ],
+      "props": [
+        {
+          "id": "gaping-giant-sized-hole-smashed",
+          "name": "gaping giant-sized hole smashed through the bakery wall, splintered beams and dark kitchen beyond",
+          "position": [
+            12.5,
+            0,
+            0.31
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                4,
+                4.2,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "heap-of-shattered-brick-and-plas",
+          "name": "heap of shattered brick and plaster rubble spilling from the broken wall",
+          "position": [
+            12.5,
+            0,
+            1.5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                3.4,
+                0.6,
+                1.6
+              ],
+              "solid": true,
+              "material": "shattered red brick and broken cream plaster chunks"
+            },
+            {
+              "shape": "box",
+              "position": [
+                -0.6,
+                0.6,
+                -0.2
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.2,
+                0.5,
+                0.8
+              ],
+              "solid": true,
+              "material": "shattered red brick and broken cream plaster chunks"
+            },
+            {
+              "shape": "wedge",
+              "position": [
+                0.6,
+                0,
+                1.3
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                2,
+                0.6,
+                0.8
+              ],
+              "solid": true,
+              "material": "shattered red brick and broken cream plaster chunks"
+            }
+          ],
+          "light": {
+            "type": "spot",
+            "color": "#ffe6b8",
+            "intensity": 5,
+            "range": 3,
+            "effect": "steady"
+          }
+        },
+        {
+          "id": "bakery-window-glowing-with-orang",
+          "name": "bakery window glowing with orange oven light, flour-dusted panes",
+          "position": [
+            2.5,
+            1.3,
+            0.31
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.6,
+                1.4,
+                0
+              ],
+              "solid": false
+            }
+          ],
+          "light": {
+            "type": "glow",
+            "color": "#ff9a4a",
+            "intensity": 1.5,
+            "range": 6,
+            "effect": "flicker"
+          }
+        },
+        {
+          "id": "painted-bakery-sign-of-a-golden",
+          "name": "painted bakery sign of a golden loaf and wheat sheaf, hanging crooked",
+          "position": [
+            6,
+            3.3,
+            0.31
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.4,
+                0.8,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "wrought-iron-lamp-post-beside-th",
+          "name": "wrought iron lamp post beside the bakery door, amber glass cracked",
+          "position": [
+            4.4,
+            0,
+            1
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.4,
+                0.3,
+                0.4
+              ],
+              "solid": true,
+              "material": "black wrought iron"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0.3,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.12,
+                2.4,
+                0.12
+              ],
+              "solid": true,
+              "material": "black wrought iron"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                2.7,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.35,
+                0.45,
+                0.35
+              ],
+              "solid": true,
+              "material": "cracked amber glass in iron frame"
+            }
+          ],
+          "light": {
+            "type": "glow",
+            "color": "#ffc070",
+            "intensity": 2.5,
+            "range": 6,
+            "effect": "steady"
+          }
+        },
+        {
+          "id": "herb-bed-crushed-flat-by-a-giant",
+          "name": "herb bed crushed flat by a giant heel, rosemary and thyme pressed into the soil",
+          "position": [
+            2.5,
+            0,
+            3.6
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                3.2,
+                0.2,
+                2.4
+              ],
+              "solid": true,
+              "material": "trampled dark brown soil with crushed bright green herbs"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0.5,
+                0.2,
+                0.2
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                2.4,
+                0.08,
+                0.08
+              ],
+              "solid": true,
+              "material": "snapped green bamboo canes"
+            }
+          ]
+        },
+        {
+          "id": "woodpile-kicked-apart-split-oven",
+          "name": "woodpile kicked apart, split oven logs strewn across the cobbles",
+          "position": [
+            1.8,
+            0,
+            8
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.6,
+                0.5,
+                1
+              ],
+              "solid": true,
+              "material": "split pale birch logs"
+            },
+            {
+              "shape": "box",
+              "position": [
+                -0.2,
+                0.5,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1,
+                0.3,
+                0.7
+              ],
+              "solid": true,
+              "material": "split pale birch logs"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0.6,
+                0,
+                -1.1
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.2,
+                0.25,
+                0.3
+              ],
+              "solid": true,
+              "material": "split pale birch logs"
+            }
+          ]
+        },
+        {
+          "id": "chopping-stump-with-a-hatchet-st",
+          "name": "chopping stump with a hatchet still bitten into it",
+          "position": [
+            3.8,
+            0,
+            7.8
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.6,
+                0.5,
+                0.6
+              ],
+              "solid": true,
+              "material": "weathered ring-cut oak stump"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0.1,
+                0.5,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.08,
+                0.6,
+                0.08
+              ],
+              "solid": true,
+              "material": "worn ash wood handle"
+            }
+          ]
+        },
+        {
+          "id": "gnarled-apple-tree-a-high-branch",
+          "name": "gnarled apple tree, a high branch snapped at giant height",
+          "position": [
+            1.2,
+            0,
+            9.8
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.5,
+                3,
+                0.5
+              ],
+              "solid": true,
+              "material": "dark gnarled bark"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                3,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                2,
+                1.5,
+                1.8
+              ],
+              "solid": true,
+              "material": "dense dark green leaves"
+            }
+          ]
+        },
+        {
+          "id": "flour-cart-overturned-on-its-sid",
+          "name": "flour cart overturned on its side by the path, wheel pointing skyward",
+          "position": [
+            4.5,
+            0,
+            10.3
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                2.2,
+                0.9,
+                1.2
+              ],
+              "solid": true,
+              "material": "weathered red-painted cart planks"
+            },
+            {
+              "shape": "box",
+              "position": [
+                -0.6,
+                0.9,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.8,
+                0.1,
+                0.8
+              ],
+              "solid": true,
+              "material": "iron-rimmed spoked wooden wheel"
+            },
+            {
+              "shape": "box",
+              "position": [
+                1.5,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.8,
+                0.1,
+                0.1
+              ],
+              "solid": true,
+              "material": "weathered red-painted cart planks"
+            }
+          ]
+        },
+        {
+          "id": "burst-flour-sacks-spilling-a-whi",
+          "name": "burst flour sacks spilling a white drift across the cobbles",
+          "position": [
+            4.5,
+            0,
+            12
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                -0.6,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.8,
+                0.4,
+                0.6
+              ],
+              "solid": true,
+              "material": "coarse tan burlap dusted white"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0.4,
+                0,
+                0.1
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.8,
+                0.35,
+                0.6
+              ],
+              "solid": true,
+              "material": "coarse tan burlap dusted white"
+            },
+            {
+              "shape": "panel",
+              "position": [
+                0.2,
+                0.01,
+                0.9
+              ],
+              "rotation": [
+                -1.5708,
+                0,
+                0
+              ],
+              "size": [
+                2.4,
+                1.6,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "trail-of-dropped-sugar-loaves-in",
+          "name": "trail of dropped sugar loaves in blue paper wrappers leading to the door",
+          "position": [
+            6.4,
+            0,
+            6.5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                -0.8,
+                0,
+                2.3
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.45,
+                0.25,
+                0.25
+              ],
+              "solid": true,
+              "material": "white crystalline sugar with blue paper wrap"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.25,
+                0.45,
+                0.25
+              ],
+              "solid": true,
+              "material": "white crystalline sugar with blue paper wrap"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0.6,
+                0,
+                -2.3
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.45,
+                0.25,
+                0.25
+              ],
+              "solid": true,
+              "material": "white crystalline sugar with blue paper wrap"
+            }
+          ]
+        },
+        {
+          "id": "royal-wedding-invitation-scroll",
+          "name": "royal wedding invitation scroll, half unrolled and trodden, red wax seal",
+          "position": [
+            7.4,
+            0,
+            2.6
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.5,
+                0.1,
+                0.12
+              ],
+              "solid": true,
+              "material": "cream parchment with red wax seal"
+            },
+            {
+              "shape": "panel",
+              "position": [
+                0.3,
+                0.01,
+                0.5
+              ],
+              "rotation": [
+                -1.5708,
+                0,
+                0
+              ],
+              "size": [
+                0.4,
+                0.5,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "wicker-basket-of-honey-loaves-he",
+          "name": "wicker basket of honey loaves held out as a bribe, honey pot tipped over",
+          "position": [
+            9.5,
+            0,
+            3.2
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.7,
+                0.35,
+                0.5
+              ],
+              "solid": true,
+              "material": "woven golden wicker"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0.6,
+                0,
+                0.1
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.3,
+                0.35,
+                0.3
+              ],
+              "solid": true,
+              "material": "glazed amber clay dripping honey"
+            }
+          ]
+        },
+        {
+          "id": "rolling-pin-and-copper-pot-lid-f",
+          "name": "rolling pin and copper pot lid flung at the giant to scare it",
+          "position": [
+            10.2,
+            0,
+            5.5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.6,
+                0.1,
+                0.1
+              ],
+              "solid": true,
+              "material": "pale maple wood"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0.6,
+                0,
+                0.3
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.5,
+                0.05,
+                0.5
+              ],
+              "solid": true,
+              "material": "dented polished copper"
+            }
+          ]
+        },
+        {
+          "id": "enormous-bare-footprint-pressed",
+          "name": "enormous bare footprint pressed into flour and crushed paving",
+          "position": [
+            12.5,
+            0.01,
+            6
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                -1.5708,
+                0,
+                0
+              ],
+              "size": [
+                1.6,
+                2.6,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "second-giant-footprint-toes-poin",
+          "name": "second giant footprint, toes pointing toward the woods",
+          "position": [
+            12.3,
+            0.01,
+            10.2
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                -1.5708,
+                0,
+                0
+              ],
+              "size": [
+                1.6,
+                2.6,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "baker-s-tin-lantern-dropped-on-i",
+          "name": "baker's tin lantern dropped on its side, still burning",
+          "position": [
+            14.6,
+            0,
+            6.8
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.3,
+                0.45,
+                0.3
+              ],
+              "solid": true,
+              "material": "punched tin with warm glass"
+            }
+          ],
+          "light": {
+            "type": "glow",
+            "color": "#ffa040",
+            "intensity": 1.8,
+            "range": 6,
+            "effect": "flicker"
+          }
+        },
+        {
+          "id": "trail-of-cake-crumbs-spun-sugar",
+          "name": "trail of cake crumbs, spun sugar and flour leading off into the dark woods",
+          "position": [
+            14.5,
+            0.01,
+            13.9
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                -1.5708,
+                0,
+                0
+              ],
+              "size": [
+                1.2,
+                6,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "fallen-top-tier-of-the-wedding-c",
+          "name": "fallen top tier of the wedding cake, sugar roses smeared, left as bait for the giant",
+          "position": [
+            13.2,
+            0,
+            12.8
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1,
+                0.5,
+                1
+              ],
+              "solid": true,
+              "material": "pink-iced sponge with piped white sugar roses"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0.1,
+                0.5,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.5,
+                0.25,
+                0.5
+              ],
+              "solid": true,
+              "material": "glossy spun gold sugar"
+            }
+          ]
+        },
+        {
+          "id": "garden-picket-fence-snapped-and",
+          "name": "garden picket fence snapped and flattened by a giant stride",
+          "position": [
+            15.5,
+            0,
+            4
+          ],
+          "rotationY": -1.5708,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                -0.8,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.4,
+                0.9,
+                0.08
+              ],
+              "solid": true,
+              "material": "grey weathered picket wood"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0.8,
+                0,
+                0.3
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.4,
+                0.08,
+                0.6
+              ],
+              "solid": true,
+              "material": "grey weathered picket wood"
+            }
+          ]
+        }
+      ],
+      "characters": [],
+      "pickups": []
+    },
+    {
+      "id": "kitchen",
+      "name": "The Broken Kitchen",
+      "outdoor": false,
+      "grid": [
+        0,
+        -1
+      ],
+      "size": [
+        16,
+        5,
+        12
+      ],
+      "start": [
+        9,
+        10
+      ],
+      "baseLight": 0.2,
+      "walls": "warm cream whitewashed lime plaster",
+      "floor": "dark smoke-stained oak floorboards",
+      "doors": [
+        {
+          "connection": "kitchen-cake-room",
+          "offset": 5.5
+        },
+        {
+          "connection": "kitchen-pantry",
+          "offset": 8
+        },
+        {
+          "connection": "kitchen-cellar",
+          "offset": 8
+        },
+        {
+          "connection": "grounds-kitchen",
+          "offset": 8
+        }
+      ],
+      "props": [
+        {
+          "id": "giant-sized-jagged-hole-smashed",
+          "name": "giant-sized jagged hole smashed through the kitchen wall, moonlit woods beyond",
+          "position": [
+            12.5,
+            0,
+            0.31
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                4,
+                3.6,
+                0
+              ],
+              "solid": false
+            }
+          ],
+          "light": {
+            "type": "glow",
+            "color": "#9fb8e8",
+            "intensity": 1.5,
+            "range": 6,
+            "effect": "steady"
+          }
+        },
+        {
+          "id": "ring-of-shattered-bricks-and-pla",
+          "name": "ring of shattered bricks and plaster heaped around the giant's breach",
+          "position": [
+            12.5,
+            0,
+            0.3
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                -1.9,
+                0,
+                0.4
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1,
+                0.8,
+                0.8
+              ],
+              "solid": true,
+              "material": "shattered red brick and broken white plaster"
+            },
+            {
+              "shape": "box",
+              "position": [
+                -1.9,
+                0.8,
+                0.4
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.6,
+                1.4,
+                0.5
+              ],
+              "solid": true,
+              "material": "shattered red brick and broken white plaster"
+            },
+            {
+              "shape": "wedge",
+              "position": [
+                0,
+                0,
+                0.9
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                2.8,
+                0.6,
+                1.2
+              ],
+              "solid": true,
+              "material": "red brick rubble glazed with dripping amber honey"
+            },
+            {
+              "shape": "box",
+              "position": [
+                1.9,
+                0,
+                0.4
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1,
+                1,
+                0.8
+              ],
+              "solid": true,
+              "material": "shattered red brick and broken white plaster"
+            }
+          ]
+        },
+        {
+          "id": "enormous-hand-shaped-smear-of-go",
+          "name": "enormous hand-shaped smear of golden honey across the rubble-strewn floor",
+          "position": [
+            12.5,
+            0.01,
+            3.3
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                -1.5708,
+                0,
+                0
+              ],
+              "size": [
+                2,
+                1.4,
+                0
+              ],
+              "solid": false
+            }
+          ],
+          "light": {
+            "type": "spot",
+            "color": "#ffd59a",
+            "intensity": 5,
+            "range": 3,
+            "effect": "steady"
+          }
+        },
+        {
+          "id": "trail-of-cake-crumbs-and-spun-su",
+          "name": "trail of cake crumbs and spun-sugar shards leading to the breach",
+          "position": [
+            10,
+            0.01,
+            4.2
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                -1.5708,
+                0,
+                0
+              ],
+              "size": [
+                3.6,
+                0.8,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "empty-gilded-wedding-cake-stand",
+          "name": "empty gilded wedding-cake stand, only a ring of smeared icing left",
+          "position": [
+            7,
+            0,
+            4
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.6,
+                0.9,
+                1.6
+              ],
+              "solid": true,
+              "material": "pale blue painted wood with gilt edges"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0.9,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.2,
+                0.05,
+                1.2
+              ],
+              "solid": true,
+              "material": "smeared white buttercream"
+            }
+          ]
+        },
+        {
+          "id": "tall-baker-s-ladder-used-to-ice",
+          "name": "tall baker's ladder used to ice the towering cake, left standing",
+          "position": [
+            7,
+            0,
+            2.6
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                -0.3,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.08,
+                3,
+                0.08
+              ],
+              "solid": true,
+              "material": "flour-dusted pale pine"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0.3,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.08,
+                3,
+                0.08
+              ],
+              "solid": true,
+              "material": "flour-dusted pale pine"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                2.9,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.7,
+                0.08,
+                0.4
+              ],
+              "solid": true,
+              "material": "flour-dusted pale pine"
+            }
+          ]
+        },
+        {
+          "id": "pair-of-domed-brick-bread-ovens",
+          "name": "pair of domed brick bread ovens, mouths still glowing",
+          "position": [
+            1.2,
+            0,
+            2.1
+          ],
+          "rotationY": 1.5708,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                3,
+                2.2,
+                1.6
+              ],
+              "solid": true,
+              "material": "soot-blackened yellow firebrick"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                2.2,
+                -0.3
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.6,
+                1.2,
+                0.6
+              ],
+              "solid": true,
+              "material": "soot-blackened yellow firebrick"
+            }
+          ],
+          "light": {
+            "type": "glow",
+            "color": "#ff8a3d",
+            "intensity": 2,
+            "range": 6,
+            "effect": "flicker"
+          }
+        },
+        {
+          "id": "flour-heaped-kneading-table-doug",
+          "name": "flour-heaped kneading table, dough swelling over its bowls",
+          "position": [
+            3.9,
+            0,
+            3
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0.7,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                2,
+                0.1,
+                0.9
+              ],
+              "solid": true,
+              "material": "scrubbed pale beech planks"
+            },
+            {
+              "shape": "box",
+              "position": [
+                -0.9,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.1,
+                0.7,
+                0.7
+              ],
+              "solid": true,
+              "material": "scrubbed pale beech planks"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0.9,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.1,
+                0.7,
+                0.7
+              ],
+              "solid": true,
+              "material": "scrubbed pale beech planks"
+            },
+            {
+              "shape": "box",
+              "position": [
+                -0.5,
+                0.8,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.5,
+                0.3,
+                0.5
+              ],
+              "solid": true,
+              "material": "swelling pale bread dough"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0.5,
+                0.8,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.5,
+                0.35,
+                0.5
+              ],
+              "solid": true,
+              "material": "swelling pale bread dough"
+            }
+          ]
+        },
+        {
+          "id": "burst-flour-sacks-slumped-agains",
+          "name": "burst flour sacks slumped against the wall",
+          "position": [
+            3.2,
+            0,
+            0.8
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.6,
+                0.7,
+                0.5
+              ],
+              "solid": true,
+              "material": "coarse undyed burlap"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0.7,
+                0,
+                0.1
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.6,
+                0.5,
+                0.6
+              ],
+              "solid": true,
+              "material": "coarse undyed burlap"
+            }
+          ]
+        },
+        {
+          "id": "drift-of-spilled-flour-scuffed-w",
+          "name": "drift of spilled flour scuffed with frantic footprints",
+          "position": [
+            4,
+            0.01,
+            5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                -1.5708,
+                0,
+                0
+              ],
+              "size": [
+                3,
+                1.2,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "shelf-of-honey-jars-and-spun-sug",
+          "name": "shelf of honey jars and spun-sugar nests, several jars missing",
+          "position": [
+            0.5,
+            0,
+            5
+          ],
+          "rotationY": 1.5708,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.6,
+                2,
+                0.4
+              ],
+              "solid": true,
+              "material": "honey-stained dark walnut"
+            }
+          ]
+        },
+        {
+          "id": "dented-copper-pots-and-pans-flun",
+          "name": "dented copper pots and pans flung at the intruder",
+          "position": [
+            10,
+            0,
+            2.2
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.4,
+                0.25,
+                0.4
+              ],
+              "solid": true,
+              "material": "dented burnished copper"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0.8,
+                0,
+                0.5
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.5,
+                0.15,
+                0.5
+              ],
+              "solid": true,
+              "material": "dented burnished copper"
+            }
+          ]
+        },
+        {
+          "id": "tray-of-honey-buns-set-down-as-a",
+          "name": "tray of honey buns set down as an offering before the breach",
+          "position": [
+            13.8,
+            0,
+            2.6
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.8,
+                0.08,
+                0.5
+              ],
+              "solid": true,
+              "material": "golden glazed pastry"
+            }
+          ]
+        },
+        {
+          "id": "tall-shuttered-window-night-sky",
+          "name": "tall shuttered window, night sky paling toward dawn",
+          "position": [
+            15.69,
+            1.4,
+            4
+          ],
+          "rotationY": -1.5708,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.4,
+                1.8,
+                0
+              ],
+              "solid": false
+            }
+          ],
+          "light": {
+            "type": "glow",
+            "color": "#c9b8e6",
+            "intensity": 1.3,
+            "range": 6,
+            "effect": "steady"
+          }
+        },
+        {
+          "id": "portrait-of-the-princess-in-her",
+          "name": "portrait of the princess in her wedding veil, knocked askew",
+          "position": [
+            8.5,
+            1.6,
+            0.31
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0.12
+              ],
+              "size": [
+                1.2,
+                1.5,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "chalk-order-slate-one-wedding-ca",
+          "name": "chalk order slate: one wedding cake, seven tiers, by dawn",
+          "position": [
+            3.2,
+            1.5,
+            0.31
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1,
+                0.8,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        }
+      ],
+      "characters": [],
+      "pickups": []
+    },
+    {
+      "id": "pantry",
+      "name": "The Raided Pantry",
+      "outdoor": false,
+      "grid": [
+        -1,
+        -1
+      ],
+      "size": [
+        14,
+        6,
+        12
+      ],
+      "start": [
+        7,
+        10.8
+      ],
+      "baseLight": 0.2,
+      "walls": "mid-grey lime plaster",
+      "floor": "dark soot-stained flagstone",
+      "doors": [
+        {
+          "connection": "kitchen-pantry",
+          "offset": 6
+        }
+      ],
+      "props": [
+        {
+          "id": "raised-pine-pantry-gallery-with",
+          "name": "raised pine pantry gallery with steep stair and rail",
+          "position": [
+            1.55,
+            0,
+            2.9
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                2.5,
+                2.2,
+                5.2
+              ],
+              "solid": true,
+              "material": "pale sanded pine boards"
+            },
+            {
+              "shape": "wedge",
+              "position": [
+                -0.55,
+                0,
+                4.2
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.2,
+                2.2,
+                3.2
+              ],
+              "solid": true,
+              "material": "pale sanded pine boards"
+            },
+            {
+              "shape": "box",
+              "position": [
+                1.2,
+                2.2,
+                -0.2
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.08,
+                0.9,
+                4.6
+              ],
+              "solid": true,
+              "material": "pale sanded pine boards"
+            }
+          ]
+        },
+        {
+          "id": "bare-high-pantry-shelf-honey-jar",
+          "name": "bare high pantry shelf, honey jars grabbed in handfuls, a few lying cracked and dripping",
+          "position": [
+            0.5,
+            2.2,
+            2.6
+          ],
+          "rotationY": 1.5708,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                3,
+                1.8,
+                0.4
+              ],
+              "solid": true,
+              "material": "honey-stained walnut planks"
+            }
+          ]
+        },
+        {
+          "id": "brass-oil-lamp-left-burning-on-t",
+          "name": "brass oil lamp left burning on the gallery floor",
+          "position": [
+            1.8,
+            2.2,
+            0.8
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.25,
+                0.35,
+                0.25
+              ],
+              "solid": true,
+              "material": "tarnished brass"
+            }
+          ],
+          "light": {
+            "type": "glow",
+            "color": "#ffc070",
+            "intensity": 2.3,
+            "range": 6,
+            "effect": "steady"
+          }
+        },
+        {
+          "id": "great-honey-barrel-knocked-askew",
+          "name": "great honey barrel knocked askew, lid torn off, smeared with a giant's enormous sticky fingerprints",
+          "position": [
+            7,
+            0,
+            3.2
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.4,
+                1.6,
+                1.4
+              ],
+              "solid": true,
+              "material": "glossy amber-lacquered oak staves"
+            },
+            {
+              "shape": "box",
+              "position": [
+                1.2,
+                0,
+                0.3
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.8,
+                0.08,
+                0.8
+              ],
+              "solid": true,
+              "material": "glossy amber-lacquered oak staves"
+            }
+          ],
+          "light": {
+            "type": "spot",
+            "color": "#ffd890",
+            "intensity": 4.8,
+            "range": 3,
+            "effect": "steady"
+          }
+        },
+        {
+          "id": "puddle-of-spilled-golden-honey-r",
+          "name": "puddle of spilled golden honey raked by giant finger trails",
+          "position": [
+            7,
+            0.01,
+            5.2
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                -1.5708,
+                0,
+                0
+              ],
+              "size": [
+                2.4,
+                1.2,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "stripped-sugar-cone-shelves-only",
+          "name": "stripped sugar-cone shelves, only paper wrappers and one broken cone left",
+          "position": [
+            7,
+            0,
+            0.55
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                3.5,
+                2.6,
+                0.5
+              ],
+              "solid": true,
+              "material": "whitewashed birch shelving"
+            }
+          ]
+        },
+        {
+          "id": "flour-barrels-one-standing-scoop",
+          "name": "flour barrels, one standing scooped hollow, one toppled and burst open",
+          "position": [
+            11,
+            0,
+            1.6
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1,
+                1.1,
+                1
+              ],
+              "solid": true,
+              "material": "pale bleached ash staves"
+            },
+            {
+              "shape": "box",
+              "position": [
+                1.3,
+                0,
+                0.3
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.2,
+                0.8,
+                0.8
+              ],
+              "solid": true,
+              "material": "pale bleached ash staves"
+            }
+          ]
+        },
+        {
+          "id": "trail-of-spilled-flour-and-cake",
+          "name": "trail of spilled flour and cake crumbs dragged toward the kitchen door",
+          "position": [
+            12,
+            0.01,
+            6.4
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                -1.5708,
+                0,
+                0
+              ],
+              "size": [
+                1.6,
+                3.8,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "slumped-burlap-sugar-sack-torn-o",
+          "name": "slumped burlap sugar sack torn open, a desperate handful scooped out",
+          "position": [
+            4.2,
+            0,
+            1.2
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.9,
+                0.8,
+                0.7
+              ],
+              "solid": true,
+              "material": "coarse undyed burlap"
+            }
+          ]
+        },
+        {
+          "id": "painted-recipe-board-for-the-roy",
+          "name": "painted recipe board for the royal wedding cake, honey and spun sugar tiers",
+          "position": [
+            3.5,
+            1.8,
+            0.31
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.4,
+                1,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "jagged-hole-punched-through-the",
+          "name": "jagged hole punched through the plaster by a giant's fist, pale dawn sky beyond",
+          "position": [
+            10.8,
+            2.6,
+            0.31
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                2.2,
+                2,
+                0
+              ],
+              "solid": false
+            }
+          ],
+          "light": {
+            "type": "glow",
+            "color": "#c8d4ff",
+            "intensity": 1.5,
+            "range": 6,
+            "effect": "steady"
+          }
+        },
+        {
+          "id": "plaster-cracked-and-bulging-inwa",
+          "name": "plaster cracked and bulging inward where the giant's shoulder pressed against the wall",
+          "position": [
+            13.69,
+            1.2,
+            2.6
+          ],
+          "rotationY": -1.5708,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.8,
+                3,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "doorside-plank-of-knife-scratche",
+          "name": "doorside plank of knife-scratched tally marks counting dwindling honey jars and sugar cones",
+          "position": [
+            13.69,
+            1,
+            4.4
+          ],
+          "rotationY": -1.5708,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.6,
+                1.6,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "small-high-pantry-window-shutter",
+          "name": "small high pantry window, shutters flung open to the night",
+          "position": [
+            0.31,
+            3.6,
+            7
+          ],
+          "rotationY": 1.5708,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1,
+                1,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "baker-s-three-legged-stool-kicke",
+          "name": "baker's three-legged stool kicked over on its side",
+          "position": [
+            9.5,
+            0,
+            7.5
+          ],
+          "rotationY": 0.4,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.5,
+                0.45,
+                0.5
+              ],
+              "solid": true,
+              "material": "worn red-painted beech"
+            }
+          ]
+        },
+        {
+          "id": "dropped-tallow-candle-stub-still",
+          "name": "dropped tallow candle stub still guttering on the flagstones",
+          "position": [
+            10.4,
+            0,
+            8
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.25,
+                0.4,
+                0.25
+              ],
+              "solid": true,
+              "material": "creamy dripping tallow"
+            }
+          ],
+          "light": {
+            "type": "glow",
+            "color": "#ff9a4a",
+            "intensity": 1.5,
+            "range": 6,
+            "effect": "flicker"
+          }
+        },
+        {
+          "id": "half-filled-bribe-basket-of-hone",
+          "name": "half-filled bribe basket of honeycomb and sugar loaves, abandoned mid-offer",
+          "position": [
+            5,
+            0,
+            8.5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.9,
+                0.6,
+                0.7
+              ],
+              "solid": true,
+              "material": "woven golden wicker"
+            }
+          ]
+        },
+        {
+          "id": "straw-broom-snapped-in-half-afte",
+          "name": "straw broom snapped in half after trying to shoo the giant",
+          "position": [
+            8.8,
+            0,
+            9.8
+          ],
+          "rotationY": 0.5,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.4,
+                0.08,
+                0.1
+              ],
+              "solid": true,
+              "material": "split straw-bound ash handle"
+            }
+          ]
+        }
+      ],
+      "characters": [],
+      "pickups": []
+    },
+    {
+      "id": "cellar",
+      "name": "The Hiding Cellar",
+      "outdoor": false,
+      "grid": [
+        1,
+        -1
+      ],
+      "size": [
+        12,
+        3.5,
+        10
+      ],
+      "start": [
+        6,
+        8.5
+      ],
+      "baseLight": 0.2,
+      "walls": "cold blue-grey rough fieldstone",
+      "floor": "packed dark brown earth",
+      "doors": [
+        {
+          "connection": "kitchen-cellar",
+          "offset": 6
+        }
+      ],
+      "props": [
+        {
+          "id": "large-charcoal-drawing-on-stone",
+          "name": "large charcoal drawing on stone of the giant as a crying child-like figure clutching its empty stomach",
+          "position": [
+            6,
+            0.9,
+            0.31
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                2,
+                1.6,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "frantic-charcoal-scrawl-of-the-g",
+          "name": "frantic charcoal scrawl of the giant as a snarling horned monster smashing a wall",
+          "position": [
+            3.5,
+            0.9,
+            0.31
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.2,
+                1.2,
+                0
+              ],
+              "solid": false
+            }
+          ],
+          "light": {
+            "type": "glow",
+            "color": "#9fb8e0",
+            "intensity": 1,
+            "range": 6,
+            "effect": "steady"
+          }
+        },
+        {
+          "id": "charcoal-sketch-of-a-small-baker",
+          "name": "charcoal sketch of a small baker holding a towering cake up to a weeping giant",
+          "position": [
+            8.5,
+            0.9,
+            0.31
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.2,
+                1.2,
+                0
+              ],
+              "solid": false
+            }
+          ],
+          "light": {
+            "type": "glow",
+            "color": "#9fb8e0",
+            "intensity": 1,
+            "range": 6,
+            "effect": "steady"
+          }
+        },
+        {
+          "id": "barred-cellar-grate-high-in-the",
+          "name": "barred cellar grate high in the wall, faint grey pre-dawn light",
+          "position": [
+            3.5,
+            2.6,
+            0.31
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.9,
+                0.5,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "barred-cellar-grate-high-in-4",
+          "name": "barred cellar grate high in the wall, faint grey pre-dawn light",
+          "position": [
+            8.5,
+            2.6,
+            0.31
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.9,
+                0.5,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "hollowed-nest-of-slumped-flour-s",
+          "name": "hollowed nest of slumped flour sacks with a crumpled apprentice's apron",
+          "position": [
+            6,
+            0,
+            1.2
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                -0.6,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.8,
+                0.5,
+                0.9
+              ],
+              "solid": true,
+              "material": "pale cream burlap dusted with white flour"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0.6,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.8,
+                0.5,
+                0.9
+              ],
+              "solid": true,
+              "material": "pale cream burlap dusted with white flour"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                -0.4
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.8,
+                0.6,
+                0.7
+              ],
+              "solid": true,
+              "material": "pale cream burlap dusted with white flour"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0.4
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1,
+                0.25,
+                0.8
+              ],
+              "solid": true,
+              "material": "pale cream burlap dusted with white flour"
+            }
+          ],
+          "light": {
+            "type": "spot",
+            "color": "#ffe6c0",
+            "intensity": 4.5,
+            "range": 3,
+            "effect": "steady"
+          }
+        },
+        {
+          "id": "upturned-tin-bucket-with-a-gutte",
+          "name": "upturned tin bucket with a guttered tallow candle and charcoal stubs",
+          "position": [
+            4.3,
+            0,
+            1.5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.35,
+                0.4,
+                0.35
+              ],
+              "solid": true,
+              "material": "dented grey tin"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0.4,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.08,
+                0.15,
+                0.08
+              ],
+              "solid": true,
+              "material": "yellowed tallow wax"
+            }
+          ],
+          "light": {
+            "type": "glow",
+            "color": "#ffa04d",
+            "intensity": 1.5,
+            "range": 6,
+            "effect": "flicker"
+          }
+        },
+        {
+          "id": "upturned-tin-bucket-with-a-g-7",
+          "name": "upturned tin bucket with a guttered tallow candle and charcoal stubs",
+          "position": [
+            7.7,
+            0,
+            1.5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.35,
+                0.4,
+                0.35
+              ],
+              "solid": true,
+              "material": "dented grey tin"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0.4,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.08,
+                0.15,
+                0.08
+              ],
+              "solid": true,
+              "material": "yellowed tallow wax"
+            }
+          ],
+          "light": {
+            "type": "glow",
+            "color": "#ffa04d",
+            "intensity": 1.5,
+            "range": 6,
+            "effect": "flicker"
+          }
+        },
+        {
+          "id": "cellar-shelf-of-honey-crocks-sev",
+          "name": "cellar shelf of honey crocks, several gaps where jars were taken",
+          "position": [
+            1.5,
+            0,
+            0.55
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                2.2,
+                2.2,
+                0.5
+              ],
+              "solid": true,
+              "material": "warm amber glazed clay over pine planks"
+            }
+          ]
+        },
+        {
+          "id": "cellar-shelf-of-preserve-jars-ha",
+          "name": "cellar shelf of preserve jars, half shaken off and shattered",
+          "position": [
+            10.5,
+            0,
+            0.55
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                2.2,
+                2.2,
+                0.5
+              ],
+              "solid": true,
+              "material": "green glass jars on weathered pine planks"
+            }
+          ]
+        },
+        {
+          "id": "timber-support-post-split-down-t",
+          "name": "timber support post split down the middle by the giant's footfalls above",
+          "position": [
+            3,
+            0,
+            3
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.3,
+                3.4,
+                0.3
+              ],
+              "solid": true,
+              "material": "splintered pale ash timber"
+            }
+          ]
+        },
+        {
+          "id": "timber-support-post-wedged-with",
+          "name": "timber support post wedged with a fresh brace, still holding",
+          "position": [
+            9,
+            0,
+            3
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.3,
+                3.4,
+                0.3
+              ],
+              "solid": true,
+              "material": "pale ash timber with iron bands"
+            }
+          ]
+        },
+        {
+          "id": "barricade-of-a-heavy-flour-bin-a",
+          "name": "barricade of a heavy flour bin and nailed boards, dragged aside from the door",
+          "position": [
+            1,
+            0,
+            4.3
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1,
+                1,
+                1.2
+              ],
+              "solid": true,
+              "material": "scuffed red-painted oak boards"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                1,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.9,
+                0.1,
+                1.3
+              ],
+              "solid": true,
+              "material": "raw splintered pine planks"
+            }
+          ]
+        },
+        {
+          "id": "pair-of-ale-barrels-rolled-again",
+          "name": "pair of ale barrels rolled against the wall as a second barricade",
+          "position": [
+            11,
+            0,
+            4.3
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                -0.35
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.7,
+                0.9,
+                0.7
+              ],
+              "solid": true,
+              "material": "dark stained oak staves with iron hoops"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0.4
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.7,
+                0.9,
+                0.7
+              ],
+              "solid": true,
+              "material": "dark stained oak staves with iron hoops"
+            }
+          ]
+        },
+        {
+          "id": "heap-of-earth-and-stones-shaken",
+          "name": "heap of earth and stones shaken down from a cracked ceiling",
+          "position": [
+            8.6,
+            0,
+            5.5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.2,
+                0.3,
+                1
+              ],
+              "solid": true,
+              "material": "loose ochre clay and broken stones"
+            },
+            {
+              "shape": "wedge",
+              "position": [
+                0,
+                0.3,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.8,
+                0.4,
+                0.6
+              ],
+              "solid": true,
+              "material": "loose ochre clay and broken stones"
+            }
+          ]
+        },
+        {
+          "id": "spilled-flour-trail-with-small-b",
+          "name": "spilled flour trail with small bare footprints leading to the sack nest",
+          "position": [
+            6,
+            0.01,
+            6
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                -1.5708,
+                0,
+                0
+              ],
+              "size": [
+                1.2,
+                3,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "dropped-flour-caked-rolling-pin",
+          "name": "dropped flour-caked rolling pin, the apprentice's only weapon",
+          "position": [
+            6.4,
+            0,
+            4.6
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.6,
+                0.08,
+                0.08
+              ],
+              "solid": true,
+              "material": "pale floured beechwood"
+            }
+          ]
+        }
+      ],
+      "characters": [],
+      "pickups": []
+    },
+    {
+      "id": "cake-room",
+      "name": "The Cake Atelier",
+      "outdoor": false,
+      "grid": [
+        0,
+        -2
+      ],
+      "size": [
+        14,
+        7,
+        12
+      ],
+      "start": [
+        6,
+        10.6
+      ],
+      "baseLight": 0.2,
+      "walls": "pale ochre lime plaster",
+      "floor": "dark charcoal slate flagstones",
+      "doors": [
+        {
+          "connection": "kitchen-cake-room",
+          "offset": 9
+        }
+      ],
+      "props": [
+        {
+          "id": "royal-cake-dais-its-gilded-turnt",
+          "name": "royal cake dais, its gilded turntable scraped bare by enormous fingers",
+          "position": [
+            7,
+            0,
+            5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                3,
+                0.5,
+                3
+              ],
+              "solid": true,
+              "material": "white marble with gold veins"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0.5,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                2.2,
+                0.12,
+                2.2
+              ],
+              "solid": true,
+              "material": "scratched gilded brass"
+            },
+            {
+              "shape": "wedge",
+              "position": [
+                0,
+                0,
+                1.9
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.2,
+                0.5,
+                0.8
+              ],
+              "solid": true,
+              "material": "white marble with gold veins"
+            }
+          ],
+          "light": {
+            "type": "spot",
+            "color": "#ffe6b8",
+            "intensity": 4.8,
+            "range": 3,
+            "effect": "steady"
+          }
+        },
+        {
+          "id": "rickety-cake-builder-s-scaffold",
+          "name": "rickety cake-builder's scaffold, plank deck dusted with sugar",
+          "position": [
+            3.8,
+            0,
+            4.5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                2.2,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.2,
+                0.1,
+                2.4
+              ],
+              "solid": true,
+              "material": "rough pale pine planks"
+            },
+            {
+              "shape": "box",
+              "position": [
+                -0.55,
+                0,
+                -1.1
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.1,
+                2.2,
+                0.1
+              ],
+              "solid": true,
+              "material": "rough pale pine planks"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0.55,
+                0,
+                -1.1
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.1,
+                2.2,
+                0.1
+              ],
+              "solid": true,
+              "material": "rough pale pine planks"
+            },
+            {
+              "shape": "box",
+              "position": [
+                -0.55,
+                0,
+                1.1
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.1,
+                2.2,
+                0.1
+              ],
+              "solid": true,
+              "material": "rough pale pine planks"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0.55,
+                0,
+                1.1
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.1,
+                2.2,
+                0.1
+              ],
+              "solid": true,
+              "material": "rough pale pine planks"
+            }
+          ]
+        },
+        {
+          "id": "tall-baker-s-ladder-knocked-flat",
+          "name": "tall baker's ladder knocked flat in a panicked scramble",
+          "position": [
+            10.5,
+            0,
+            4.9
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.5,
+                0.12,
+                3.2
+              ],
+              "solid": true,
+              "material": "splintered honey-colored ash wood"
+            }
+          ]
+        },
+        {
+          "id": "rack-of-giant-canvas-piping-bags",
+          "name": "rack of giant canvas piping bags, one burst and slumped",
+          "position": [
+            3,
+            0,
+            1
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                -1,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.1,
+                2.5,
+                0.1
+              ],
+              "solid": true,
+              "material": "dark wrought iron"
+            },
+            {
+              "shape": "box",
+              "position": [
+                1,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.1,
+                2.5,
+                0.1
+              ],
+              "solid": true,
+              "material": "dark wrought iron"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                2.4,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                2.1,
+                0.1,
+                0.1
+              ],
+              "solid": true,
+              "material": "dark wrought iron"
+            },
+            {
+              "shape": "box",
+              "position": [
+                -0.4,
+                0.9,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.5,
+                1.5,
+                0.5
+              ],
+              "solid": true,
+              "material": "cream-stained heavy canvas"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0.45,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.5,
+                0.5,
+                0.5
+              ],
+              "solid": true,
+              "material": "cream-stained heavy canvas"
+            }
+          ]
+        },
+        {
+          "id": "sugar-spun-wedding-crown-on-a-ve",
+          "name": "sugar-spun wedding crown on a velvet stand, one spire snapped off",
+          "position": [
+            11,
+            0,
+            1.5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.6,
+                1.1,
+                0.6
+              ],
+              "solid": true,
+              "material": "deep royal blue velvet"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                1.1,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.45,
+                0.35,
+                0.45
+              ],
+              "solid": true,
+              "material": "translucent amber spun sugar"
+            }
+          ]
+        },
+        {
+          "id": "baker-s-drafting-table-strewn-wi",
+          "name": "baker's drafting table strewn with measuring rods and a guttering candle",
+          "position": [
+            13.2,
+            0,
+            4
+          ],
+          "rotationY": -1.5708,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0.75,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.6,
+                0.08,
+                0.9
+              ],
+              "solid": true,
+              "material": "ink-stained pale birch"
+            },
+            {
+              "shape": "box",
+              "position": [
+                -0.7,
+                0,
+                -0.35
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.08,
+                0.75,
+                0.08
+              ],
+              "solid": true,
+              "material": "ink-stained pale birch"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0.7,
+                0,
+                -0.35
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.08,
+                0.75,
+                0.08
+              ],
+              "solid": true,
+              "material": "ink-stained pale birch"
+            },
+            {
+              "shape": "box",
+              "position": [
+                -0.7,
+                0,
+                0.35
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.08,
+                0.75,
+                0.08
+              ],
+              "solid": true,
+              "material": "ink-stained pale birch"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0.7,
+                0,
+                0.35
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.08,
+                0.75,
+                0.08
+              ],
+              "solid": true,
+              "material": "ink-stained pale birch"
+            }
+          ],
+          "light": {
+            "type": "glow",
+            "color": "#ffa552",
+            "intensity": 1.5,
+            "range": 6,
+            "effect": "flicker"
+          }
+        },
+        {
+          "id": "baker-s-charcoal-sketch-of-a-gia",
+          "name": "baker's charcoal sketch of a giant-sized cake plan, a hungry giant drawn smiling beside it",
+          "position": [
+            13.69,
+            1.5,
+            4
+          ],
+          "rotationY": -1.5708,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.2,
+                0.9,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "enormous-cake-knife-licked-and-g",
+          "name": "enormous cake knife licked and gnawed clean, dropped on the floor",
+          "position": [
+            4.6,
+            0,
+            7.8
+          ],
+          "rotationY": 0.3,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.6,
+                0.08,
+                0.25
+              ],
+              "solid": true,
+              "material": "polished silver steel"
+            }
+          ]
+        },
+        {
+          "id": "trail-of-cake-crumbs-spilled-flo",
+          "name": "trail of cake crumbs, spilled flour and huge bare giant footprints leading out south",
+          "position": [
+            9.1,
+            0,
+            12
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0.01,
+                0
+              ],
+              "rotation": [
+                -1.5708,
+                0,
+                0
+              ],
+              "size": [
+                1.4,
+                5.4,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "tall-vaulted-lancet-window-moonl",
+          "name": "tall vaulted lancet window, moonlight paling toward dawn",
+          "position": [
+            7,
+            2.5,
+            0.31
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                2,
+                3.5,
+                0
+              ],
+              "solid": false
+            }
+          ],
+          "light": {
+            "type": "glow",
+            "color": "#b8cdf0",
+            "intensity": 1.3,
+            "range": 6,
+            "effect": "steady"
+          }
+        },
+        {
+          "id": "brick-sugar-boiling-hearth-with",
+          "name": "brick sugar-boiling hearth with a copper kettle of scorched caramel",
+          "position": [
+            1,
+            0,
+            8
+          ],
+          "rotationY": 1.5708,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.6,
+                1,
+                1
+              ],
+              "solid": true,
+              "material": "soot-blackened red brick"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                1,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.8,
+                0.6,
+                0.8
+              ],
+              "solid": true,
+              "material": "hammered bright copper"
+            }
+          ],
+          "light": {
+            "type": "glow",
+            "color": "#ff7a33",
+            "intensity": 1.5,
+            "range": 6,
+            "effect": "flicker"
+          }
+        },
+        {
+          "id": "overturned-honey-cask-honey-pool",
+          "name": "overturned honey cask, honey pooled across the slate",
+          "position": [
+            12,
+            0,
+            9.5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.7,
+                0.7,
+                1
+              ],
+              "solid": true,
+              "material": "dark oak staves bound with iron hoops"
+            },
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0.01,
+                1.4
+              ],
+              "rotation": [
+                -1.5708,
+                0,
+                0
+              ],
+              "size": [
+                1.2,
+                1,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "gilt-framed-portrait-of-the-brid",
+          "name": "gilt-framed portrait of the bride-to-be princess, hung slightly askew",
+          "position": [
+            0.31,
+            2,
+            3
+          ],
+          "rotationY": 1.5708,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.4,
+                1.8,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "tall-shelf-of-sugar-paste-roses",
+          "name": "tall shelf of sugar-paste roses, half swept to the floor",
+          "position": [
+            13.4,
+            0,
+            1.2
+          ],
+          "rotationY": -1.5708,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.6,
+                2.4,
+                0.5
+              ],
+              "solid": true,
+              "material": "rose-pink painted cupboard wood"
+            }
+          ]
+        },
+        {
+          "id": "flour-sack-slit-open-and-half-em",
+          "name": "flour sack slit open and half emptied, a failed bribe",
+          "position": [
+            2,
+            0,
+            10.5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.8,
+                0.5,
+                0.6
+              ],
+              "solid": true,
+              "material": "torn coarse tan burlap"
+            }
+          ]
+        },
+        {
+          "id": "upturned-copper-mixing-bowl-big",
+          "name": "upturned copper mixing bowl big as a bathtub, banged like a drum to scare",
+          "position": [
+            11.5,
+            0,
+            7.5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.4,
+                0.6,
+                1.4
+              ],
+              "solid": true,
+              "material": "dented tarnished green-copper"
+            }
+          ]
+        },
+        {
+          "id": "enormous-four-fingered-handprint",
+          "name": "enormous four-fingered handprint smeared in flour and frosting high on the wall",
+          "position": [
+            10,
+            3,
+            0.31
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                2.4,
+                2.6,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        }
+      ],
+      "characters": [],
+      "pickups": []
+    }
+  ],
+  "connections": [
+    {
+      "id": "grounds-kitchen",
+      "rooms": [
+        "grounds",
+        "kitchen"
+      ],
+      "locked": false
+    },
+    {
+      "id": "kitchen-pantry",
+      "rooms": [
+        "kitchen",
+        "pantry"
+      ],
+      "locked": false
+    },
+    {
+      "id": "kitchen-cellar",
+      "rooms": [
+        "kitchen",
+        "cellar"
+      ],
+      "locked": false
+    },
+    {
+      "id": "kitchen-cake-room",
+      "rooms": [
+        "kitchen",
+        "cake-room"
+      ],
+      "locked": false
+    }
+  ]
+}

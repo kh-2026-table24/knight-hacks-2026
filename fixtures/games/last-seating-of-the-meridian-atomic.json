@@ -1,0 +1,1314 @@
+{
+  "version": 1,
+  "title": "The Last Seating of the Meridian Atomic",
+  "summary": "In 1957 the Meridian Atomic Limited was sold as the future of travel, a streamlined dining car serving 'radiant cuisine' to paying guests. In truth, a government-funded lab was using the car to test an irradiated food additive on unsuspecting passengers, with a sealed reactor-cooled galley at the far end. The experiment went badly wrong during one dinner service: the diners and staff were changed and the car was quietly sealed off on a forgotten siding. The player pieces together the cover-up from the quarantine notices outside and the abandoned, glowing table settings, charts and galley equipment inside.",
+  "rooms": [
+    {
+      "id": "siding",
+      "name": "Forgotten Siding",
+      "outdoor": true,
+      "grid": [
+        0,
+        0
+      ],
+      "size": [
+        16,
+        6,
+        14
+      ],
+      "start": [
+        8,
+        12
+      ],
+      "baseLight": 0.3,
+      "walls": "pale cream and brushed silver riveted aluminum train siding",
+      "floor": "dark charcoal cinder ballast gravel",
+      "doors": [
+        {
+          "connection": "siding-dining-car",
+          "offset": 8
+        }
+      ],
+      "props": [
+        {
+          "id": "curtained-dining-car-windows-see",
+          "name": "curtained dining car windows seeping sickly green glow",
+          "position": [
+            3.5,
+            1.6,
+            0.31
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                -1.8,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.2,
+                1,
+                0
+              ],
+              "solid": false
+            },
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.2,
+                1,
+                0
+              ],
+              "solid": false
+            },
+            {
+              "shape": "panel",
+              "position": [
+                1.8,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.2,
+                1,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "curtained-dining-car-windows-wit",
+          "name": "curtained dining car windows with green glow and a clawed handprint on the glass",
+          "position": [
+            12.5,
+            1.6,
+            0.31
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                -1.8,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.2,
+                1,
+                0
+              ],
+              "solid": false
+            },
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.2,
+                1,
+                0
+              ],
+              "solid": false
+            },
+            {
+              "shape": "panel",
+              "position": [
+                1.8,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.2,
+                1,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "rusted-chain-link-quarantine-fen",
+          "name": "rusted chain-link quarantine fence with its gate cut out",
+          "position": [
+            8,
+            0,
+            4
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                -4.5,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                6,
+                2,
+                0.08
+              ],
+              "solid": true,
+              "material": "rust-orange corroded chain-link wire"
+            },
+            {
+              "shape": "box",
+              "position": [
+                4.5,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                6,
+                2,
+                0.08
+              ],
+              "solid": true,
+              "material": "rust-orange corroded chain-link wire"
+            }
+          ]
+        },
+        {
+          "id": "yellow-radiation-trefoil-quarant",
+          "name": "yellow radiation trefoil quarantine placards reading DANGER KEEP OUT",
+          "position": [
+            8,
+            0.9,
+            4.06
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                -5,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.9,
+                0.7,
+                0
+              ],
+              "solid": false
+            },
+            {
+              "shape": "panel",
+              "position": [
+                4,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.9,
+                0.7,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "chain-link-gate-leaf-cut-from-it",
+          "name": "chain-link gate leaf cut from its hinges, lying flat in the weeds",
+          "position": [
+            7.5,
+            0,
+            5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.6,
+                0.05,
+                1.2
+              ],
+              "solid": true,
+              "material": "rust-orange corroded chain-link wire"
+            }
+          ]
+        },
+        {
+          "id": "trail-of-glowing-green-bare-foot",
+          "name": "trail of glowing green bare footprints leading away from the car",
+          "position": [
+            9.2,
+            0.01,
+            7
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                -1.5708,
+                0,
+                0
+              ],
+              "size": [
+                0.6,
+                5,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "flickering-geiger-counter-strapp",
+          "name": "flickering Geiger counter strapped to a wooden post, needle pinned",
+          "position": [
+            11.5,
+            0,
+            5.5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.12,
+                1.3,
+                0.12
+              ],
+              "solid": true,
+              "material": "weathered grey timber"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                1.3,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.36,
+                0.26,
+                0.36
+              ],
+              "solid": true,
+              "material": "olive drab enameled steel with brass dial"
+            }
+          ]
+        },
+        {
+          "id": "dropped-brass-conductor-s-lanter",
+          "name": "dropped brass conductor's lantern lying on its side, glass cracked",
+          "position": [
+            10,
+            0,
+            7.6
+          ],
+          "rotationY": 0.4,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.36,
+                0.22,
+                0.22
+              ],
+              "solid": true,
+              "material": "tarnished brass and red glass"
+            }
+          ]
+        },
+        {
+          "id": "atomic-energy-commission-sawhors",
+          "name": "Atomic Energy Commission sawhorse barricade stenciled RESTRICTED",
+          "position": [
+            4.5,
+            0,
+            6.5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0.85,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                2,
+                0.25,
+                0.08
+              ],
+              "solid": true,
+              "material": "white and red striped painted wood"
+            },
+            {
+              "shape": "box",
+              "position": [
+                -0.85,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.1,
+                0.85,
+                0.5
+              ],
+              "solid": true,
+              "material": "white and red striped painted wood"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0.85,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.1,
+                0.85,
+                0.5
+              ],
+              "solid": true,
+              "material": "white and red striped painted wood"
+            }
+          ]
+        },
+        {
+          "id": "faded-dine-into-tomorrow-meridia",
+          "name": "faded Dine Into Tomorrow Meridian Atomic billboard with smiling diners",
+          "position": [
+            2.2,
+            0,
+            7.5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                1,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                2,
+                1.4,
+                0.08
+              ],
+              "solid": true,
+              "material": "peeling turquoise painted plywood"
+            },
+            {
+              "shape": "box",
+              "position": [
+                -0.8,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.1,
+                1,
+                0.08
+              ],
+              "solid": true,
+              "material": "peeling turquoise painted plywood"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0.8,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.1,
+                1,
+                0.08
+              ],
+              "solid": true,
+              "material": "peeling turquoise painted plywood"
+            },
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                1.05,
+                0.05
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.8,
+                1.3,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "chrome-and-cherry-red-vinyl-dini",
+          "name": "chrome and cherry-red vinyl dining car chair, dragged out and toppled",
+          "position": [
+            5.8,
+            0,
+            8.5
+          ],
+          "rotationY": 0.3,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.45,
+                0.45,
+                0.45
+              ],
+              "solid": true,
+              "material": "cherry-red vinyl and chrome"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0.45
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.45,
+                0.06,
+                0.5
+              ],
+              "solid": true,
+              "material": "cherry-red vinyl and chrome"
+            }
+          ]
+        },
+        {
+          "id": "trefoil-stenciled-additive-drums",
+          "name": "trefoil-stenciled additive drums, one tipped and leaking green sludge",
+          "position": [
+            14.1,
+            0,
+            6.5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                -0.5,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.6,
+                0.9,
+                0.6
+              ],
+              "solid": true,
+              "material": "faded yellow painted steel"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0.5,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.6,
+                0.6,
+                0.9
+              ],
+              "solid": true,
+              "material": "faded yellow painted steel"
+            }
+          ]
+        }
+      ],
+      "characters": [],
+      "pickups": []
+    },
+    {
+      "id": "dining-car",
+      "name": "Dining Car",
+      "outdoor": false,
+      "grid": [
+        0,
+        -1
+      ],
+      "size": [
+        18,
+        4,
+        10
+      ],
+      "start": [
+        6,
+        8.5
+      ],
+      "baseLight": 0.3,
+      "walls": "polished mid-brown walnut veneer paneling",
+      "floor": "dark charcoal linoleum",
+      "doors": [
+        {
+          "connection": "siding-dining-car",
+          "offset": 5
+        }
+      ],
+      "props": [
+        {
+          "id": "sealed-reactor-galley-hatch-seam",
+          "name": "sealed reactor galley hatch, seams pulsing radioactive green, radiation trefoil stencilled on it",
+          "position": [
+            15,
+            0,
+            0.45
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                2.2,
+                3,
+                0.3
+              ],
+              "solid": true,
+              "material": "riveted lead-lined steel glowing acid green at the seams"
+            }
+          ]
+        },
+        {
+          "id": "pool-of-glowing-green-coolant-se",
+          "name": "pool of glowing green coolant seeping from under the galley hatch",
+          "position": [
+            15,
+            0.01,
+            2.2
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                -1.5708,
+                0,
+                0
+              ],
+              "size": [
+                2.2,
+                1.5,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "art-deco-booth-seat-with-a-diner",
+          "name": "art-deco booth seat with a diner's dark silhouette burned into the upholstery",
+          "position": [
+            16.8,
+            0,
+            2.3
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.4,
+                0.45,
+                0.6
+              ],
+              "solid": true,
+              "material": "scorched oxblood vinyl upholstery"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0.45,
+                -0.22
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.4,
+                0.7,
+                0.15
+              ],
+              "solid": true,
+              "material": "scorched oxblood vinyl upholstery"
+            }
+          ]
+        },
+        {
+          "id": "white-clothed-dining-table-laid",
+          "name": "white-clothed dining table laid with glowing half-eaten plates of radiant cuisine",
+          "position": [
+            16.8,
+            0,
+            3.4
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0.7,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.4,
+                0.1,
+                1
+              ],
+              "solid": true,
+              "material": "starched white linen tablecloth"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.15,
+                0.7,
+                0.15
+              ],
+              "solid": true,
+              "material": "polished chrome"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0.8,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1,
+                0.04,
+                0.6
+              ],
+              "solid": true,
+              "material": "glowing green food on cracked white porcelain"
+            }
+          ]
+        },
+        {
+          "id": "art-deco-booth-seat-with-two-sco",
+          "name": "art-deco booth seat with two scorched shadow figures in the upholstery",
+          "position": [
+            16.8,
+            0,
+            4.5
+          ],
+          "rotationY": 3.1416,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.4,
+                0.45,
+                0.6
+              ],
+              "solid": true,
+              "material": "scorched teal vinyl upholstery"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0.45,
+                -0.22
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.4,
+                0.7,
+                0.15
+              ],
+              "solid": true,
+              "material": "scorched teal vinyl upholstery"
+            }
+          ]
+        },
+        {
+          "id": "art-deco-booth-seat-with-a-child",
+          "name": "art-deco booth seat with a child-sized silhouette burned into it",
+          "position": [
+            16.8,
+            0,
+            5.1
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.4,
+                0.45,
+                0.6
+              ],
+              "solid": true,
+              "material": "scorched oxblood vinyl upholstery"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0.45,
+                -0.22
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.4,
+                0.7,
+                0.15
+              ],
+              "solid": true,
+              "material": "scorched oxblood vinyl upholstery"
+            }
+          ]
+        },
+        {
+          "id": "dining-table-with-a-spilled-glow",
+          "name": "dining table with a spilled glowing soup tureen and an overturned wine glass",
+          "position": [
+            16.8,
+            0,
+            6.2
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0.7,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.4,
+                0.1,
+                1
+              ],
+              "solid": true,
+              "material": "stained white linen tablecloth"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.15,
+                0.7,
+                0.15
+              ],
+              "solid": true,
+              "material": "polished chrome"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0.2,
+                0.8,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.5,
+                0.25,
+                0.4
+              ],
+              "solid": true,
+              "material": "glowing green broth in white enamel"
+            }
+          ]
+        },
+        {
+          "id": "maitre-d-stand-holding-a-governm",
+          "name": "maitre d' stand holding a government lab clipboard logging dose numbers per table",
+          "position": [
+            12.6,
+            0,
+            4.5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.6,
+                1.1,
+                0.5
+              ],
+              "solid": true,
+              "material": "glossy black Bakelite with chrome bands"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                1.1,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.3,
+                0.03,
+                0.4
+              ],
+              "solid": true,
+              "material": "typed lab paper with columns of dose figures"
+            }
+          ]
+        },
+        {
+          "id": "chrome-sideboard-with-a-cream-ba",
+          "name": "chrome sideboard with a cream Bakelite radio humming a lullaby, dial glowing",
+          "position": [
+            11,
+            0,
+            0.55
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                1.6,
+                0.9,
+                0.5
+              ],
+              "solid": true,
+              "material": "brushed chrome with walnut inlay"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0.3,
+                0.9,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.5,
+                0.35,
+                0.3
+              ],
+              "solid": true,
+              "material": "cream Bakelite with gold speaker grille"
+            }
+          ]
+        },
+        {
+          "id": "chrome-dining-chair-knocked-onto",
+          "name": "chrome dining chair knocked onto its back, red seat cushion torn",
+          "position": [
+            8,
+            0,
+            5
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                0.05
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.5,
+                0.05,
+                0.8
+              ],
+              "solid": true,
+              "material": "chrome tubing and red vinyl"
+            },
+            {
+              "shape": "box",
+              "position": [
+                0,
+                0,
+                -0.35
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                0.5,
+                0.5,
+                0.1
+              ],
+              "solid": true,
+              "material": "chrome tubing and red vinyl"
+            }
+          ]
+        },
+        {
+          "id": "framed-radiant-cuisine-poster-ov",
+          "name": "framed 'Radiant Cuisine' poster overlaid with a pinned lab chart of rising dose curves",
+          "position": [
+            8,
+            1.4,
+            0.31
+          ],
+          "rotationY": 0,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                2,
+                1.4,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        },
+        {
+          "id": "row-of-streamlined-train-windows",
+          "name": "row of streamlined train windows taped over with yellow quarantine notices",
+          "position": [
+            0.31,
+            1.3,
+            4
+          ],
+          "rotationY": 1.5708,
+          "parts": [
+            {
+              "shape": "panel",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "rotation": [
+                0,
+                0,
+                0
+              ],
+              "size": [
+                6,
+                1.1,
+                0
+              ],
+              "solid": false
+            }
+          ]
+        }
+      ],
+      "characters": [],
+      "pickups": []
+    }
+  ],
+  "connections": [
+    {
+      "id": "siding-dining-car",
+      "rooms": [
+        "siding",
+        "dining-car"
+      ],
+      "locked": false
+    }
+  ]
+}

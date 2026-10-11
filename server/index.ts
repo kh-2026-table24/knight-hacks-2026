@@ -2,10 +2,11 @@ import { readFile } from "node:fs/promises";
 import { createServer, type ServerResponse } from "node:http";
 import { extname, join, normalize } from "node:path";
 import { getAsset } from "./assets";
-import { getGame, InvalidGameError, isSafeId } from "./games";
+import { getGame, InvalidGameError, isSafeId, listGames } from "./games";
 import { onCloudRun } from "./secrets";
 
 // Game server. Vite proxies /api here (see vite.config.ts); `npm run dev` starts both.
+//   GET /api/games                        -> the games there are to play: [{ id, title, summary, rooms }]
 //   GET /api/games/:gameId                -> the game's GameSpec JSON
 //   GET /api/games/:gameId/assets/:artId  -> PNG (generated the first time it's asked for)
 // In production (`npm run build && npm start`) it also serves the built client from dist/.
@@ -53,6 +54,10 @@ const server = createServer(async (req, res) => {
     const parts = pathname.split("/").filter(Boolean).map(decodeURIComponent);
     const [api, games, gameId, assets, artId] = parts;
     if (api !== "api") return await sendStatic(res, pathname);
+    if (games === "games" && parts.length === 2) {
+      const list = (await listGames()).filter((g) => isAllowed(g.id));
+      return send(res, 200, JSON.stringify(list), "application/json");
+    }
     if (games !== "games" || !gameId || !isAllowed(gameId)) return send(res, 404, "Not found");
 
     const game = await getGame(gameId);
