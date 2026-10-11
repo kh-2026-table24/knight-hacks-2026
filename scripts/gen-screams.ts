@@ -1,15 +1,16 @@
-// Generates the jumpscare screams with ElevenLabs and saves them as public/audio/screams/<voice>.mp3. A
-// hostile character's `scream` (src/shared/spec.ts) picks which one plays when it catches the player.
-// Needs ELEVENLABS_API_KEY in .env.local. Each run is a new (billed) generation, so commit the results.
+// Generates the recorded scream voices with ElevenLabs and saves them as public/audio/screams/<voice>.mp3.
+// Each character's own scream is generated with the game (server/screams.ts); these stand in until it's
+// made, or if it can't be (src/shared/screams.ts picks one from the description), and the sting plays
+// under every scream. Needs ELEVENLABS_API_KEY in .env.local. Each run is billed, so commit the results.
 //
 //   npm run screams                 every voice
 //   npm run screams -- woman sting  just these
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { SCREAMS, type Scream } from "../src/shared/spec";
+import { SCREAM_VOICES, type ScreamVoice } from "../src/shared/screams";
 
 const SECONDS = 2.5;
-const PROMPTS: Record<Scream | "sting", string> = {
+const PROMPTS: Record<ScreamVoice | "sting", string> = {
   woman: "A ghostly woman's shrill, piercing banshee scream rising into a distorted wail, close to the ear, cavernous reverb. Horror jumpscare.",
   man: "A man's hoarse, agonized, furious scream, raw and right in your face, cold stone room reverb. Horror jumpscare.",
   child: "A ghost child's high, unnatural shriek that warps and echoes, close and sudden. Horror jumpscare.",
@@ -25,7 +26,7 @@ if (!apiKey) {
   console.error("ELEVENLABS_API_KEY is not set; add it to .env.local");
   process.exit(1);
 }
-const all = [...SCREAMS, "sting"] as const;
+const all = [...SCREAM_VOICES, "sting"] as const;
 const names = process.argv.slice(2);
 const unknown = names.filter((name) => !(all as readonly string[]).includes(name));
 if (unknown.length) {

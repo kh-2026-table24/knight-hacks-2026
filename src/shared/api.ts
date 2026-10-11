@@ -55,6 +55,8 @@ export interface GameStatus {
   failed: string[];
   /** Images being drawn right now. */
   generating: number;
+  /** Hostile characters' screams (src/shared/screams.ts): how many, the ids made so far, and the ids given up on (they use a recorded voice). Not counted in the progress. */
+  screams: { total: number; ready: string[]; failed: string[] };
   /** Games made by this server; fixtures have none. */
   tokens?: TokenUsage;
   /** The latest server log lines about this game, oldest first (since the server last started). */

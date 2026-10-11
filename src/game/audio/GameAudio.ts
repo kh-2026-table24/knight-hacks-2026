@@ -1,4 +1,5 @@
-import { SCREAMS, type Ambience, type Footsteps, type Scream } from "../../shared/spec";
+import { SCREAM_VOICES, type ScreamJob, type ScreamVoice } from "../../shared/screams";
+import type { Ambience, Footsteps } from "../../shared/spec";
 import { SOUND_VARIATIONS, soundUrls, type SoundName } from "./sounds";
 import { bats, drip, eerieMusic, heartbeat, rain, roomTone, staticBurst, wind } from "./synth";
 
@@ -16,8 +17,9 @@ const HOUSE_NOISE_GAP: [number, number] = [8, 22];
 const SFX_VOLUME = 0.8;
 const AMBIENCE_VOLUME = 0.6;
 const MUSIC_VOLUME = 0.5;
-// Jumpscare screams (scripts/gen-screams.ts makes them), each laid over the same sting.
-const screamUrl = (name: Scream | "sting") => `/audio/screams/${name}.mp3`;
+// Jumpscares: a character's own generated scream, or one of the recorded voices until it's made (both
+// in src/shared/screams.ts), laid over the same sting.
+const voiceUrl = (name: ScreamVoice | "sting") => `/audio/screams/${name}.mp3`;
 // While a scream plays, the music and the room's background drop to this, so it hits out of near silence.
 const SCARE_DUCK = 0.15;
 
@@ -41,7 +43,10 @@ export class GameAudio {
   readonly music = this.context.createGain();
 
   private readonly buffers = new Map<SoundName, AudioBuffer[]>();
-  private readonly screams = new Map<Scream | "sting", AudioBuffer>();
+  private readonly voices = new Map<ScreamVoice | "sting", AudioBuffer>();
+  /** Generated screams by id; a pending decode counts, so each is fetched once. */
+  private readonly screams = new Map<string, Promise<AudioBuffer | undefined>>();
+  private readonly decoded = new Map<string, AudioBuffer>();
   private stopAmbience?: () => void;
   private currentAmbience?: Ambience;
   private stopMusicLoop?: () => void;
@@ -70,11 +75,11 @@ export class GameAudio {
   /** Downloads and decodes every recorded sound. Ones that fail to load are skipped with a warning. */
   async load() {
     const names = Object.keys(SOUND_VARIATIONS) as SoundName[];
-    const screams = [...SCREAMS, "sting"] as const;
+    const voices = [...SCREAM_VOICES, "sting"] as const;
     await Promise.all([
-      ...screams.map(async (name) => {
+      ...voices.map(async (name) => {
         try {
-          this.screams.set(name, await this.context.decodeAudioData(await (await fetch(screamUrl(name))).arrayBuffer()));
+          this.voices.set(name, await this.context.decodeAudioData(await (await fetch(voiceUrl(name))).arrayBuffer()));
         } catch {
           console.warn(`[audio] the ${name} scream failed to load`);
         }
@@ -119,14 +124,33 @@ export class GameAudio {
     if (this.running) staticBurst(this.context, this.sfx);
   }
 
-  /** A jumpscare: the sting and the voice's scream at once, with the music and background ducked under them. */
-  scream(voice: Scream) {
+  /** Fetches and decodes generated screams not loaded yet (`urls` by scream id). */
+  loadScreams(urls: Map<string, string>) {
+    for (const [id, url] of urls) {
+      if (this.screams.has(id)) continue;
+      const loading = fetch(url)
+        .then(async (response) => {
+          if (!response.ok) throw new Error(`${response.status}`);
+          const buffer = await this.context.decodeAudioData(await response.arrayBuffer());
+          this.decoded.set(id, buffer);
+          return buffer;
+        })
+        .catch((error) => {
+          console.warn(`[audio] scream ${id} failed to load (${error}); it'll use a recorded voice`);
+          return undefined;
+        });
+      this.screams.set(id, loading);
+    }
+  }
+
+  /** A jumpscare: the sting and the scream at once (the generated one if it's loaded, else the recorded voice), with the music and background ducked under them. */
+  scream(scream: Pick<ScreamJob, "id" | "voice">) {
     if (!this.running) return;
     const now = this.context.currentTime;
     let longest = 0;
     for (const [buffer, volume] of [
-      [this.screams.get("sting"), 0.45],
-      [this.screams.get(voice), 0.85],
+      [this.voices.get("sting"), 0.45],
+      [this.decoded.get(scream.id) ?? this.voices.get(scream.voice), 0.85],
     ] as const) {
       if (!buffer) continue;
       const source = this.context.createBufferSource();

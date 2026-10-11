@@ -1,5 +1,4 @@
 import { PLAYER } from "./constants";
-import { guessScream } from "./screams";
 import { isFields, isNumber, type Obj, type Reader } from "./reader";
 import {
   DEFAULTS,
@@ -8,7 +7,6 @@ import {
   LIGHT_TYPES,
   LIMITS,
   MOVEMENT_TYPES,
-  SCREAMS,
   type AmbientSpec,
   type CharacterArt,
   type CharacterSpec,
@@ -52,10 +50,10 @@ export function parseCharacter(r: Reader, value: unknown, path: string): Charact
   if (o.has("gives") && !o.has("dialogue")) o.error("gives", `needs "dialogue": the item is handed over when the player finishes talking`);
   const hostile = nested(o, "hostile", parseDamage, r);
   // Only hostile characters scream; on anyone else it's ignored.
-  const chosenScream = o.oneOf("scream", SCREAMS, { optional: true });
+  const chosenScream = o.text("scream", { optional: true, max: 200 });
   const light = nested(o, "light", parseLight, r);
   if (o.failed || !id || !name || !position || !size || !art) return undefined;
-  const scream = hostile && (chosenScream ?? guessScream(`${art.description} ${name}`));
+  const scream = hostile && (chosenScream ?? `${art.description}, screaming`);
   return {
     id, name, position, size, art, solid,
     ...(movement && { movement }), ...(dialogue && { dialogue }), ...(gives && { gives }), ...(hostile && { hostile }), ...(scream && { scream }), ...(light && { light }),

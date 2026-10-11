@@ -2,7 +2,8 @@ import { Vector3, type Object3D, type Texture } from "three";
 import { QueryFilterFlags, type KinematicCharacterController, type World } from "@dimforge/rapier3d-compat";
 import { artFor } from "../shared/art";
 import { ART_FRAME_SECONDS } from "../shared/constants";
-import { DEFAULTS, type CharacterSpec, type Conversation, type Damage, type ItemSpec, type Movement, type Scream } from "../shared/spec";
+import { screamFor, type ScreamJob } from "../shared/screams";
+import { DEFAULTS, type CharacterSpec, type Conversation, type Damage, type ItemSpec, type Movement } from "../shared/spec";
 import { CHARACTER_STRETCH, characterBrightness, createCharacterGlow } from "./characters";
 import { Part, PLAYER_GROUP } from "./Part";
 import type { TextureLibrary } from "./TextureLibrary";
@@ -30,7 +31,8 @@ export class Character extends Part {
   readonly gives: ItemSpec | undefined;
   readonly hostile: Damage | undefined;
   readonly movement: Movement | undefined;
-  readonly scream: Scream | undefined;
+  /** Hostile characters: the scream of their jumpscare. */
+  readonly scream: ScreamJob | undefined;
   private readonly animations: Partial<Record<AnimationState, Texture[]>> = {};
 
   private readonly home: Vector3;
@@ -54,7 +56,7 @@ export class Character extends Part {
     this.gives = spec.gives;
     this.hostile = spec.hostile;
     this.movement = spec.movement;
-    this.scream = spec.scream;
+    this.scream = screamFor(spec);
     const frames = artFor.character(spec.art, spec.size);
     for (const state of ANIMATION_STATES) {
       const list = frames[state].flatMap((art) => textures.get(art.id) ?? []);

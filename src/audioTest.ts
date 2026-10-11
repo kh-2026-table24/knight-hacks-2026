@@ -1,7 +1,8 @@
 // Sound board for audio-test.html: every sound in GameAudio, one button each.
 import { GameAudio } from "./game/audio/GameAudio";
 import { SOUND_VARIATIONS, type SoundName } from "./game/audio/sounds";
-import { AMBIENCES, FOOTSTEPS, SCREAMS, type Ambience } from "./shared/spec";
+import { SCREAM_VOICES } from "./shared/screams";
+import { AMBIENCES, FOOTSTEPS, type Ambience } from "./shared/spec";
 
 const audio = new GameAudio();
 await audio.load();
@@ -53,8 +54,8 @@ section("One-shots", [
 ]);
 
 section(
-  "Jumpscare screams (with the sting)",
-  SCREAMS.map((voice) => [voice, () => audio.scream(voice)]),
+  "Recorded scream voices (with the sting), used until a character's own scream is made",
+  SCREAM_VOICES.map((voice) => [voice, () => audio.scream({ id: "", voice })]),
 );
 
 let ambience: Ambience | null = null;

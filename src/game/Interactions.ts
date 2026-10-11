@@ -1,6 +1,7 @@
 import type { World } from "@dimforge/rapier3d-compat";
 import { PLAYER } from "../shared/constants";
-import type { ItemSpec, Scream } from "../shared/spec";
+import type { ScreamJob } from "../shared/screams";
+import type { ItemSpec } from "../shared/spec";
 import type { GameAudio } from "./audio/GameAudio";
 import { Character } from "./Character";
 import { Door } from "./Door";
@@ -114,7 +115,7 @@ export class Interactions {
   }
 
   /** The character's face fills the screen as it screams; then it's gone. */
-  private async scare(character: Character, scream: Scream) {
+  private async scare(character: Character, scream: ScreamJob) {
     const { player, hud } = this.host;
     this.lastScare.set(character, performance.now());
     player.frozen = true;
