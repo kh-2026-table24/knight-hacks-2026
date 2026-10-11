@@ -1,7 +1,7 @@
 import { Group, type Box3, type Object3D, type Texture } from "three";
 import type { World } from "@dimforge/rapier3d-compat";
 import { artFor, materialOf } from "../shared/art";
-import { FRAME_SECONDS } from "../shared/constants";
+import { ART_FRAME_SECONDS } from "../shared/constants";
 import { boundsOf, lightPartIndex, placeProp } from "../shared/geometry";
 import type { AmbientSpec, Conversation, Damage, ItemSpec, PropSpec } from "../shared/spec";
 import { Part } from "./Part";
@@ -41,7 +41,7 @@ export class Prop {
     this.parts = spec.parts.map((part, i) => {
       const art = part.shape === "panel" ? artFor.panel(spec, part) : [artFor.surface(materialOf(spec, part))];
       const frames = art.flatMap((a) => textures.get(a.id) ?? []);
-      const built = new Part(part, { texture: frames[0], light: i === lightIndex ? spec.light : undefined });
+      const built = new Part(part, { texture: frames[0], light: i === lightIndex ? spec.light : undefined, tint: part.tint });
       // Touching a hazard hurts even where it isn't solid (flames, a pool of something).
       if (spec.hazard && !part.solid) built.sensor = true;
       if (frames.length > 1) this.animated.push({ part: built, frames });
@@ -65,7 +65,7 @@ export class Prop {
     for (const part of this.parts) part.updateLight(time);
     if (this.animated.length === 0) return;
     this.frameTime += dt;
-    if (this.frameTime < FRAME_SECONDS) return;
+    if (this.frameTime < ART_FRAME_SECONDS) return;
     this.frameTime = 0;
     this.frame++;
     for (const { part, frames } of this.animated) part.showFrame(frames[this.frame % frames.length]);

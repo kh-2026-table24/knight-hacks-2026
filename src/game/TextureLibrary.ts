@@ -4,9 +4,12 @@ import type { ArtJob } from "../shared/art";
 const imageLoader = new ImageLoader();
 
 // Every art id gets one shared Texture up front, showing a flat placeholder. load() swaps the generated
-// images in as they arrive, and everything using a texture updates with it.
+// images in as the server finishes them, and everything using a texture updates with it.
 export class TextureLibrary {
   private readonly textures = new Map<string, Texture>();
+  private readonly requested = new Set<string>();
+  /** Loaded, or given up on (it keeps its placeholder). */
+  private readonly settled = new Set<string>();
 
   constructor(private readonly jobs: Map<string, ArtJob>) {
     for (const id of jobs.keys()) {
@@ -33,10 +36,26 @@ export class TextureLibrary {
     return this.jobs.get(id)?.builtinUrl ?? `/api/games/${encodeURIComponent(gameId)}/assets/${encodeURIComponent(id)}`;
   }
 
-  /** Requests the images in the order given (the current room first) and swaps each in as it arrives. Resolves with the ids that failed. */
+  /** Whether an image has loaded or been given up on, so there's nothing more to wait for. */
+  isSettled(id: string) {
+    return this.settled.has(id) || !this.textures.has(id);
+  }
+
+  /** Requests the images not asked for yet and swaps each in as it arrives. Resolves with the ids that failed. */
   async load(gameId: string, ids: string[]): Promise<string[]> {
-    const results = await Promise.allSettled(ids.map((id) => this.setImage(id, this.urlOf(gameId, id))));
-    return ids.filter((_, i) => results[i].status === "rejected");
+    const fresh = ids.filter((id) => !this.requested.has(id));
+    for (const id of fresh) this.requested.add(id);
+    const results = await Promise.allSettled(fresh.map((id) => this.setImage(id, this.urlOf(gameId, id))));
+    for (const id of fresh) this.settled.add(id);
+    return fresh.filter((_, i) => results[i].status === "rejected");
+  }
+
+  /** Images the server couldn't make: they keep their placeholder, and nothing waits on them. */
+  giveUp(ids: string[]) {
+    for (const id of ids) {
+      this.requested.add(id);
+      this.settled.add(id);
+    }
   }
 
   private async setImage(id: string, url: string) {

@@ -1,4 +1,4 @@
-import { doorSides } from "./checkGame";
+import { doorSides, playOrder } from "./checkGame";
 import { DOOR } from "./constants";
 import type { CharacterArt, DoorSpec, GameSpec, ItemSpec, PartSpec, PropSpec, RoomSpec, AmbientSpec, Vec2 } from "./spec";
 
@@ -115,6 +115,15 @@ export function collectArt(spec: Pick<GameSpec, "rooms" | "connections">): Map<s
   const jobs = new Map<string, ArtJob>();
   for (const room of spec.rooms) for (const art of roomArt(spec, room)) jobs.set(art.id, art);
   return jobs;
+}
+
+/** Every image the game needs, once each, with the play-order position of the first room that needs it (0 is the start). */
+export function artInPlayOrder(spec: Pick<GameSpec, "rooms" | "connections">): { job: ArtJob; room: number }[] {
+  const seen = new Map<string, { job: ArtJob; room: number }>();
+  playOrder(spec).forEach((room, i) => {
+    for (const job of roomArt(spec, room)) if (!seen.has(job.id)) seen.set(job.id, { job, room: i });
+  });
+  return [...seen.values()];
 }
 
 /** The ids one room needs, without repeats. */

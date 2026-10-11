@@ -32,6 +32,35 @@ export function solveLocks(graph: LockGraph): { reached: Set<string>; opened: Se
   return { reached, opened };
 }
 
+/**
+ * The rooms in the order a player gets to them: everything open from the start, nearest first, then
+ * what lies behind each locked door once its key has been reached. Art is made in this order.
+ */
+export function playOrder(spec: Pick<GameSpec, "rooms" | "connections">): RoomSpec[] {
+  const keyRooms = new Map<string, string[]>();
+  for (const room of spec.rooms) for (const { key } of keysIn(room)) keyRooms.set(key.unlocks, [...(keyRooms.get(key.unlocks) ?? []), room.id]);
+  const opened = new Set(spec.connections.filter((c) => !c.locked).map((c) => c.id));
+  const order = [spec.rooms[0].id];
+  for (let grew = true; grew; ) {
+    grew = false;
+    // Breadth first through open doors; `order` grows while it's walked.
+    for (let i = 0; i < order.length; i++) {
+      for (const { id, rooms } of spec.connections) {
+        const other = rooms[0] === order[i] ? rooms[1] : rooms[1] === order[i] ? rooms[0] : undefined;
+        if (other && opened.has(id) && !order.includes(other)) order.push(other);
+      }
+    }
+    for (const { id } of spec.connections) {
+      if (!opened.has(id) && keyRooms.get(id)?.some((room) => order.includes(room))) {
+        opened.add(id);
+        grew = true;
+      }
+    }
+  }
+  // A valid game reaches every room; anything else still goes last rather than missing.
+  return [...order.flatMap((id) => spec.rooms.filter((room) => room.id === id)), ...spec.rooms.filter((room) => !order.includes(room.id))];
+}
+
 /** Every key in a room, wherever it is: lying around, inside a prop, or handed over by a character. */
 export function keysIn(room: RoomSpec): { key: KeySpec; path: string }[] {
   return [

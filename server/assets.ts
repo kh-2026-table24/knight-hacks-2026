@@ -1,10 +1,11 @@
 import { GoogleGenAI } from "@google/genai";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import sharp from "sharp";
-import { collectArt, type ArtJob } from "../src/shared/art";
+import { artInPlayOrder, collectArt, type ArtJob } from "../src/shared/art";
 import type { GameSpec } from "../src/shared/spec";
 import { gameDir } from "./games";
+import { log } from "./log";
 import { getSecret } from "./secrets";
 
 // The key comes from .env.local locally and from Secret Manager on Cloud Run (see secrets.ts). The client
@@ -41,22 +42,116 @@ function planOf(game: GameSpec) {
   return plan;
 }
 
-/** The finished PNG for an art id: from disk if it's been made before, otherwise generated now. Undefined if the game has no such art. */
+/** The finished PNG for an art id, or undefined if it isn't made yet (or the game has no such art). Painting makes them. */
 export async function getAsset(gameId: string, game: GameSpec, artId: string): Promise<Buffer | undefined> {
   const job = planOf(game).get(artId);
   if (!job || job.builtinUrl) return undefined;
+  return readIfExists(join(assetsDir(gameId), `${job.id}.png`));
+}
+
+// Painting: making every image a game needs, in the order the player will need them, until all are done.
+// It runs on its own once started, whether or not anyone is playing, and everything lands on disk.
+
+export interface PaintStatus {
+  /** Still working through the images. */
+  running: boolean;
+  /** Images being drawn by Gemini right now. */
+  generating: number;
+  total: number;
+  ready: string[];
+  /** Images that failed twice; the game shows a placeholder for them. */
+  failed: string[];
+}
+
+interface Painting {
+  total: number;
+  ready: Set<string>;
+  failed: Set<string>;
+  running: boolean;
+  /** Resolves once what's already on disk has been counted. */
+  scanned: Promise<void>;
+}
+
+// Keyed by the GameSpec object, so an edited fixture starts a fresh plan.
+const paintings = new WeakMap<GameSpec, Painting>();
+// Gemini calls in flight per game id.
+const generating = new Map<string, number>();
+
+/** Where a game's images stand. `start` begins painting it if it hasn't been started since the server started. */
+export async function paintStatus(gameId: string, game: GameSpec, { start }: { start: boolean }): Promise<PaintStatus> {
+  let painting = paintings.get(game);
+  if (!painting && start) painting = startPainting(gameId, game);
+  if (!painting) {
+    const ready = await madeIds(gameId, game);
+    return { running: false, generating: 0, total: planOf(game).size, ready, failed: [] };
+  }
+  await painting.scanned;
+  const { running, total, ready, failed } = painting;
+  return { running, generating: generating.get(gameId) ?? 0, total, ready: [...ready], failed: [...failed] };
+}
+
+function startPainting(gameId: string, game: GameSpec): Painting {
+  const ready = new Set<string>();
+  const painting: Painting = { total: planOf(game).size, ready, failed: new Set(), running: true, scanned: Promise.resolve() };
+  paintings.set(game, painting);
+  let todo: ReturnType<typeof artInPlayOrder> = [];
+  painting.scanned = madeIds(gameId, game).then((ids) => {
+    for (const id of ids) ready.add(id);
+    todo = artInPlayOrder(game).filter(({ job }) => !ready.has(job.id));
+    painting.running = todo.length > 0;
+  });
+
+  void (async () => {
+    await painting.scanned;
+    if (todo.length) log(gameId, `painting ${todo.length} of ${painting.total} images (${painting.ready.size} already on disk)`);
+    await Promise.all(
+      todo.map(async ({ job, room }) => {
+        // One retry: Gemini occasionally returns nothing or refuses a prompt it accepts the second time.
+        for (let attempt = 0; ; attempt++) {
+          try {
+            await make(gameId, game, job, room);
+            painting.ready.add(job.id);
+            const settled = painting.ready.size + painting.failed.size;
+            if (settled % 10 === 0) log(gameId, `painted ${settled} of ${painting.total} images${painting.failed.size ? ` (${painting.failed.size} failed)` : ""}`);
+            return;
+          } catch (error) {
+            const reason = error instanceof Error ? error.message : String(error);
+            if (attempt === 1) {
+              log(gameId, `gave up on ${job.id}: ${reason}`, "error");
+              painting.failed.add(job.id);
+              return;
+            }
+            log(gameId, `${job.id} failed, retrying: ${reason}`, "warn");
+          }
+        }
+      }),
+    );
+    painting.running = false;
+    if (todo.length) log(gameId, `painting done: ${painting.ready.size} made, ${painting.failed.size} failed`);
+  })();
+  return painting;
+}
+
+/** Ids of the art already on disk (shared builtin art counts as made). */
+async function madeIds(gameId: string, game: GameSpec): Promise<string[]> {
+  const files = new Set(await readdir(assetsDir(gameId)).catch(() => [] as string[]));
+  return [...planOf(game).values()].filter((job) => job.builtinUrl || files.has(`${job.id}.png`)).map((job) => job.id);
+}
+
+/** Makes one image and saves it as a PNG. `priority` is its room's place in the play order; lower goes first. */
+function make(gameId: string, game: GameSpec, job: ArtJob, priority: number): Promise<Buffer> {
   const file = join(assetsDir(gameId), `${job.id}.png`);
   return once(file, async () => {
     const existing = await readIfExists(file);
     if (existing) return existing;
-    const png = await processImage(await original(gameId, game, job), job.kind === "surface" ? "surface" : "cutout");
+    const png = await processImage(await original(gameId, game, job, priority), job.kind === "surface" ? "surface" : "cutout");
     await writeFile(file, png);
     return png;
   });
 }
 
 /** Gemini's original JPEG for an art id, kept so later animation frames can use it as a reference. */
-function original(gameId: string, game: GameSpec, job: ArtJob): Promise<Buffer> {
+function original(gameId: string, game: GameSpec, job: ArtJob, priority: number): Promise<Buffer> {
   const file = join(assetsDir(gameId), `${job.id}.jpg`);
   return once(file, async () => {
     const existing = await readIfExists(file);
@@ -64,13 +159,23 @@ function original(gameId: string, game: GameSpec, job: ArtJob): Promise<Buffer> 
 
     const referenceJob = job.referenceId ? planOf(game).get(job.referenceId) : undefined;
     // If the first frame fails, still draw this one, just without the reference.
-    const reference = referenceJob ? await original(gameId, game, referenceJob).catch(() => undefined) : undefined;
+    const reference = referenceJob ? await original(gameId, game, referenceJob, priority).catch(() => undefined) : undefined;
     const prompt = reference ? framePrompt(job.subject ?? job.prompt, job.prompt) : promptFor(job);
 
     const started = Date.now();
-    console.log(`[${gameId}] generating ${job.id}${reference ? ` (from ${job.referenceId})` : ""}`);
-    const jpeg = Buffer.from(await limit(() => askGemini(prompt, reference?.toString("base64"), job.aspectRatio)), "base64");
-    console.log(`[${gameId}] generated ${job.id} in ${((Date.now() - started) / 1000).toFixed(1)}s`);
+    log(gameId, `painting ${job.id} (room ${priority + 1} in play order${reference ? `, from ${job.referenceId}` : ""})`);
+    const jpeg = Buffer.from(
+      await limit(priority, async () => {
+        generating.set(gameId, (generating.get(gameId) ?? 0) + 1);
+        try {
+          return await askGemini(prompt, reference?.toString("base64"), job.aspectRatio);
+        } finally {
+          generating.set(gameId, generating.get(gameId)! - 1);
+        }
+      }),
+      "base64",
+    );
+    log(gameId, `painted ${job.id} in ${((Date.now() - started) / 1000).toFixed(1)}s`);
 
     await mkdir(assetsDir(gameId), { recursive: true });
     await writeFile(file, jpeg);
@@ -233,17 +338,25 @@ async function readIfExists(file: string) {
   }
 }
 
+// Runs at most `max` tasks at once. Waiting tasks start lowest priority first, in arrival order within a
+// priority, so the rooms a player reaches first are painted first, even across games being made at once.
 function limiter(max: number) {
   let active = 0;
-  const waiting: (() => void)[] = [];
-  return async <T>(task: () => Promise<T>): Promise<T> => {
-    if (active >= max) await new Promise<void>((resolve) => waiting.push(resolve));
-    active++;
+  const waiting: { priority: number; start: () => void }[] = [];
+  return async <T>(priority: number, task: () => Promise<T>): Promise<T> => {
+    if (active < max) active++;
+    else
+      await new Promise<void>((start) => {
+        const at = waiting.findIndex((w) => w.priority > priority);
+        waiting.splice(at === -1 ? waiting.length : at, 0, { priority, start });
+      });
     try {
       return await task();
     } finally {
-      active--;
-      waiting.shift()?.();
+      // Hand the slot straight to the next task, so nothing can slip in between.
+      const next = waiting.shift();
+      if (next) next.start();
+      else active--;
     }
   };
 }

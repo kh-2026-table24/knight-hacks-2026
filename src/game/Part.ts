@@ -58,10 +58,12 @@ export class Part {
   protected body: RigidBody | null = null;
   protected collider: Collider | null = null;
   readonly lightSpec: LightSpec | undefined;
+  /** Multiplied over the texture: "#rrggbb", or white for none. */
+  private readonly tint: string;
   private light: PointLight | SpotLight | null = null;
   private readonly lightPhase = Math.random() * 100;
 
-  constructor(spec: PartShape, options: { texture?: Texture; light?: LightSpec } = {}) {
+  constructor(spec: PartShape, options: { texture?: Texture; light?: LightSpec; tint?: string } = {}) {
     this.shape = spec.shape;
     this.size = new Vector3().fromArray(spec.size);
     const [w, h, d] = spec.size;
@@ -103,6 +105,7 @@ export class Part {
     this.solid = spec.solid;
     this.colliderDesc = colliderDesc;
     this.lightSpec = options.light;
+    this.tint = options.tint ?? "#ffffff";
     if (this.lightSpec?.type === "glow") {
       this.mesh.material.emissive.set(this.lightSpec.color);
       this.mesh.material.emissiveIntensity = SELF_GLOW[spec.shape];
@@ -123,7 +126,7 @@ export class Part {
     if (!texture) return;
     const material = this.mesh.material;
     material.map = texture;
-    material.color.set(0xffffff);
+    material.color.set(this.tint);
     material.alphaTest = 0.5;
     // A glowing part lights up its own picture rather than a flat block of color.
     if (this.lightSpec?.type === "glow") material.emissiveMap = texture;

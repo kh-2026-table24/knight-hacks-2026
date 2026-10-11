@@ -82,7 +82,7 @@ export class Room {
     const uv = floorGeometry.getAttribute("uv");
     for (let i = 0; i < uv.count; i++) uv.setXY(i, (uv.getX(i) * w) / FLOOR_TILE_SIZE, (uv.getY(i) * d) / FLOOR_TILE_SIZE);
     const floorTexture = textures.get(artFor.surface(spec.floor).id);
-    const floorMaterial = new MeshStandardMaterial({ color: floorTexture ? 0xffffff : 0x1c1a17, map: floorTexture ?? null });
+    const floorMaterial = new MeshStandardMaterial({ color: floorTexture ? (spec.floorTint ?? 0xffffff) : 0x1c1a17, map: floorTexture ?? null });
     this.floor = new Mesh(floorGeometry, floorMaterial);
     this.floor.position.set(w / 2, -FLOOR_THICKNESS / 2, d / 2);
 

@@ -290,6 +290,203 @@ body {
   font-size: 24px;
 }
 
+.title-menu-browse {
+  max-width: min(760px, 100%);
+  gap: 4px;
+}
+
+.title-empty {
+  margin: 0 0 8px;
+  font-size: 22px;
+  color: var(--bone);
+  text-shadow: 2px 2px 0 #000;
+}
+
+/* A game in the browse list, in the dialogue box's frame (.hud-frame) and type: the title where the
+   speaker goes, the story's first sentence as the line, and how far along it is underneath. */
+.title-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 4px 12px 2px;
+  font-family: "IM Fell English", Georgia, serif;
+  color: #e8e2d6;
+  text-align: left;
+  text-shadow: 0 2px 0 #000;
+  cursor: pointer;
+  background: none;
+  filter: brightness(0.5) saturate(0.6);
+  transition: filter 0.15s steps(2);
+}
+
+.title-card:focus {
+  outline: none;
+}
+
+.title-card.title-item-selected {
+  filter: none;
+}
+
+.title-card[aria-disabled="true"] {
+  cursor: default;
+}
+
+.title-card-title {
+  margin-bottom: 2px;
+}
+
+.title-card-text.hud-dialogue-text {
+  min-height: 0;
+  font-size: 20px;
+}
+
+.title-card-meta {
+  margin-top: 4px;
+  font-family: "VT323", monospace;
+  font-size: 19px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.title-item-selected .title-card-state {
+  color: var(--candle);
+}
+
+.title-card[aria-disabled="true"] .title-card-state {
+  color: #b01c1c;
+}
+
+/* Loading screen (src/game/ui/LoadingScreen.ts): the title's picture, under the game's name and a row of
+   candle-lit cells. It sits just under the title screen so that fades out over it. */
+.loading-screen {
+  z-index: 9;
+}
+
+.loading-column {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 12px;
+  height: 100%;
+  padding: 24px 16px max(48px, 12vh) max(16px, 8.5vw);
+  box-sizing: border-box;
+}
+
+.loading-title {
+  margin: 0;
+  max-width: 760px;
+  font-size: 34px;
+  font-weight: normal;
+  line-height: 1.05;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--candle);
+  text-shadow: 2px 2px 0 #000;
+}
+
+.loading-stage {
+  margin: 0;
+  font-size: 26px;
+  letter-spacing: 0.08em;
+  color: var(--bone);
+  text-shadow: 2px 2px 0 #000;
+}
+
+.loading-bar {
+  position: relative;
+  display: flex;
+  gap: 4px;
+  width: min(520px, 100%);
+}
+
+.loading-cell {
+  flex: 1;
+  height: 14px;
+  background: #1d1a24;
+  box-shadow: 2px 2px 0 #000;
+}
+
+.loading-cell-lit {
+  background: var(--candle);
+}
+
+/* Where the doors open. */
+.loading-mark {
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  width: 2px;
+  background: var(--bone);
+  opacity: 0.7;
+}
+
+/* Before there's anything to count, a light crawls along the cells. */
+.loading-bar-seeking .loading-cell {
+  animation: loading-seek 2s steps(1) infinite;
+  animation-delay: calc(var(--i) * 0.08s);
+}
+
+@keyframes loading-seek {
+  0%, 12% {
+    background: var(--candle);
+  }
+  13%, 100% {
+    background: #1d1a24;
+  }
+}
+
+.loading-stats {
+  margin: 0;
+  font-size: 20px;
+  letter-spacing: 0.06em;
+  color: var(--bone);
+  opacity: 0.8;
+  text-shadow: 2px 2px 0 #000;
+}
+
+.loading-stats[hidden] {
+  display: none;
+}
+
+.loading-note {
+  margin: 0;
+  max-width: 640px;
+  font-size: 20px;
+  line-height: 1.2;
+  color: var(--dim);
+  white-space: pre-wrap;
+  text-shadow: 2px 2px 0 #000;
+}
+
+/* The server's log for this game: small, dim, older lines fading out above. */
+.loading-log {
+  margin: 4px 0 0;
+  max-width: min(900px, 100%);
+  overflow: hidden;
+  font-family: "VT323", monospace;
+  font-size: 16px;
+  line-height: 1.15;
+  color: var(--dim);
+  white-space: pre;
+  text-overflow: ellipsis;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 45%);
+  mask-image: linear-gradient(to bottom, transparent, #000 45%);
+}
+
+.loading-log[hidden] {
+  display: none;
+}
+
+.loading-failed .loading-stage {
+  color: #b01c1c;
+}
+
+.loading-failed .loading-cell {
+  background: #3a0d0d;
+}
+
 @keyframes title-blink {
   0%, 60% {
     opacity: 1;
@@ -301,7 +498,8 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .title-prompt,
-  .title-item-selected .title-item-marker {
+  .title-item-selected .title-item-marker,
+  .loading-bar-seeking .loading-cell {
     animation: none;
   }
 }

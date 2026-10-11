@@ -59,8 +59,10 @@ export const PICKUP = {
 /** The validator requires every prop to come within this distance of somewhere the player can walk. */
 export const REACH = 1.5;
 
-/** Animation speed of sprites: 6 frames a second. */
+/** Animation speed of the player's sprite: 6 frames a second. */
 export const FRAME_SECONDS = 1 / 6;
+/** Animation speed of generated sprites (props and characters): slow, about 3 frames a second. */
+export const ART_FRAME_SECONDS = 1 / 3;
 
 /** Physics runs at a fixed 60 Hz, decoupled from the display's frame rate. */
 export const PHYSICS_STEP = 1 / 60;

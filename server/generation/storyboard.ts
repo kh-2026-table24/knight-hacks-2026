@@ -156,9 +156,6 @@ These are facts about the engine. A storyboard that ignores them can't be built.
   (yards, gardens, graveyards, the street) show only the building's face along the north edge.
 - A room is 6 to 30 m wide and deep and 3 to 10 m tall. A room holds at most 4 characters.
 - Plan 4 to 8 rooms and 2 to 5 locked doors. At most 12 rooms.
-- All art (rooms, objects, characters) is painted by an image model with strict content filters.
-  Keep violence implied: bloodstains, a dropped weapon, an empty bed, a covered shape, a ghost. Never
-  ask for gore or a dead child.
 </the_game>
 
 <guidance>

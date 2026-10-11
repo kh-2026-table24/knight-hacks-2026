@@ -1,7 +1,7 @@
 import { Vector3, type Object3D, type Texture } from "three";
 import { QueryFilterFlags, type KinematicCharacterController, type World } from "@dimforge/rapier3d-compat";
 import { artFor } from "../shared/art";
-import { FRAME_SECONDS } from "../shared/constants";
+import { ART_FRAME_SECONDS } from "../shared/constants";
 import { DEFAULTS, type CharacterSpec, type Conversation, type Damage, type ItemSpec, type Movement } from "../shared/spec";
 import { CHARACTER_STRETCH, characterBrightness, createCharacterGlow } from "./characters";
 import { Part, PLAYER_GROUP } from "./Part";
@@ -196,7 +196,7 @@ export class Character extends Part {
     const frames = (this.moving && this.animations.moving) || this.animations.idle;
     if (!frames || frames.length < 2) return;
     this.frameTime += dt;
-    if (this.frameTime < FRAME_SECONDS) return;
+    if (this.frameTime < ART_FRAME_SECONDS) return;
     this.frameTime = 0;
     this.frame = (this.frame + 1) % frames.length;
     this.showFrame(frames[this.frame]);

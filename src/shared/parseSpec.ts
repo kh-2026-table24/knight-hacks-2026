@@ -71,7 +71,7 @@ function tagRoom<T>(r: Reader, value: unknown, parse: () => T): T {
   return result;
 }
 
-const ROOM_FIELDS = ["id", "name", "outdoor", "grid", "size", "start", "baseLight", "walls", "floor", "footsteps", "ambience", "doors", "props", "characters", "pickups"];
+const ROOM_FIELDS = ["id", "name", "outdoor", "grid", "size", "start", "baseLight", "walls", "floor", "wallsTint", "floorTint", "footsteps", "ambience", "doors", "props", "characters", "pickups"];
 
 /** Parses one room. Exported for room-scoped repair, where Claude returns replacement rooms. */
 export function parseRoom(r: Reader, value: unknown, path: string): RoomSpec | undefined {
@@ -94,6 +94,8 @@ export function parseRoom(r: Reader, value: unknown, path: string): RoomSpec | u
   const baseLight = o.num("baseLight", { optional: true, min: 0, max: 1 }) ?? DEFAULTS.baseLight;
   const walls = o.text("walls");
   const floor = o.text("floor");
+  const wallsTint = o.color("wallsTint", { optional: true });
+  const floorTint = o.color("floorTint", { optional: true });
   const footsteps = o.oneOf("footsteps", FOOTSTEPS, { optional: true }) ?? guessFootsteps(floor ?? "");
   const ambience = o.oneOf("ambience", AMBIENCES, { optional: true }) ?? DEFAULTS.ambience[outdoor ? "outdoor" : "indoor"];
   const doors = o.array("doors", (v, p) => parseDoor(r, v, p), { optional: true }) ?? [];
@@ -102,7 +104,10 @@ export function parseRoom(r: Reader, value: unknown, path: string): RoomSpec | u
   const pickups = o.array("pickups", (v, p) => parsePickup(r, v, p), { optional: true, max: LIMITS.pickupsPerRoom }) ?? [];
 
   if (o.failed || !id || !name || !grid || !size || !start || !walls || !floor) return undefined;
-  return { id, name, outdoor, grid, size, start, baseLight, walls, floor, footsteps, ambience, doors, props, characters, pickups };
+  return {
+    id, name, outdoor, grid, size, start, baseLight, walls, floor, ...(wallsTint && { wallsTint }), ...(floorTint && { floorTint }),
+    footsteps, ambience, doors, props, characters, pickups,
+  };
 }
 
 function parseConnection(r: Reader, value: unknown, path: string): ConnectionSpec | undefined {
@@ -152,7 +157,7 @@ function parseProp(r: Reader, value: unknown, path: string): PropSpec | undefine
 }
 
 function parsePart(r: Reader, value: unknown, path: string): PartSpec | undefined {
-  const o = r.object(value, path, ["shape", "position", "rotation", "size", "solid", "material", "art", "frames"]);
+  const o = r.object(value, path, ["shape", "position", "rotation", "size", "solid", "material", "art", "frames", "tint"]);
   if (!o) return undefined;
   const shape = o.oneOf("shape", SHAPES);
   const position = o.vec3("position");
@@ -163,6 +168,7 @@ function parsePart(r: Reader, value: unknown, path: string): PartSpec | undefine
   const material = o.text("material", { optional: true });
   const art = o.text("art", { optional: true });
   const frames = o.strings("frames", { optional: true, min: 1, max: LIMITS.framesPerState - 1 });
+  const tint = o.color("tint", { optional: true });
   if (shape && panel && material) o.error("material", `is only for box and wedge parts; a panel's picture comes from "art" (or the prop's name)`);
   if (shape && !panel && art) o.error("art", `is only for panels; box and wedge parts take a "material"`);
   if (shape && !panel && frames) o.error("frames", "is only for panels");
@@ -171,7 +177,7 @@ function parsePart(r: Reader, value: unknown, path: string): PartSpec | undefine
     if (w <= 0 || h <= 0 || d < 0 || (!panel && d <= 0)) o.error("size", `must be positive (panels use depth 0), got [${size.join(", ")}]`);
   }
   if (o.failed || !shape || !position || !size) return undefined;
-  return { shape, position, rotation, size, solid, ...(material && { material }), ...(art && { art }), ...(frames && { frames }) };
+  return { shape, position, rotation, size, solid, ...(material && { material }), ...(art && { art }), ...(frames && { frames }), ...(tint && { tint }) };
 }
 
 function parsePickup(r: Reader, value: unknown, path: string): PickupSpec | undefined {

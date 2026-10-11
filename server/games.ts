@@ -41,11 +41,18 @@ export async function getGame(gameId: string): Promise<GameSpec | undefined> {
   return spec;
 }
 
+/** What the game list says about a game, before how far along its art is (jobs.ts adds that). */
+export type GameInfo = Pick<GameSummary, "id" | "title" | "summary" | "rooms">;
+
+/** Ids of the folders in server/games/: generated games, finished or not, and fixtures' art. */
+export async function generatedIds(): Promise<string[]> {
+  return (await readdir(GAMES_DIR).catch(() => [] as string[])).filter(isSafeId).sort();
+}
+
 /** Every game that validates: fixtures first, then generated ones. Ones that don't validate are left out. */
-export async function listGames(): Promise<GameSummary[]> {
+export async function listGames(): Promise<GameInfo[]> {
   const fixtures = (await readdir(FIXTURES_DIR).catch(() => [] as string[])).filter((n) => n.endsWith(".json")).map((n) => n.slice(0, -5));
-  const generated = await readdir(GAMES_DIR).catch(() => [] as string[]);
-  const ids = [...new Set([...fixtures.sort(), ...generated.sort()])].filter(isSafeId);
+  const ids = [...new Set([...fixtures.sort(), ...(await generatedIds())])].filter(isSafeId);
   const games = await Promise.all(
     ids.map(async (id) => {
       try {
@@ -57,7 +64,7 @@ export async function listGames(): Promise<GameSummary[]> {
       }
     }),
   );
-  return games.filter((g): g is GameSummary => g !== undefined);
+  return games.filter((g): g is GameInfo => g !== undefined);
 }
 
 /** Saves a generated game, already validated, as server/games/<id>/game.json. */
@@ -66,7 +73,7 @@ export async function saveGame(gameId: string, spec: GameSpec) {
   await writeFile(join(gameDir(gameId), "game.json"), JSON.stringify(spec, null, 2));
 }
 
-async function readIfExists(file: string) {
+export async function readIfExists(file: string) {
   try {
     return await readFile(file, "utf8");
   } catch (error) {

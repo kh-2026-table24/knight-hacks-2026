@@ -9,7 +9,8 @@ import { LIMITS, type GameSpec } from "../../src/shared/spec";
 import { validateGame } from "../../src/shared/validate";
 import { gameDir, isSafeId, saveGame } from "../games";
 import { checkStoryboard, type Storyboard, type StoryboardRoom } from "./checkStoryboard";
-import { askClaude } from "./claude";
+import { log } from "../log";
+import { askClaude, type TokenMeter } from "./claude";
 import { repairSection, type RepairContext } from "./repair";
 import { roomPrompt, roomSystemPrompt } from "./roomPrompt";
 import { STORYBOARD_PROMPT } from "./storyboard";
@@ -23,26 +24,40 @@ const MAX_REPAIRS = 2;
 
 const message = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
+/** Told how generation is going, so the server can show it while the player waits. */
+export interface GenerateHooks {
+  onStoryboard?(storyboard: Storyboard): void;
+  onRoomBuilt?(built: number, total: number): void;
+  /** Counts the tokens every Claude call spends. */
+  meter?: TokenMeter;
+}
+
 /** Generates a game and saves it as server/games/<gameId>/game.json. Throws if it can't be made valid. */
-export async function generateGame(gameId: string): Promise<GameSpec> {
-  const storyboard = await writeStoryboard(gameId);
+export async function generateGame(gameId: string, hooks: GenerateHooks = {}): Promise<GameSpec> {
+  const storyboard = await writeStoryboard(gameId, hooks.meter);
+  hooks.onStoryboard?.(storyboard);
   const system = roomSystemPrompt(storyboard);
   // A share of the warning level, not the hard limit, so a few rooms running over still fits.
   const artBudget = Math.floor(LIMITS.artJobsWarning / storyboard.rooms.length);
-  const build = (room: StoryboardRoom, repair?: RepairContext) => buildRoom(gameId, system, storyboard, room, artBudget, repair);
+  const build = (room: StoryboardRoom, repair?: RepairContext) => buildRoom(gameId, system, storyboard, room, artBudget, hooks.meter, repair);
 
   const rooms = new Map<string, unknown>();
-  await Promise.all(storyboard.rooms.map(async (room) => rooms.set(room.id, await build(room))));
+  await Promise.all(
+    storyboard.rooms.map(async (room) => {
+      rooms.set(room.id, await build(room));
+      hooks.onRoomBuilt?.(rooms.size, storyboard.rooms.length);
+    }),
+  );
 
   for (let round = 0; ; round++) {
     const game = assemble(storyboard, rooms);
     await writeJson(gameId, "game.draft.json", game);
     const { spec, issues } = validateGame(game);
     const warnings = issues.filter((issue) => issue.severity === "warning");
-    if (warnings.length) console.log(`[${gameId}] warnings:\n${formatIssues(warnings)}`);
+    if (warnings.length) log(gameId, `${warnings.length} warning${warnings.length === 1 ? "" : "s"}:\n${formatIssues(warnings)}`, "warn");
     if (spec) {
       await saveGame(gameId, spec);
-      console.log(`[${gameId}] saved "${spec.title}"`);
+      log(gameId, `saved "${spec.title}"`);
       return spec;
     }
 
@@ -50,7 +65,7 @@ export async function generateGame(gameId: string): Promise<GameSpec> {
     if (round === MAX_REPAIRS || problems.size === 0) {
       throw new Error(`Game ${gameId} still has problems after ${round} repair rounds:\n${formatIssues(errorsIn(issues))}`);
     }
-    console.log(`[${gameId}] repair round ${round + 1}: ${[...problems.keys()].join(", ")}`);
+    log(gameId, `repair round ${round + 1} for ${[...problems.keys()].join(", ")}:\n${formatIssues(errorsIn(issues))}`, "warn");
     await Promise.all(
       [...problems].map(async ([id, list]) => {
         const room = storyboard.rooms.find((r) => r.id === id)!;
@@ -61,11 +76,11 @@ export async function generateGame(gameId: string): Promise<GameSpec> {
 }
 
 /** Asks for a storyboard until its map and keys check out, and saves it next to the game. */
-async function writeStoryboard(gameId: string): Promise<Storyboard> {
+async function writeStoryboard(gameId: string, meter: TokenMeter | undefined): Promise<Storyboard> {
   let repair: RepairContext | undefined;
   for (let attempt = 0; ; attempt++) {
     const prompt = STORYBOARD_PROMPT + (repair ? repairSection(repair, "storyboard", "fix the rooms, doors and keys so the map works, and keep the story") : "");
-    const text = await askClaude(prompt, { label: `${gameId} storyboard`, effort: "high" });
+    const text = await askClaude(prompt, { label: `storyboard${attempt ? ` (fix ${attempt})` : ""}`, gameId, effort: "high", meter });
 
     let json: unknown;
     let problems: string[];
@@ -74,7 +89,8 @@ async function writeStoryboard(gameId: string): Promise<Storyboard> {
       const checked = checkStoryboard(json);
       if (checked.storyboard) {
         await writeJson(gameId, "storyboard.json", { research: extractTagged(text, "research"), storyboard: json });
-        console.log(`[${gameId}] storyboard: "${checked.storyboard.title}", ${checked.storyboard.rooms.length} rooms`);
+        const { title, rooms, doors } = checked.storyboard;
+        log(gameId, `storyboard: "${title}", ${rooms.length} rooms (${rooms.map((r) => r.id).join(", ")}), ${doors.filter((d) => d.locked).length} locked doors`);
         return checked.storyboard;
       }
       problems = checked.problems;
@@ -82,17 +98,25 @@ async function writeStoryboard(gameId: string): Promise<Storyboard> {
       problems = [message(error)];
     }
     if (attempt === MAX_REPAIRS) throw new Error(`The storyboard for ${gameId} still has problems:\n${problems.map((p) => `- ${p}`).join("\n")}`);
-    console.log(`[${gameId}] storyboard needs fixing:\n${problems.map((p) => `- ${p}`).join("\n")}`);
+    log(gameId, `storyboard needs fixing:\n${problems.map((p) => `- ${p}`).join("\n")}`, "warn");
     repair = { previous: json === undefined ? text : JSON.stringify(json, null, 2), problems };
   }
 }
 
 /** One room's JSON, as Claude wrote it, with the fields the map fixes forced to the storyboard's values. */
-async function buildRoom(gameId: string, system: string, storyboard: Storyboard, room: StoryboardRoom, artBudget: number, repair?: RepairContext) {
+async function buildRoom(
+  gameId: string,
+  system: string,
+  storyboard: Storyboard,
+  room: StoryboardRoom,
+  artBudget: number,
+  meter: TokenMeter | undefined,
+  repair?: RepairContext,
+) {
   const howToFix = "move, resize, replace or remove things to fix each problem, and keep the room's story and look";
   for (let attempt = 0; ; attempt++) {
     const prompt = roomPrompt(storyboard, room, artBudget) + (repair ? repairSection(repair, "room", howToFix) : "");
-    const text = await askClaude(prompt, { system, label: `${gameId} ${room.id}${repair ? " (repair)" : ""}`, effort: "high" });
+    const text = await askClaude(prompt, { system, label: `room ${room.id}${repair ? " (repair)" : ""}`, gameId, effort: "high", meter });
     try {
       const json = extractTaggedJson(text, "room");
       if (isFields(json)) Object.assign(json, { id: room.id, grid: room.grid, outdoor: room.outdoor });
@@ -130,7 +154,7 @@ function problemsByRoom(game: unknown, errors: Issue[], artBudget: number): Map<
     for (const room of rooms) {
       const count = artIdsForRoom({ rooms, connections: parsed.connections }, room).length;
       if (count > artBudget) {
-        add(room.id, `The game needs ${total} images; the limit is ${LIMITS.artJobs}. This room needs ${count}; bring it to about ${artBudget} by reusing one description for repeated things, using fewer materials and fewer animation frames.`);
+        add(room.id, `The game needs ${total} images; the limit is ${LIMITS.artJobs}. This room needs ${count}; bring it to about ${artBudget} by reusing one description for repeated things (with "tint" for color variants), using fewer materials, and animating only things that move.`);
       }
     }
   }

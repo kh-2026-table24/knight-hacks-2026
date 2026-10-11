@@ -44,6 +44,9 @@ export interface RoomSpec {
   /** Material descriptions ("damp green-black fieldstone"); they become tiled surface textures. */
   walls: string;
   floor: string;
+  /** "#rrggbb" multiplied over the walls' or floor's texture, so another room can reuse the same material in a different color. */
+  wallsTint?: string;
+  floorTint?: string;
   /** What walking on the floor sounds like. Defaults to a guess from `floor`. */
   footsteps: Footsteps;
   /** The room's background sound. Defaults to "wind" outdoors and "room" indoors. */
@@ -90,8 +93,16 @@ export interface PartSpec {
   material?: string;
   /** Panels only: what the picture shows. Defaults to the prop's name. */
   art?: string;
-  /** Panels only: further animation frames after `art`, described as changes ("a shorter flame"). Played at 6 fps, looping. */
+  /**
+   * Panels only: further animation frames after `art`, described as changes ("the rope swings left").
+   * Played slowly (about 3 a second), looping. Only for things that move; a whole animation is 4 to 6 frames.
+   */
   frames?: string[];
+  /**
+   * "#rrggbb" multiplied over the part's picture or material. The same image tinted differently reads
+   * as a different object (a pale and a dark chair) without generating another image. Omit for none.
+   */
+  tint?: string;
 }
 
 export interface PropSpec {
@@ -143,7 +154,7 @@ export interface CharacterSpec {
 export interface CharacterArt {
   /** The subject, drawn once as the reference for every frame ("hunched caretaker holding a dim lantern"). */
   description: string;
-  /** One pose per frame. idle[0] is the reference image. */
+  /** One pose per frame, played slowly (about 3 a second). idle[0] is the reference image. A single pose is fine; an animation is 4 to 6. */
   idle: string[];
   moving?: string[];
 }
@@ -217,7 +228,7 @@ export const LIMITS = {
   rooms: 12,
   roomSide: [6, 30],
   roomHeight: [3, 10],
-  propsPerRoom: 40,
+  propsPerRoom: 80,
   partsPerProp: 16,
   charactersPerRoom: 4,
   pickupsPerRoom: 6,
@@ -234,7 +245,7 @@ export const LIMITS = {
   detectRadius: 12,
   wanderRadius: [0.5, 8],
   patrolPoints: 8,
-  framesPerState: 4,
+  framesPerState: 6,
   characterWidth: [0.2, 3],
   characterHeight: [0.2, 4],
   ambientEvery: 0.5,

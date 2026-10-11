@@ -16,7 +16,7 @@ export interface InteractionHost {
   readonly player: Player;
   readonly world: World;
   readonly hud: Hud;
-  /** Sound effects. Headless runs (scripts/check-play.ts) have none. */
+  /** Sound effects, if there are any. */
   readonly audio?: GameAudio;
   game(): Game | null;
   room(): Room | null;
@@ -128,20 +128,28 @@ export class Interactions {
     const connection = game?.connections.get(door.connectionId);
     if (!game || !room || !connection) return;
 
-    if (connection.locked) {
-      const key = game.state.keys.find((k) => k.unlocks === connection.id);
-      if (!key) {
-        this.host.audio?.play("door-locked");
-        await this.show(["It's locked."]);
-        return;
-      }
+    const key = connection.locked ? game.state.keys.find((k) => k.unlocks === connection.id) : undefined;
+    if (connection.locked && !key) {
+      this.host.audio?.play("door-locked");
+      await this.show(["It's locked."]);
+      return;
+    }
+
+    const next = game.rooms.get(connection.otherRoom(room.id));
+    if (!next) return;
+    // The room beyond is still being painted (see main.ts); it opens once all its images are in.
+    if (!game.isRoomReady(next.id)) {
+      this.host.audio?.play("door-locked");
+      await this.show(["The door won't give.", "Something on the other side is still taking shape. Try again soon."]);
+      return;
+    }
+
+    if (key) {
       connection.unlock();
       this.host.audio?.play("unlock");
       await this.show([`You unlock it with ${describe(key)}.`]);
     }
-
-    const next = game.rooms.get(connection.otherRoom(room.id));
-    if (!next || this.host.room() !== room) return;
+    if (this.host.room() !== room) return;
     this.host.audio?.play("door-open");
     this.host.swapRooms(next, connection.id);
   }

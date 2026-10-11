@@ -72,9 +72,16 @@ Light and motion
   lanterns, fires, ghosts); a spot is a cone of light from above (a hanging lamp, moonlight through a
   hole). flicker suits flames, pulse suits the supernatural. A soft spot on a story object is a fair way
   to draw the eye to it.
-- "frames" animate a sprite at 6 fps: flames, a swinging body, dripping water, a twitching hand. Describe
-  each frame as a change from the first.
-- Ambient particles add life: dust motes, embers, falling ash, drips, flies, fireflies, falling leaves.
+- Make still things feel alive with light, not animation. A candle, a hearth, a lantern, a glowing
+  sigil, a television left on: give it a flickering or pulsing light and leave the sprite still. Light
+  effects cost no images; every animation frame is another generated image.
+- Save "frames" (and character "idle"/"moving" lists longer than one pose) for things that actually move:
+  characters walking or turning, a hanged body swinging, a rocking chair, a door creaking open and shut.
+  An animation is 4 to 6 frames, never more. Frames play slowly, about 3 a second, so make each one a
+  clear, distinct pose and describe it as a change from the first. A character that only stands there
+  needs one idle pose.
+- Ambient particles add life for free: dust motes, embers, falling ash, drips, flies, fireflies, falling
+  leaves.
 
 Story and progression
 - The player learns the story by examining things and talking. Examine text is what she notices, in a
@@ -90,9 +97,23 @@ Fitting it together
 - Keep open paths at least 1.2 m wide from the start to every door, character, key and story object, and
   keep the floor just inside each door clear (the player appears ${DOOR.arrivalDistance} m in front of it).
 - Things must not pass through each other; things on top of something sit at its top's height.
-- Every distinct description is one generated image, even across rooms. Repeated objects should share
-  one description exactly (six identical pews, five gravestones) and vary by position, rotationY and
-  size instead. Keep box materials to a few per room, and reuse the storyboard's surfaces.
+- Images are expensive, so reuse them, but never at the cost of a full, varied room. There is no limit
+  on how many objects you place; the limit is on distinct images. Every distinct description (a sprite's
+  art, a material, a frame, a character pose) is one generated image, and the exact same text anywhere
+  in the game, in any room, reuses that image for free.
+  - Repeated objects share one description, word for word (six pews, five gravestones, a row of jars),
+    and vary by position, rotationY and size.
+  - "tint" recolors a picture or material without a new image, by multiplying its colors. Use it for
+    variants of the same thing: the same "high-backed carved chair" at "#9a8670" and at "#5e5a6e" reads as
+    two different chairs; the same "cracked lime plaster" walls at "wallsTint" "#b8a890" in one room and
+    "#7d8a8a" in another reads as two rooms. Subtle tints (close to white) age or warm a thing; strong
+    ones change it. Tints only darken, so describe the brightest version.
+  - Never stretch one image over different kinds of things. A chair is not a table, a crate is not a
+    cabinet, a portrait is not a mirror: each different kind of object gets its own specific
+    description. A room built from two or three repeated images looks fake; one built from a dozen
+    distinct things, repeated and tinted, looks real.
+  - Keep box materials to a few per room, and reuse the storyboard's surfaces across rooms, tinted where
+    a room should feel different.
 - Reference sizes: door ${DOOR.width} x ${DOOR.height} m, adult 1.8 m, chair seat 0.45 m, table 0.75 m high, bed 2 x 1.5 m,
   wardrobe 1.2 x 2.1 m, bookcase 1 x 2 m, coffin 2 x 0.7 m, gravestone 0.8 x 1.1 m, tree 3-6 m tall,
   candle 0.3 m, barrel 0.6 x 0.9 m.
@@ -148,5 +169,7 @@ ${doors.join("\n") || "- (none)"}
 ${keys.length === 0 ? "- Keys: none belong in this room." : `- Keys: put exactly these keys in this room, as written, and no others.\n${keys.join("\n")}`}
 
 Aim for about ${artBudget} distinct images in this room or fewer (each distinct sprite description,
-material, frame and character pose is one).`;
+material, frame and character pose is one; a storyboard material written word for word is shared with
+the other rooms that use it). That
+limits distinct images, not objects: fill the room as fully as it needs, with repeats and tints.`;
 }

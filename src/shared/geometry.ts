@@ -75,7 +75,7 @@ export function lightPartIndex(prop: Pick<PropSpec, "parts">) {
  * the west and east walls. Outdoors: only the north wall, the building's face. The south side, nearest
  * the camera, is always open so the camera can see in.
  */
-export function roomWalls(room: Pick<RoomSpec, "size" | "outdoor" | "walls">): PropSpec[] {
+export function roomWalls(room: Pick<RoomSpec, "size" | "outdoor" | "walls" | "wallsTint">): PropSpec[] {
   const [w, h, d] = room.size;
   const t = WALL_THICKNESS;
   const wall = (id: string, position: Vec3, size: Vec3): PropSpec => ({
@@ -84,7 +84,7 @@ export function roomWalls(room: Pick<RoomSpec, "size" | "outdoor" | "walls">): P
     position: [0, 0, 0],
     rotationY: 0,
     material: room.walls,
-    parts: [{ shape: "box", position, rotation: [0, 0, 0], size, solid: true }],
+    parts: [{ shape: "box", position, rotation: [0, 0, 0], size, solid: true, ...(room.wallsTint && { tint: room.wallsTint }) }],
   });
   const north = wall("north-wall", [w / 2, 0, t / 2], [w, h, t]);
   if (room.outdoor) return [north];

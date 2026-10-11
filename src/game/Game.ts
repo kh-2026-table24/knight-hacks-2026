@@ -1,4 +1,4 @@
-import { collectArt } from "../shared/art";
+import { artIdsForRoom, collectArt } from "../shared/art";
 import { doorSides } from "../shared/checkGame";
 import type { GameSpec } from "../shared/spec";
 import { Connection } from "./Connection";
@@ -13,6 +13,8 @@ export class Game {
   readonly connections: Map<string, Connection>;
   readonly rooms: Map<string, Room>;
   readonly startRoom: Room;
+  /** The art ids each room needs, by room id. */
+  private readonly roomArt: Map<string, string[]>;
 
   constructor(
     /** The server's id for the game; its assets are served under it. */
@@ -24,5 +26,11 @@ export class Game {
     const sides = doorSides(spec.rooms, spec.connections);
     this.rooms = new Map(spec.rooms.map((room) => [room.id, new Room(room, this.textures, sides.get(room.id) ?? new Map(), this.state)]));
     this.startRoom = this.rooms.get(spec.rooms[0].id)!;
+    this.roomArt = new Map(spec.rooms.map((room) => [room.id, artIdsForRoom(spec, room)]));
+  }
+
+  /** A room can be entered once every image it needs has loaded (or been given up on). */
+  isRoomReady(roomId: string) {
+    return (this.roomArt.get(roomId) ?? []).every((id) => this.textures.isSettled(id));
   }
 }
