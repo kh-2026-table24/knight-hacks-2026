@@ -1,6 +1,6 @@
 import type { World } from "@dimforge/rapier3d-compat";
 import { PLAYER } from "../shared/constants";
-import type { ItemSpec } from "../shared/spec";
+import type { ItemSpec, Scream } from "../shared/spec";
 import type { GameAudio } from "./audio/GameAudio";
 import { Character } from "./Character";
 import { Door } from "./Door";
@@ -23,6 +23,12 @@ export interface InteractionHost {
   swapRooms(next: Room, arrivalConnectionId?: string): void;
 }
 
+// A hostile character that catches the player jumpscares them (its face and its scream), then vanishes
+// back to where it started and waits this long before hunting again. Catches by the same character
+// within the cooldown are ordinary hits, so the scare doesn't wear out.
+const VANISH_SECONDS = 4;
+const SCARE_COOLDOWN_SECONDS = 20;
+
 const verb = (target: Interactable) => (target instanceof Character ? "Talk" : target.examine ? "Examine" : "Search");
 const describe = (item: ItemSpec) => `the ${item.name}`;
 
@@ -32,6 +38,8 @@ const describe = (item: ItemSpec) => `the ${item.name}`;
 export class Interactions {
   /** What the player was touching last step, so a door only triggers once on contact. */
   private touching = new Set<Touchable>();
+  /** When each character last jumpscared the player (performance.now()). */
+  private lastScare = new WeakMap<Character, number>();
 
   constructor(private readonly host: InteractionHost) {
     window.addEventListener("keydown", (e) => {
@@ -63,7 +71,7 @@ export class Interactions {
     // Checked every step: something hostile keeps hurting while you stay in contact, once the blinking from the last hit ends.
     for (const owner of now) {
       const damage = owner instanceof Character ? owner.hostile?.damage : owner instanceof Prop ? owner.hazard?.damage : undefined;
-      if (damage && this.hurt(game, damage)) break;
+      if (damage && this.hurt(game, damage, owner instanceof Character ? owner : undefined)) break;
     }
 
     for (const pickup of room.pickupsInReach(player.position)) {
@@ -86,15 +94,40 @@ export class Interactions {
   }
 
   /** Takes hearts unless the player is still blinking from the last hit. Returns whether it landed. */
-  private hurt(game: Game, damage: number) {
+  private hurt(game: Game, damage: number, by?: Character) {
     const { player, hud } = this.host;
     if (!player.vulnerable || game.state.hearts === 0) return false;
     game.state.hearts = Math.max(0, game.state.hearts - damage);
     player.startInvulnerability(PLAYER.invulnerableSeconds);
-    this.host.audio?.play("hurt");
     hud.setHearts(game.state.hearts, PLAYER.maxHearts);
-    if (game.state.hearts === 0) void this.die(game);
+    const dead = game.state.hearts === 0;
+    const last = by && this.lastScare.get(by);
+    if (by?.scream && (last === undefined || performance.now() - last > SCARE_COOLDOWN_SECONDS * 1000)) {
+      void this.scare(by, by.scream).then(() => {
+        if (dead) void this.die(game);
+      });
+    } else {
+      this.host.audio?.play("hurt");
+      if (dead) void this.die(game);
+    }
     return true;
+  }
+
+  /** The character's face fills the screen as it screams; then it's gone. */
+  private async scare(character: Character, scream: Scream) {
+    const { player, hud } = this.host;
+    this.lastScare.set(character, performance.now());
+    player.frozen = true;
+    hud.setHint(null);
+    this.host.audio?.scream(scream);
+    try {
+      await hud.jumpscare.play(character.portrait);
+    } finally {
+      player.frozen = false;
+    }
+    character.vanish(VANISH_SECONDS);
+    // A fresh moment of blinking, in case it vanished to right where the player is standing.
+    player.startInvulnerability(PLAYER.invulnerableSeconds);
   }
 
   // Each press plays the next conversation and the last one repeats. A held item comes out once the

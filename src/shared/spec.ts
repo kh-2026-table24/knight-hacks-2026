@@ -147,6 +147,8 @@ export interface CharacterSpec {
   /** Dropped once, when the player first finishes the last conversation. */
   gives?: ItemSpec;
   hostile?: Damage;
+  /** Hostile characters only: the voice it screams in when it catches the player, as its face fills the screen. Defaults to a guess from its art and name. */
+  scream?: Scream;
   /** Without a light of its own, a character carries the standard soft glow. */
   light?: LightSpec;
 }
@@ -159,7 +161,11 @@ export interface CharacterArt {
   moving?: string[];
 }
 
-export const MOVEMENT_TYPES = ["wander", "patrol", "chase"] as const;
+/** woman, man, child: a human voice. creature: inhuman, demonic. beast: a large animal (hound, wolf). vermin: rats, bats, small things. drowned: gurgling, through water. */
+export const SCREAMS = ["woman", "man", "child", "creature", "beast", "vermin", "drowned"] as const;
+export type Scream = (typeof SCREAMS)[number];
+
+export const MOVEMENT_TYPES =["wander", "patrol", "chase"] as const;
 export type Movement =
   /** Drifts around where it was placed. */
   | { type: "wander"; speed: number; radius: number }
