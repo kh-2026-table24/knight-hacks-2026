@@ -60,8 +60,9 @@ async function fetchGame(): Promise<Game> {
   return new Game(id, spec);
 }
 
-/** Loads the images the server has finished since last time, so rooms fill in as it paints them. */
+/** Loads the images (and screams) the server has finished since last time, so rooms fill in as it paints them. */
 async function loadFinished(game: Game, status: GameStatus) {
+  composer.sounds.audio.loadScreams(new Map(status.screams.ready.map((art) => [art, game.textures.urlOf(id, art)])));
   game.textures.giveUp(status.failed);
   const failed = await game.textures.load(id, status.ready);
   if (failed.length) console.warn("Images that wouldn't load:", failed);
@@ -105,7 +106,8 @@ for (;;) {
   const status = await fetchStatus();
   if (status) {
     await loadFinished(playing, status);
-    if (status.stage === "ready" && status.ready.every((art) => playing.textures.isSettled(art))) {
+    const screamsSettled = status.screams.ready.length + status.screams.failed.length >= status.screams.total;
+    if (status.stage === "ready" && screamsSettled && status.ready.every((art) => playing.textures.isSettled(art))) {
       console.log(`All ${status.total} images loaded${status.failed.length ? `, ${status.failed.length} given up on` : ""}`);
       break;
     }

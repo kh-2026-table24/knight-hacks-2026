@@ -16,6 +16,7 @@
     "server": "tsx scripts/server.ts",
     "start": "tsx server/index.ts",
     "music": "tsx --env-file=.env.local scripts/gen-music.ts",
+    "screams": "tsx --env-file=.env.local scripts/gen-screams.ts",
     "generate": "tsx --env-file=.env.local server/generation/generate.ts",
     "publish-game": "tsx scripts/publish-game.ts"
   },

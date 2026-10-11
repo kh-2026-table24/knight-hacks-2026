@@ -1,3 +1,4 @@
+import { SCREAM_VOICES, type ScreamJob, type ScreamVoice } from "../../shared/screams";
 import type { Ambience, Footsteps } from "../../shared/spec";
 import { SOUND_VARIATIONS, soundUrls, type SoundName } from "./sounds";
 import { bats, drip, eerieMusic, heartbeat, rain, roomTone, staticBurst, wind } from "./synth";
@@ -13,6 +14,14 @@ export interface PlayOptions {
 
 // Seconds between the house's own noises (a creak, static, bats overhead) while house noises are on.
 const HOUSE_NOISE_GAP: [number, number] = [8, 22];
+const SFX_VOLUME = 0.8;
+const AMBIENCE_VOLUME = 0.6;
+const MUSIC_VOLUME = 0.5;
+// Jumpscares: a character's own generated scream, or one of the recorded voices until it's made (both
+// in src/shared/screams.ts), laid over the same sting.
+const voiceUrl = (name: ScreamVoice | "sting") => `/audio/screams/${name}.mp3`;
+// While a scream plays, the music and the room's background drop to this, so it hits out of near silence.
+const SCARE_DUCK = 0.15;
 
 /**
  * All of the game's sound. Browsers only allow audio after the player clicks or presses a key, so
@@ -34,6 +43,10 @@ export class GameAudio {
   readonly music = this.context.createGain();
 
   private readonly buffers = new Map<SoundName, AudioBuffer[]>();
+  private readonly voices = new Map<ScreamVoice | "sting", AudioBuffer>();
+  /** Generated screams by id; a pending decode counts, so each is fetched once. */
+  private readonly screams = new Map<string, Promise<AudioBuffer | undefined>>();
+  private readonly decoded = new Map<string, AudioBuffer>();
   private stopAmbience?: () => void;
   private currentAmbience?: Ambience;
   private stopMusicLoop?: () => void;
@@ -42,9 +55,9 @@ export class GameAudio {
   constructor() {
     this.master.connect(this.context.destination);
     for (const [bus, volume] of [
-      [this.sfx, 0.8],
-      [this.ambience, 0.6],
-      [this.music, 0.5],
+      [this.sfx, SFX_VOLUME],
+      [this.ambience, AMBIENCE_VOLUME],
+      [this.music, MUSIC_VOLUME],
     ] as const) {
       bus.gain.value = volume;
       bus.connect(this.master);
@@ -62,8 +75,16 @@ export class GameAudio {
   /** Downloads and decodes every recorded sound. Ones that fail to load are skipped with a warning. */
   async load() {
     const names = Object.keys(SOUND_VARIATIONS) as SoundName[];
-    await Promise.all(
-      names.map(async (name) => {
+    const voices = [...SCREAM_VOICES, "sting"] as const;
+    await Promise.all([
+      ...voices.map(async (name) => {
+        try {
+          this.voices.set(name, await this.context.decodeAudioData(await (await fetch(voiceUrl(name))).arrayBuffer()));
+        } catch {
+          console.warn(`[audio] the ${name} scream failed to load`);
+        }
+      }),
+      ...names.map(async (name) => {
         const results = await Promise.allSettled(
           soundUrls(name).map(async (url) => this.context.decodeAudioData(await (await fetch(url)).arrayBuffer())),
         );
@@ -71,7 +92,7 @@ export class GameAudio {
         if (buffers.length < results.length) console.warn(`[audio] ${results.length - buffers.length} of ${name}'s sounds failed to load`);
         this.buffers.set(name, buffers);
       }),
-    );
+    ]);
   }
 
   private get running() {
@@ -101,6 +122,57 @@ export class GameAudio {
 
   static() {
     if (this.running) staticBurst(this.context, this.sfx);
+  }
+
+  /** Fetches and decodes generated screams not loaded yet (`urls` by scream id). */
+  loadScreams(urls: Map<string, string>) {
+    for (const [id, url] of urls) {
+      if (this.screams.has(id)) continue;
+      const loading = fetch(url)
+        .then(async (response) => {
+          if (!response.ok) throw new Error(`${response.status}`);
+          const buffer = await this.context.decodeAudioData(await response.arrayBuffer());
+          this.decoded.set(id, buffer);
+          return buffer;
+        })
+        .catch((error) => {
+          console.warn(`[audio] scream ${id} failed to load (${error}); it'll use a recorded voice`);
+          return undefined;
+        });
+      this.screams.set(id, loading);
+    }
+  }
+
+  /** A jumpscare: the sting and the scream at once (the generated one if it's loaded, else the recorded voice), with the music and background ducked under them. */
+  scream(scream: Pick<ScreamJob, "id" | "voice">) {
+    if (!this.running) return;
+    const now = this.context.currentTime;
+    let longest = 0;
+    for (const [buffer, volume] of [
+      [this.voices.get("sting"), 0.45],
+      [this.decoded.get(scream.id) ?? this.voices.get(scream.voice), 0.85],
+    ] as const) {
+      if (!buffer) continue;
+      const source = this.context.createBufferSource();
+      source.buffer = buffer;
+      source.playbackRate.value = 1 + (Math.random() * 2 - 1) * 0.05;
+      const gain = this.context.createGain();
+      gain.gain.value = volume;
+      source.connect(gain).connect(this.sfx);
+      source.start(now);
+      longest = Math.max(longest, buffer.duration);
+    }
+    if (!longest) return this.static();
+    for (const [bus, level] of [
+      [this.music, MUSIC_VOLUME],
+      [this.ambience, AMBIENCE_VOLUME],
+    ] as const) {
+      bus.gain.cancelScheduledValues(now);
+      bus.gain.setValueAtTime(bus.gain.value, now);
+      bus.gain.linearRampToValueAtTime(level * SCARE_DUCK, now + 0.05);
+      bus.gain.setValueAtTime(level * SCARE_DUCK, now + longest * 0.8);
+      bus.gain.linearRampToValueAtTime(level, now + longest + 2);
+    }
   }
 
   /** One beat. Call it on a timer that speeds up as an enemy gets closer. */

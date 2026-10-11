@@ -2,6 +2,7 @@ import { Vector3, type Object3D, type Texture } from "three";
 import { QueryFilterFlags, type KinematicCharacterController, type World } from "@dimforge/rapier3d-compat";
 import { artFor } from "../shared/art";
 import { ART_FRAME_SECONDS } from "../shared/constants";
+import { screamFor, type ScreamJob } from "../shared/screams";
 import { DEFAULTS, type CharacterSpec, type Damage, type ItemSpec, type Movement } from "../shared/spec";
 import { CHARACTER_STRETCH, characterBrightness, createCharacterGlow } from "./characters";
 import { Part, PLAYER_GROUP } from "./Part";
@@ -36,6 +37,8 @@ export class Character extends Part {
   readonly objective: string | undefined;
   readonly hostile: Damage | undefined;
   readonly movement: Movement | undefined;
+  /** Hostile characters: the scream of their jumpscare. */
+  readonly scream: ScreamJob | undefined;
   private readonly animations: Partial<Record<AnimationState, Texture[]>> = {};
 
   private readonly home: Vector3;
@@ -61,6 +64,7 @@ export class Character extends Part {
     this.objective = spec.objective;
     this.hostile = spec.hostile;
     this.movement = spec.movement;
+    this.scream = screamFor(spec);
     const frames = artFor.character(spec.art, spec.size);
     for (const state of ANIMATION_STATES) {
       const list = frames[state].flatMap((art) => textures.get(art.id) ?? []);
@@ -91,6 +95,24 @@ export class Character extends Part {
   /** Characters are drawn at a brightness set by the room's base light. */
   setRoomLight(lightLevel: number) {
     this.mesh.material.emissiveIntensity = characterBrightness(lightLevel);
+  }
+
+  /** Its reference picture (the first idle frame), for the jumpscare. Undefined until the image has loaded. */
+  get portrait(): CanvasImageSource | undefined {
+    const image = this.animations.idle?.[0].image as CanvasImageSource | undefined;
+    // Before it's painted, the texture holds a 1-pixel placeholder.
+    return image && "width" in image && Number(image.width) > 1 ? image : undefined;
+  }
+
+  /** After a jumpscare: it vanishes and is back where it started, and waits a moment before it hunts again. */
+  vanish(seconds: number) {
+    this.mesh.position.copy(this.home);
+    this.body?.setNextKinematicTranslation(this.home);
+    this.body?.setTranslation(this.home, true);
+    this.chasing = false;
+    this.hasTarget = false;
+    this.moving = false;
+    this.pauseFor = seconds;
   }
 
   /** Advances movement and animation. `paused` holds movement (e.g. while a dialogue is open). */

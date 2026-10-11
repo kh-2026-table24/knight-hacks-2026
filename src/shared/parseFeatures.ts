@@ -25,7 +25,7 @@ export function nested<T>(o: Obj, key: string, parse: (r: Reader, value: unknown
   return o.has(key) ? parse(r, o.raw(key), o.at(key)) : undefined;
 }
 
-const CHARACTER_FIELDS = ["id", "name", "position", "size", "art", "solid", "movement", "dialogue", "afterwards", "gives", "objective", "hostile", "light"];
+const CHARACTER_FIELDS = ["id", "name", "position", "size", "art", "solid", "movement", "dialogue", "afterwards", "gives", "objective", "hostile", "scream", "light"];
 
 export function parseCharacter(r: Reader, value: unknown, path: string): CharacterSpec | undefined {
   const o = r.object(value, path, CHARACTER_FIELDS);
@@ -51,12 +51,15 @@ export function parseCharacter(r: Reader, value: unknown, path: string): Charact
   const objective = o.slug("objective", { optional: true });
   if (objective && !o.has("dialogue")) o.error("objective", `needs "dialogue": the objective is set when the player finishes talking`);
   const hostile = nested(o, "hostile", parseDamage, r);
+  // Only hostile characters scream; on anyone else it's ignored. Left out, screamFor makes one from the art.
+  const chosenScream = o.text("scream", { optional: true });
   const light = nested(o, "light", parseLight, r);
   if (o.failed || !id || !name || !position || !size || !art) return undefined;
+  const scream = hostile && chosenScream;
   return {
     id, name, position, size, art, solid,
     ...(movement && { movement }), ...(dialogue && { dialogue }), ...(afterwards && { afterwards }), ...(gives && { gives }), ...(objective && { objective }),
-    ...(hostile && { hostile }), ...(light && { light }),
+    ...(hostile && { hostile }), ...(scream && { scream }), ...(light && { light }),
   };
 }
 

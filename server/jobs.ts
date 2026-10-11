@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { progressOf, type GameStage, type GameStatus, type GameSummary, type TokenUsage } from "../src/shared/api";
 import type { GameSpec } from "../src/shared/spec";
 import { paintStatus, type PaintStatus } from "./assets";
+import { screamStatus } from "./screams";
 import { gameDir, generatedIds, getGame, listGames, readIfExists } from "./games";
 import { log, recentLog } from "./log";
 import { TokenMeter } from "./generation/claude";
@@ -43,7 +44,7 @@ export function createGame(): string {
   return id;
 }
 
-/** The whole flow: storyboard, rooms, then every image, in the order the player will reach them. */
+/** The whole flow: storyboard, rooms, then every image, in the order the player will reach them, and the screams alongside. */
 async function make(gameId: string) {
   let saving = Promise.resolve();
   const update = (change: Making | Partial<Making>) => {
@@ -81,26 +82,27 @@ async function make(gameId: string) {
     making.delete(gameId);
     // Paints the copy games.ts serves, so the painting and every status report share one plan.
     const game = await getGame(gameId);
-    if (game) await paintStatus(gameId, game, { start: true });
+    if (game) await Promise.all([paintStatus(gameId, game, { start: true }), screamStatus(gameId, game, { start: true })]);
   } catch (error) {
     log(gameId, `generation failed: ${message(error)}`, "error");
     update({ stage: "failed", error: message(error).split("\n")[0] });
   }
 }
 
-/** Where a game stands, or undefined if there's no such game. Asking starts painting a game whose images aren't all made. */
+/** Where a game stands, or undefined if there's no such game. Asking starts painting a game whose images (or screams) aren't all made. */
 export async function gameStatus(gameId: string): Promise<GameStatus | undefined> {
   const game = await getGame(gameId);
   const tokens = await tokensOf(gameId);
   if (game) {
-    const art = await paintStatus(gameId, game, { start: true });
+    const [art, screams] = await Promise.all([paintStatus(gameId, game, { start: true }), screamStatus(gameId, game, { start: true })]);
     const { total, ready, failed, generating } = art;
-    return { stage: artStage(art), title: game.title, total, ready, failed, generating, tokens, log: recentLog(gameId, LOG_LINES) };
+    return { stage: artStage(art), title: game.title, total, ready, failed, generating, screams, tokens, log: recentLog(gameId, LOG_LINES) };
   }
   const state = await makingState(gameId);
   if (!state) return undefined;
   const { stage, title, roomsBuilt, roomsTotal, error } = state;
-  return { stage, title, roomsBuilt, roomsTotal, error, total: 0, ready: [], failed: [], generating: 0, tokens, log: recentLog(gameId, LOG_LINES) };
+  const screams = { total: 0, ready: [], failed: [] };
+  return { stage, title, roomsBuilt, roomsTotal, error, total: 0, ready: [], failed: [], generating: 0, screams, tokens, log: recentLog(gameId, LOG_LINES) };
 }
 
 async function tokensOf(gameId: string): Promise<TokenUsage | undefined> {

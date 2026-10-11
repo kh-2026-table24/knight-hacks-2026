@@ -39,7 +39,7 @@ export function closestAspectRatio(aspect: number) {
 }
 
 // cyrb53: a small, well-spread string hash, so ids are stable across runs without a dependency.
-function hash(text: string) {
+export function hash(text: string) {
   let h1 = 0xdeadbeef;
   let h2 = 0x41c6ce57;
   for (let i = 0; i < text.length; i++) {
@@ -52,7 +52,7 @@ function hash(text: string) {
   return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(16).padStart(14, "0").slice(-8);
 }
 
-const slug = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 32).replace(/-$/, "") || "art";
+export const slug = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 32).replace(/-$/, "") || "art";
 
 function job(kind: ArtKind, prompt: string, aspect: number, extra: Pick<ArtJob, "subject" | "referenceId"> = {}): ArtJob {
   const aspectRatio = kind === "surface" ? "1:1" : closestAspectRatio(aspect);
