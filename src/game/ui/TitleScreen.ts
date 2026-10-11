@@ -6,7 +6,7 @@ import { TitleArt } from "./TitleArt";
 // game, under a pixel-font menu. It opens on PRESS ANY KEY, which is also what lets the browser start
 // the music. NEW GAME has the server make one; BROWSE GAMES lists every game made before, each in the
 // dialogue box's frame, with how far along its art is. The name is a placeholder.
-export const GAME_NAME = "Château Nowhere";
+export const GAME_NAME = "Dream Catcher";
 const MENU_THEME = "/audio/menu-theme.mp3";
 // While browsing, the list refreshes this often so games being painted count up.
 const BROWSE_REFRESH_MS = 2000;
