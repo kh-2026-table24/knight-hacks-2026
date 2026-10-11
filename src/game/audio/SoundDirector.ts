@@ -38,9 +38,8 @@ export class SoundDirector {
   enterRoom(spec: RoomSpec) {
     this.floor = spec.footsteps;
     this.audio.setAmbience(spec.ambience);
-    // Creaks and distant doors belong inside the house.
-    if (spec.outdoor) this.audio.stopHouseNoises();
-    else this.audio.startHouseNoises();
+    // Creaks and whispers inside, crows and bells under the open sky.
+    this.audio.startHouseNoises(spec.outdoor);
     this.heartbeatIn = 0;
   }
 

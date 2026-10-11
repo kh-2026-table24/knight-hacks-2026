@@ -1,5 +1,6 @@
 // Sound board for audio-test.html: every sound in GameAudio, one button each.
 import { GameAudio } from "./game/audio/GameAudio";
+import { NOISES, type NoiseName } from "./game/audio/noises";
 import { SOUND_VARIATIONS, type SoundName } from "./game/audio/sounds";
 import { SCREAM_VOICES } from "./shared/screams";
 import { AMBIENCES, FOOTSTEPS, type Ambience } from "./shared/spec";
@@ -58,6 +59,11 @@ section(
   SCREAM_VOICES.map((voice) => [voice, () => audio.scream({ id: "", voice })]),
 );
 
+section(
+  "Distant noises (one plays every so often, off to one side)",
+  (Object.keys(NOISES) as NoiseName[]).map((name) => [`${name}${NOISES[name].outdoor ? " (outdoors)" : ""}`, () => audio.distant(name)]),
+);
+
 let ambience: Ambience | null = null;
 const setAmbience = (kind: Ambience) => (button: HTMLButtonElement) => {
   ambience = ambience === kind ? null : kind;
@@ -70,6 +76,7 @@ let heart: ReturnType<typeof setInterval> | undefined;
 section("Loops", [
   ...AMBIENCES.map((kind): [string, (b: HTMLButtonElement) => void] => [`ambience: ${kind}`, setAmbience(kind)]),
   toggle("eerie music", () => audio.startMusic(), () => audio.stopMusic()),
-  toggle("house noises (every 8-22s)", () => audio.startHouseNoises(), () => audio.stopHouseNoises()),
+  toggle("house noises, indoors (every 8-22s)", () => audio.startHouseNoises(false), () => audio.stopHouseNoises()),
+  toggle("house noises, outdoors (every 8-22s)", () => audio.startHouseNoises(true), () => audio.stopHouseNoises()),
   toggle("heartbeat (enemy close)", () => (heart = setInterval(() => audio.heartbeat(), 700)), () => clearInterval(heart)),
 ]);

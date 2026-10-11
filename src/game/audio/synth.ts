@@ -281,3 +281,217 @@ export function heartbeat(ctx: AudioContext, out: AudioNode, volume = 1) {
     osc.stop(at + 0.2);
   }
 }
+
+/** Repeats `fire` after a random gap of `min` to `max` seconds until stopped. */
+function every(min: number, max: number, fire: () => void) {
+  let timer: ReturnType<typeof setTimeout>;
+  const next = () => {
+    timer = setTimeout(() => {
+      fire();
+      next();
+    }, (min + Math.random() * (max - min)) * 1000);
+  };
+  next();
+  return () => clearTimeout(timer);
+}
+
+/** A short burst of filtered noise: the building block of crackles and thunder. */
+function burst(ctx: AudioContext, out: AudioNode, { type, frequency, q = 1, volume, attack, decay, pan = 0 }: {
+  type: BiquadFilterType;
+  frequency: number;
+  q?: number;
+  volume: number;
+  attack: number;
+  decay: number;
+  pan?: number;
+}) {
+  const now = ctx.currentTime;
+  const src = noise(ctx);
+  const filter = ctx.createBiquadFilter();
+  filter.type = type;
+  filter.frequency.value = frequency;
+  filter.Q.value = q;
+  const env = ctx.createGain();
+  env.gain.setValueAtTime(0.0001, now);
+  env.gain.exponentialRampToValueAtTime(volume, now + attack);
+  env.gain.exponentialRampToValueAtTime(0.0001, now + attack + decay);
+  const panner = ctx.createStereoPanner();
+  panner.pan.value = pan;
+  src.connect(filter).connect(env).connect(panner).connect(out);
+  src.start(now, Math.random() * 1.5);
+  src.stop(now + attack + decay + 0.05);
+}
+
+/** The sea: slow waves rolling in and drawing back over rocks, with the hiss of foam on each one. */
+export function sea(ctx: AudioContext, out: AudioNode): Stop {
+  return loop(ctx, out, (bus) => {
+    const body = noise(ctx);
+    const low = ctx.createBiquadFilter();
+    low.type = "lowpass";
+    low.frequency.value = 500;
+    const swell = ctx.createGain();
+    swell.gain.value = 0.22;
+    body.connect(low).connect(swell).connect(bus);
+
+    const foam = noise(ctx);
+    const high = ctx.createBiquadFilter();
+    high.type = "highpass";
+    high.frequency.value = 2200;
+    const foamGain = ctx.createGain();
+    foamGain.gain.value = 0.04;
+    foam.connect(high).connect(foamGain).connect(bus);
+
+    body.start();
+    foam.start(ctx.currentTime, 0.7);
+    // One wave every eight seconds or so; the foam peaks a little after the swell, as it breaks.
+    return [body, foam, lfo(ctx, swell.gain, 0.12, 0.18), lfo(ctx, low.frequency, 0.12, 300), lfo(ctx, foamGain.gain, 0.12, 0.035)];
+  }, 3);
+}
+
+/** A storm: heavy rain, and thunder rolling in every half minute or so, near or far. */
+export function storm(ctx: AudioContext, out: AudioNode): Stop {
+  const stopRain = rain(ctx, out);
+  const stopThunder = every(12, 35, () => {
+    const near = Math.random() < 0.35;
+    // A crack for a near strike, then the long roll.
+    if (near) burst(ctx, out, { type: "bandpass", frequency: 1800, q: 0.5, volume: 0.35, attack: 0.01, decay: 0.4, pan: Math.random() - 0.5 });
+    burst(ctx, out, { type: "lowpass", frequency: near ? 220 : 120, volume: near ? 0.9 : 0.5, attack: near ? 0.05 : 0.6, decay: 3 + Math.random() * 3, pan: Math.random() * 1.2 - 0.6 });
+  });
+  return () => {
+    stopThunder();
+    stopRain();
+  };
+}
+
+/** A fire: a soft roar, and pops and crackles of wood from all around it. */
+export function fire(ctx: AudioContext, out: AudioNode): Stop {
+  let stopCrackles: Stop = () => {};
+  const stopRoar = loop(ctx, out, (bus) => {
+    const roar = noise(ctx);
+    const low = ctx.createBiquadFilter();
+    low.type = "lowpass";
+    low.frequency.value = 350;
+    const roarGain = ctx.createGain();
+    roarGain.gain.value = 0.18;
+    roar.connect(low).connect(roarGain).connect(bus);
+    roar.start();
+    stopCrackles = every(0.04, 0.5, () => {
+      const pop = Math.random() < 0.08;
+      burst(ctx, bus, {
+        type: "bandpass",
+        frequency: pop ? 900 : 2500 + Math.random() * 3500,
+        q: 2,
+        volume: pop ? 0.4 : 0.05 + Math.random() * 0.15,
+        attack: 0.002,
+        decay: pop ? 0.12 : 0.02 + Math.random() * 0.03,
+        pan: Math.random() * 0.8 - 0.4,
+      });
+    });
+    return [roar, lfo(ctx, roarGain.gain, 0.3, 0.05)];
+  });
+  return () => {
+    stopCrackles();
+    stopRoar();
+  };
+}
+
+/** Old wiring: the mains hum and the high buzz of fluorescent tubes, which now and then stutter. */
+export function hum(ctx: AudioContext, out: AudioNode): Stop {
+  let stopFlicker: Stop = () => {};
+  const stopHum = loop(ctx, out, (bus) => {
+    const level = ctx.createGain();
+    level.gain.value = 1;
+    level.connect(bus);
+    const sources: AudioScheduledSourceNode[] = [];
+    for (const [frequency, volume] of [
+      [60, 0.05],
+      [120, 0.035],
+      [180, 0.015],
+    ] as const) {
+      const osc = ctx.createOscillator();
+      osc.frequency.value = frequency;
+      const g = ctx.createGain();
+      g.gain.value = volume;
+      osc.connect(g).connect(level);
+      osc.start();
+      sources.push(osc);
+    }
+    // The tubes: a buzzy sawtooth at twice the mains, heard only high up.
+    const buzz = ctx.createOscillator();
+    buzz.type = "sawtooth";
+    buzz.frequency.value = 120;
+    const band = ctx.createBiquadFilter();
+    band.type = "bandpass";
+    band.frequency.value = 3200;
+    band.Q.value = 3;
+    const buzzGain = ctx.createGain();
+    buzzGain.gain.value = 0.02;
+    buzz.connect(band).connect(buzzGain).connect(level);
+    buzz.start();
+    sources.push(buzz);
+    // A tube struggling: the buzz cuts out and comes back a few times.
+    stopFlicker = every(6, 20, () => {
+      const now = ctx.currentTime;
+      for (let i = 0; i < 2 + Math.floor(Math.random() * 4); i++) {
+        const at = now + i * (0.06 + Math.random() * 0.1);
+        buzzGain.gain.setValueAtTime(0.002, at);
+        buzzGain.gain.setValueAtTime(0.03, at + 0.04);
+      }
+      buzzGain.gain.setValueAtTime(0.02, now + 1);
+    });
+    return sources;
+  });
+  return () => {
+    stopFlicker();
+    stopHum();
+  };
+}
+
+/** A still night: crickets chirping from the dark on both sides, over a faint breeze. */
+export function night(ctx: AudioContext, out: AudioNode): Stop {
+  const stops: Stop[] = [];
+  const stopBreeze = loop(ctx, out, (bus) => {
+    const air = noise(ctx);
+    const band = ctx.createBiquadFilter();
+    band.type = "bandpass";
+    band.frequency.value = 600;
+    band.Q.value = 0.5;
+    const airGain = ctx.createGain();
+    airGain.gain.value = 0.05;
+    air.connect(band).connect(airGain).connect(bus);
+    air.start();
+
+    // Each cricket has its own pitch, place and rhythm: a chirp of a few pulses, then a pause.
+    for (let c = 0; c < 4; c++) {
+      const pitch = 3800 + Math.random() * 1400;
+      const pan = Math.random() * 1.6 - 0.8;
+      const volume = 0.012 + Math.random() * 0.018;
+      stops.push(
+        every(0.6, 1.4, () => {
+          const now = ctx.currentTime;
+          const osc = ctx.createOscillator();
+          osc.frequency.value = pitch;
+          const env = ctx.createGain();
+          env.gain.value = 0;
+          const pulses = 3 + Math.floor(Math.random() * 3);
+          for (let i = 0; i < pulses; i++) {
+            const at = now + i * 0.045;
+            env.gain.setValueAtTime(0, at);
+            env.gain.linearRampToValueAtTime(volume, at + 0.008);
+            env.gain.linearRampToValueAtTime(0, at + 0.03);
+          }
+          const panner = ctx.createStereoPanner();
+          panner.pan.value = pan;
+          osc.connect(env).connect(panner).connect(bus);
+          osc.start(now);
+          osc.stop(now + pulses * 0.045 + 0.05);
+        }),
+      );
+    }
+    return [air, lfo(ctx, airGain.gain, 0.06, 0.03)];
+  }, 3);
+  return () => {
+    for (const stop of stops) stop();
+    stopBreeze();
+  };
+}

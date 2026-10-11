@@ -83,8 +83,14 @@ export interface RoomSpec {
 export const FOOTSTEPS = ["wood", "stone", "grass", "carpet", "snow"] as const;
 export type Footsteps = (typeof FOOTSTEPS)[number];
 
-/** wind: open air. rain: a storm outside, or on the roof. room: the low hum of a quiet building. drip: water dripping (cellars, caves, crypts). */
-export const AMBIENCES = ["wind", "rain", "room", "drip"] as const;
+/**
+ * wind: open air. rain: steady rain outside, or on the roof. storm: heavy rain with thunder. sea: waves on
+ * a shore or against rocks (coasts, lighthouses, piers). room: the low hum of a quiet building. drip: water
+ * dripping (cellars, caves, crypts). fire: a crackling fire or furnace. hum: electric buzz of old wiring and
+ * fluorescent lights (offices, hospitals, arcades, back rooms). night: crickets in the dark (fields,
+ * gardens, woods on a still night).
+ */
+export const AMBIENCES = ["wind", "rain", "storm", "sea", "room", "drip", "fire", "hum", "night"] as const;
 export type Ambience = (typeof AMBIENCES)[number];
 
 export interface DoorSpec {
