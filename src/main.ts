@@ -22,7 +22,7 @@ function fail(message: string): never {
 // without it, the title screen lists them. The pick goes into the address, so reloading stays in it.
 let gameId = new URLSearchParams(location.search).get("game");
 if (!gameId) {
-  const title = new TitleScreen();
+  const title = new TitleScreen(composer.sounds.audio);
   gameId = await title.choose();
   history.replaceState(null, "", `?game=${encodeURIComponent(gameId)}`);
   title.hide();

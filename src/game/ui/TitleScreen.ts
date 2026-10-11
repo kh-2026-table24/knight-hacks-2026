@@ -1,11 +1,14 @@
 import type { GameSummary } from "../../shared/api";
+import type { GameAudio } from "../audio/GameAudio";
+import { TitleArt } from "./TitleArt";
 
-// The title screen: the name glowing across the top left, a short menu under it, and a blurred figure
-// reaching out of the dark on the right. Plain HTML over the (still empty) canvas, like the HUD.
-// The name is a placeholder.
+// The title screen, PS1-style: the picture (TitleArt) is drawn at low resolution and dithered like the
+// game, under a pixel-font menu. It opens on PRESS ANY KEY, which is also what lets the browser start
+// the music. The name is a placeholder.
 export const GAME_NAME = "Château Nowhere";
 // START GAME plays this one when it's in the list, otherwise the first game.
 const FEATURED_GAME = "haunted";
+const MENU_THEME = "/audio/menu-theme.mp3";
 
 interface MenuItem {
   label: string;
@@ -25,78 +28,80 @@ const element = <K extends keyof HTMLElementTagNameMap>(tag: K, className: strin
 /** The story's opening sentence. */
 const firstSentence = (text: string) => text.match(/^.*?[.!?](\s|$)/)?.[0].trim() ?? text;
 
-// How sharply the name arches (em of drop per unit of width, squared), and roughly how wide each
-// letter is (em), for working out the tilt that follows the curve.
-const ARCH = 4.2;
-const LETTER_WIDTH = 0.78;
-
-/** One span per letter, lifted onto an arch and turned to follow it, like the name was scrawled in a sweep. */
-function archedLetters(text: string, parent: HTMLElement) {
-  const letters = [...text];
-  letters.forEach((char, i) => {
-    const t = letters.length === 1 ? 0.5 : i / (letters.length - 1);
-    const span = element("span", "title-letter", parent, char === " " ? " " : char);
-    // Highest a little right of center, dipping at both ends; the slope sets each letter's tilt.
-    const x = t - 0.45;
-    const width = letters.length * LETTER_WIDTH;
-    span.style.setProperty("--lift", `${(ARCH * x * x - ARCH * 0.25).toFixed(3)}em`);
-    span.style.setProperty("--tilt", `${((Math.atan((2 * ARCH * x) / width) * 180) / Math.PI).toFixed(1)}deg`);
-    // Each letter flickers on its own clock, so the glow never pulses in unison.
-    span.style.animationDelay = `${(-Math.random() * 9).toFixed(2)}s`;
-  });
-}
-
 export class TitleScreen {
   private readonly root: HTMLElement;
+  private readonly art = new TitleArt(GAME_NAME, "/title/ghost.jpg");
+  private readonly prompt: HTMLElement;
   private readonly menu: HTMLElement;
-  private readonly status: HTMLElement;
   private items: HTMLButtonElement[] = [];
   private games: GameSummary[] = [];
   private pick: ((id: string) => void) | null = null;
+  private stopMusic: (() => void) | undefined;
 
-  constructor(parent: HTMLElement = document.body) {
+  constructor(
+    private readonly audio?: GameAudio,
+    parent: HTMLElement = document.body,
+  ) {
     this.root = element("div", "title-screen", parent);
-    const figure = element("img", "title-figure", this.root);
-    figure.src = "/title/ghost.jpg";
-    figure.alt = "";
-    element("div", "title-grain", this.root);
+    this.root.append(this.art.canvas);
+    void this.art.start();
 
     const column = element("div", "title-column", this.root);
-    const name = element("h1", "title-name", column);
-    name.setAttribute("aria-label", GAME_NAME);
-    // A smeared copy behind the name, like it was dragged across the glass.
-    archedLetters(GAME_NAME, element("span", "title-name-smear", name));
-    archedLetters(GAME_NAME, element("span", "title-name-text", name));
-
-    this.status = element("p", "title-status", column);
+    // The name is drawn in the picture; this is for screen readers.
+    element("h1", "title-name", column, GAME_NAME);
+    this.prompt = element("p", "title-prompt", column, "Press any key");
     this.menu = element("nav", "title-menu", column);
+    this.menu.hidden = true;
     this.menu.addEventListener("keydown", this.onKey);
   }
 
-  /** Shows the menu and resolves with the id of the game to play. */
+  /** Waits for a key, shows the menu, and resolves with the id of the game to play. */
   async choose(): Promise<string> {
     const picked = new Promise<string>((resolve) => (this.pick = resolve));
-    this.status.textContent = "listening at the door…";
-    try {
-      const response = await fetch("/api/games");
+    const list = fetch("/api/games").then(async (response) => {
       if (!response.ok) throw new Error(await response.text());
-      this.games = (await response.json()) as GameSummary[];
+      return (await response.json()) as GameSummary[];
+    });
+
+    await this.pressAnyKey();
+    if (this.audio) this.stopMusic = await this.audio.playTrack(MENU_THEME, 3).catch(() => undefined);
+    try {
+      this.games = await list;
     } catch (error) {
-      this.status.textContent = `the house won't answer (${error instanceof Error ? error.message : String(error)})`;
+      this.prompt.textContent = `The house won't answer (${error instanceof Error ? error.message : String(error)})`;
       return new Promise(() => {});
     }
     if (this.games.length === 0) {
-      this.status.textContent = "no houses tonight";
+      this.prompt.textContent = "No houses tonight";
       return new Promise(() => {});
     }
-    this.status.hidden = true;
+    this.prompt.hidden = true;
+    this.menu.hidden = false;
     this.showMain();
     return picked;
   }
 
   hide() {
+    this.stopMusic?.();
     this.root.classList.add("title-screen-leaving");
-    setTimeout(() => this.root.remove(), 900);
+    setTimeout(() => {
+      this.art.stop();
+      this.root.remove();
+    }, 900);
+  }
+
+  private pressAnyKey() {
+    return new Promise<void>((resolve) => {
+      const go = (e: Event) => {
+        if (e instanceof KeyboardEvent && (e.repeat || ["Shift", "Control", "Alt", "Meta"].includes(e.key))) return;
+        e.preventDefault();
+        window.removeEventListener("keydown", go);
+        window.removeEventListener("pointerdown", go);
+        resolve();
+      };
+      window.addEventListener("keydown", go);
+      window.addEventListener("pointerdown", go);
+    });
   }
 
   private showMain() {
@@ -141,12 +146,15 @@ export class TitleScreen {
       return button;
     });
     this.menu.replaceChildren(...this.items);
-    this.select(this.items[0]);
+    this.select(this.items[0], true);
   }
 
-  private select(item: HTMLButtonElement) {
+  /** Marks an item selected, with a soft tick unless `quiet` (a new menu opening). */
+  private select(item: HTMLButtonElement, quiet = false) {
+    const changed = !item.classList.contains("title-item-selected");
     for (const other of this.items) other.classList.toggle("title-item-selected", other === item);
-    if (document.activeElement !== item) item.focus({ preventScroll: false });
+    if (document.activeElement !== item) item.focus();
+    if (changed && !quiet) this.audio?.play("dialogue", { volume: 0.25, pitchJitter: 0 });
   }
 
   private onKey = (e: KeyboardEvent) => {

@@ -116,6 +116,27 @@ export class GameAudio {
     this.stopAmbience = kind ? AMBIENCE_LOOPS[kind](this.context, this.ambience) : undefined;
   }
 
+  /** Loops a recorded track (e.g. the menu theme) on the music bus, fading in. Returns a stop that fades it out. */
+  async playTrack(url: string, fade = 2): Promise<() => void> {
+    const buffer = await this.context.decodeAudioData(await (await fetch(url)).arrayBuffer());
+    const source = this.context.createBufferSource();
+    source.buffer = buffer;
+    source.loop = true;
+    const gain = this.context.createGain();
+    const now = this.context.currentTime;
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(1, now + fade);
+    source.connect(gain).connect(this.music);
+    source.start();
+    return () => {
+      const at = this.context.currentTime;
+      gain.gain.cancelScheduledValues(at);
+      gain.gain.setValueAtTime(gain.gain.value, at);
+      gain.gain.linearRampToValueAtTime(0, at + fade);
+      source.stop(at + fade);
+    };
+  }
+
   startMusic() {
     this.stopMusicLoop ??= eerieMusic(this.context, this.music);
   }

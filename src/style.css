@@ -147,17 +147,18 @@ body {
   }
 }
 
-/* Title screen (src/game/ui/TitleScreen.ts): a glowing scrawled name and a short menu on the left, a
-   blurred figure reaching out of the dark on the right, under film grain. */
+/* Title screen (src/game/ui/TitleScreen.ts). The picture is a low-resolution canvas (TitleArt.ts) scaled
+   up with hard pixel edges, like the game; the menu is set in a pixel font over it. */
 .title-screen {
-  --glow: #8dff74;
-  --ink: #d8ffc9;
-  --menu: #b9c4b0;
+  --bone: #e9dfcf;
+  --dim: #8f8a99;
+  --candle: #f0a85a;
   position: fixed;
   inset: 0;
   z-index: 10;
   overflow: hidden;
   background: #000;
+  font-family: "VT323", monospace;
   transition: opacity 0.9s ease;
 }
 
@@ -166,242 +167,141 @@ body {
   pointer-events: none;
 }
 
-.title-figure {
-  position: absolute;
-  top: 50%;
-  right: 0;
-  height: 100%;
-  min-width: 70%;
-  object-fit: cover;
-  object-position: 70% 50%;
-  transform: translateY(-50%);
-  /* Fade the figure's left side into the dark, under the name and menu. */
-  mask-image: linear-gradient(to right, transparent 0%, #000 45%);
-  opacity: 0.85;
-  animation: title-breathe 9s ease-in-out infinite;
-}
-
-/* Film grain: animated noise, plus a vignette. */
-.title-grain {
-  position: absolute;
-  inset: -50%;
-  pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  opacity: 0.13;
-  mix-blend-mode: screen;
-  animation: title-grain 0.5s steps(4) infinite;
-}
-
-.title-screen::after {
-  content: "";
+.title-art {
   position: absolute;
   inset: 0;
-  pointer-events: none;
-  background: radial-gradient(ellipse at 45% 50%, transparent 40%, rgba(0, 0, 0, 0.85) 100%);
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
 }
 
 .title-column {
   position: relative;
-  z-index: 1;
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: clamp(40px, 10vh, 110px) 16px 24px clamp(16px, 8vw, 140px);
+  /* The name is drawn in the picture, across the top; the menu starts below it. */
+  padding: max(150px, 36vh) 16px 24px max(16px, 8.5vw);
   box-sizing: border-box;
 }
 
 .title-name {
-  position: relative;
-  /* The arch lifts the middle letters about an em above the line. */
-  margin: 1.1em 0 clamp(36px, 9vh, 90px);
-  font-family: "Rock Salt", "IM Fell English", cursive;
-  font-weight: normal;
-  font-size: clamp(26px, 5.2vw, 64px);
-  line-height: 1;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.title-name-text,
-.title-name-smear {
-  display: block;
-}
-
-.title-name-smear {
   position: absolute;
-  inset: 0;
-  transform: translateX(-0.5em) scaleX(1.08);
-  filter: blur(10px);
-  opacity: 0.4;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
 }
 
-.title-letter {
-  display: inline-block;
-  color: var(--ink);
-  transform: translateY(var(--lift)) rotate(var(--tilt));
-  text-shadow:
-    0 0 4px var(--glow),
-    0 0 14px var(--glow),
-    0 0 36px rgba(80, 230, 60, 0.6);
-  animation: title-flicker 9s infinite;
-}
-
-.title-status {
+.title-prompt {
   margin: 0;
-  font-family: "Special Elite", monospace;
-  font-size: 16px;
-  letter-spacing: 0.12em;
-  color: var(--menu);
+  font-size: 28px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--bone);
+  text-shadow: 2px 2px 0 #000;
+  animation: title-blink 1.4s steps(1) infinite;
 }
 
-.title-status[hidden] {
+.title-prompt[hidden],
+.title-menu[hidden] {
   display: none;
 }
 
 .title-menu {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  max-width: min(460px, 100%);
+  gap: 10px;
+  max-width: min(520px, 100%);
   min-height: 0;
   overflow-y: auto;
-  padding: 4px 4px 4px 0;
+  padding: 2px 4px 2px 0;
 }
 
 .title-item {
   display: grid;
-  grid-template-columns: 30px 1fr;
+  grid-template-columns: 22px 1fr;
   align-items: center;
-  column-gap: 14px;
+  column-gap: 12px;
   padding: 0;
   border: 0;
   background: none;
   text-align: left;
   cursor: pointer;
-  font-family: "Special Elite", monospace;
-  color: var(--menu);
-  opacity: 0.7;
-  transition:
-    opacity 0.15s ease,
-    color 0.15s ease;
+  font: inherit;
+  color: var(--dim);
 }
 
 .title-item:focus {
   outline: none;
 }
 
-.title-item-selected {
-  opacity: 1;
-  color: #eef6e8;
-}
-
 .title-item:disabled {
   cursor: default;
 }
 
-.title-item-label {
-  font-size: 18px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  text-shadow: 0 0 8px rgba(0, 0, 0, 0.9);
+.title-item-selected {
+  color: var(--candle);
 }
 
-/* The ring that marks the selected item. */
+.title-item-label {
+  font-size: 28px;
+  line-height: 1.1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 0 #000;
+}
+
+/* A pixel arrow beside the selected item. */
 .title-item-marker {
   grid-row: span 2;
-  width: 26px;
-  height: 26px;
-  border: 2px solid currentColor;
-  border-radius: 50%;
-  box-sizing: border-box;
-  visibility: hidden;
-}
-
-.title-item-marker::after {
-  content: "";
-  display: block;
+  align-self: start;
+  margin-top: 8px;
   width: 0;
   height: 0;
-  margin: 6px 0 0 8px;
   border-style: solid;
-  border-width: 5px 0 5px 8px;
+  border-width: 7px 0 7px 12px;
   border-color: transparent transparent transparent currentColor;
+  visibility: hidden;
+  filter: drop-shadow(2px 2px 0 #000);
 }
 
 .title-item-selected .title-item-marker {
   visibility: visible;
+  animation: title-blink 1s steps(1) infinite;
 }
 
 .title-item-detail {
   grid-column: 2;
   display: none;
-  margin-top: 6px;
-  font-family: "IM Fell English", Georgia, serif;
-  font-style: italic;
-  font-size: 15px;
-  line-height: 1.35;
-  letter-spacing: 0;
-  color: #95a08c;
+  margin-top: 2px;
+  font-size: 20px;
+  line-height: 1.15;
+  color: var(--bone);
+  opacity: 0.75;
+  text-shadow: 2px 2px 0 #000;
 }
 
 .title-item-selected .title-item-detail {
   display: block;
 }
 
-.title-menu-browse {
-  gap: 14px;
-}
-
 .title-menu-browse .title-item-label {
-  font-size: 15px;
+  font-size: 24px;
 }
 
-@keyframes title-flicker {
-  0%, 88%, 92%, 100% {
+@keyframes title-blink {
+  0%, 60% {
     opacity: 1;
   }
-  89% {
-    opacity: 0.45;
-  }
-  90.5% {
-    opacity: 0.95;
-  }
-  91% {
-    opacity: 0.3;
-  }
-}
-
-@keyframes title-breathe {
-  0%, 100% {
-    transform: translateY(-50%) scale(1);
-    filter: blur(0);
-  }
-  50% {
-    transform: translateY(-50%) scale(1.025);
-    filter: blur(1.5px);
-  }
-}
-
-@keyframes title-grain {
-  0% { transform: translate(0, 0); }
-  25% { transform: translate(-6%, 4%); }
-  50% { transform: translate(5%, -7%); }
-  75% { transform: translate(-3%, -4%); }
-  100% { transform: translate(4%, 6%); }
-}
-
-/* On narrow screens the figure sits behind the menu, so dim it to keep the text readable. */
-@media (max-width: 700px) {
-  .title-figure {
-    opacity: 0.45;
-    mask-image: none;
+  61%, 100% {
+    opacity: 0.15;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .title-letter,
-  .title-figure,
-  .title-grain {
+  .title-prompt,
+  .title-item-selected .title-item-marker {
     animation: none;
   }
 }
