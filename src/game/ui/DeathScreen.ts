@@ -83,7 +83,8 @@ export class DeathScreen {
         resolve(choice);
       };
       this.items = [
-        this.menuItem("Try again", `Wake in the ${death.room}, whole again`, () => choose("retry")),
+        // Room names often bring their own article ("The Cliff Path").
+        this.menuItem("Try again", `Wake in the ${death.room.replace(/^the\s+/i, "")}, whole again`, () => choose("retry")),
         this.menuItem("New dream", "Another haunting, from the title screen", () => choose("new")),
       ];
       this.menu.replaceChildren(...this.items);
