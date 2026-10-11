@@ -151,7 +151,7 @@ These are facts about the engine. A storyboard that ignores them can't be built.
 - A key can lie in the open, be hidden inside an object (it drops out the first time the player
   examines or searches it), or be handed over by a character at the end of their conversation. Hints
   are only words: a character or a note can point the player toward a key.
-- Each room has 1 to 4 story objects the player can examine; everything else in it is scenery.
+- Each room has 2 to 4 story objects the player can examine; everything else in it is scenery.
 - The map is a grid of rooms, one room per cell. Rooms connect only to neighboring cells (north,
   south, east or west), through a door in the shared wall. The first room listed is where the game
   starts. Every locked door's key must be reachable before that door.
@@ -179,8 +179,8 @@ Everything here is advice, not rules. Break it when the story is better for it.
   lighting mood. Describe surfaces and light concretely ("whitewashed plaster yellowed by lamp
   smoke"), since those words become textures and lights.
 - Give each room one focal point on its north wall or at its center that the eye goes to first, and
-  1 to 4 story objects the player will want to examine. Fill the rest with dressing, generously
-  outdoors, where there are no walls to hold the eye.
+  2 to 4 story objects the player will want to examine. Outdoor areas have no walls to frame them, so
+  give them more dressing than indoor rooms.
 - Dressing and story objects are solid things that could stand, sit or hang somewhere. Weather and
   effects (spray, waves, fog, smoke, wind) belong in a room's lighting and description, not its objects.
 - Keep the voice, but write dialogue that is clear the first time it's read: concrete details over
@@ -224,7 +224,7 @@ object inside <storyboard></storyboard>, in this shape:
       "lighting": "how dark the room is and what lights it",
       "focalPoint": "the first thing the eye goes to, and where it is",
       "storyObjects": [
-        { "name": "specific, visual name (1 to 4 per room)", "where": "its place in the room", "reveals": "what examining it tells the player" }
+        { "name": "specific, visual name (2 to 4 per room)", "where": "its place in the room", "reveals": "what examining it tells the player" }
       ],
       "dressing": ["other objects that fill the room and set the scene"],
       "characters": [

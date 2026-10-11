@@ -5,10 +5,10 @@
 //   npx tsx scripts/gen-ui.ts heart key  regenerate just these
 import { access, mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { askGemini, cutoutPrompt, processImage } from "../server/assets";
+import { askModal, cutoutPrompt, processImage } from "../server/assets";
 
 const OUT_DIR = join(import.meta.dirname, "..", "public", "ui");
-// Gemini's originals, kept so the PNGs can be reprocessed without paying to regenerate them.
+// The full-size originals, kept so the PNGs can be reprocessed without paying to regenerate them.
 const ORIGINALS_DIR = join(import.meta.dirname, "ui-originals");
 
 const ASSETS: Record<string, { prompt: string; aspectRatio: string; longSide: number }> = {
@@ -43,9 +43,9 @@ await Promise.all(
     if (requested.length ? !requested.includes(name) : exists) return;
 
     console.log(`generating ${name}`);
-    const jpeg = Buffer.from(await askGemini(cutoutPrompt(prompt), undefined, aspectRatio), "base64");
-    await writeFile(join(ORIGINALS_DIR, `${name}.jpg`), jpeg);
-    await writeFile(file, await processImage(jpeg, "cutout", longSide));
+    const png = await askModal(cutoutPrompt(prompt), undefined, aspectRatio);
+    await writeFile(join(ORIGINALS_DIR, `${name}.png`), png);
+    await writeFile(file, await processImage(png, "cutout", longSide));
     console.log(`saved public/ui/${name}.png`);
   }),
 );

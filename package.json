@@ -14,8 +14,6 @@
     "preview": "vite preview",
     "claude": "tsx scripts/claude.ts",
     "server": "tsx scripts/server.ts",
-    "sprite": "tsx --env-file=.env.local scripts/gemini.ts",
-    "gemini-text": "tsx --env-file=.env.local scripts/gemini-text.ts",
     "start": "tsx server/index.ts",
     "music": "tsx --env-file=.env.local scripts/gen-music.ts",
     "generate": "tsx --env-file=.env.local server/generation/generate.ts",
@@ -33,7 +31,6 @@
     "@anthropic-ai/sdk": "^0.133.0",
     "@dimforge/rapier3d-compat": "^0.21.0",
     "@google-cloud/secret-manager": "^7.1.1",
-    "@google/genai": "^2.28.0",
     "sharp": "^0.35.5",
     "three": "^0.186.1",
     "tsx": "^4.23.15"

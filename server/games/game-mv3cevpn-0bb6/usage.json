@@ -1,0 +1,120 @@
+{
+  "input": 131618,
+  "cached": 383578,
+  "output": 172307,
+  "live": 0,
+  "calls": [
+    {
+      "label": "storyboard",
+      "input": 5705,
+      "cached": 0,
+      "output": 37090,
+      "seconds": 397.6
+    },
+    {
+      "label": "room lantern-room",
+      "input": 660,
+      "cached": 29506,
+      "output": 11015,
+      "seconds": 108.8
+    },
+    {
+      "label": "room store-service-room",
+      "input": 801,
+      "cached": 29506,
+      "output": 12908,
+      "seconds": 121.2
+    },
+    {
+      "label": "room keepers-kitchen",
+      "input": 679,
+      "cached": 29506,
+      "output": 12874,
+      "seconds": 123.4
+    },
+    {
+      "label": "room keepers-bedroom",
+      "input": 732,
+      "cached": 29506,
+      "output": 15891,
+      "seconds": 150.6
+    },
+    {
+      "label": "room east-landing",
+      "input": 30212,
+      "cached": 0,
+      "output": 18579,
+      "seconds": 172.6
+    },
+    {
+      "label": "room lighthouse-yard",
+      "input": 711,
+      "cached": 29506,
+      "output": 18669,
+      "seconds": 178.9
+    },
+    {
+      "label": "room brae-blessing-chapel",
+      "input": 608,
+      "cached": 29506,
+      "output": 18030,
+      "seconds": 180.3
+    },
+    {
+      "label": "room west-landing",
+      "input": 499,
+      "cached": 29506,
+      "output": 21979,
+      "seconds": 207.4
+    },
+    {
+      "label": "room brae-blessing-chapel (repair)",
+      "input": 7428,
+      "cached": 29506,
+      "output": 133,
+      "seconds": 2.8
+    },
+    {
+      "label": "room west-landing (repair)",
+      "input": 8745,
+      "cached": 29506,
+      "output": 183,
+      "seconds": 4.5
+    },
+    {
+      "label": "room east-landing (repair)",
+      "input": 8532,
+      "cached": 29506,
+      "output": 533,
+      "seconds": 5.7
+    },
+    {
+      "label": "room store-service-room (repair)",
+      "input": 6489,
+      "cached": 29506,
+      "output": 674,
+      "seconds": 6.2
+    },
+    {
+      "label": "room lighthouse-yard (repair)",
+      "input": 15354,
+      "cached": 29506,
+      "output": 3119,
+      "seconds": 25.1
+    },
+    {
+      "label": "room brae-blessing-chapel (repair)",
+      "input": 7434,
+      "cached": 29506,
+      "output": 192,
+      "seconds": 3.7
+    },
+    {
+      "label": "room brae-blessing-chapel (repair)",
+      "input": 37029,
+      "cached": 0,
+      "output": 438,
+      "seconds": 6.5
+    }
+  ]
+}

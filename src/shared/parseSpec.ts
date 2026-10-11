@@ -139,7 +139,8 @@ function parseProp(r: Reader, value: unknown, path: string): PropSpec[] | undefi
   const o = r.object(value, path, PROP_FIELDS);
   if (!o) return undefined;
   const id = o.slug("id");
-  const name = o.text("name", { max: 160 });
+  // Not shown to the player; it doubles as the art prompt, so it gets the full text length.
+  const name = o.text("name");
   const position = o.vec3("position");
   const rotationY = o.num("rotationY", { optional: true }) ?? 0;
   const material = o.text("material", { optional: true });

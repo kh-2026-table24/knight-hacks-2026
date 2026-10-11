@@ -114,7 +114,7 @@ export interface PartSpec {
 export interface PropSpec {
   /** Unique within its room. */
   id: string;
-  /** Specific and evocative ("iron-bound sea chest, lid forced open"); the default picture for its panels. */
+  /** Specific and visual ("iron-bound oak sea chest, lid forced open, front view"); the default picture for its panels. */
   name: string;
   /** Room coordinates of the prop's origin (its bottom-center). y is above 0 for things on platforms or walls. */
   position: Vec3;
@@ -240,8 +240,8 @@ export const LIMITS = {
   rooms: 12,
   roomSide: [6, 30],
   roomHeight: [3, 10],
-  propsPerRoom: 150,
-  partsPerProp: 16,
+  propsPerRoom: 250,
+  partsPerProp: 24,
   charactersPerRoom: 4,
   pickupsPerRoom: 6,
   propLightsPerRoom: 8,
@@ -263,8 +263,9 @@ export const LIMITS = {
   characterHeight: [0.2, 4],
   ambientEvery: 0.5,
   ambientLifetime: 10,
-  artJobsWarning: 180,
-  artJobs: 300,
+  // Images come from our own GPU now (a second or so each when warm), so games can use many more.
+  artJobsWarning: 360,
+  artJobs: 600,
 } as const;
 
 export const DEFAULTS = {

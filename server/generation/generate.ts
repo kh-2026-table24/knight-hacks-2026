@@ -8,7 +8,7 @@ import { parseGameSpec } from "../../src/shared/parseSpec";
 import { isFields } from "../../src/shared/reader";
 import { LIMITS, type GameSpec } from "../../src/shared/spec";
 import { validateGame } from "../../src/shared/validate";
-import { gameDir, isSafeId, saveGame } from "../games";
+import { gameDir, isSafeId, readIfExists, saveGame } from "../games";
 import { checkStoryboard, type Storyboard, type StoryboardRoom } from "./checkStoryboard";
 import { log } from "../log";
 import { autofixRoom } from "./autofix";
@@ -39,28 +39,35 @@ export interface GenerateHooks {
   meter?: TokenMeter;
 }
 
-/** Generates a game and saves it as server/games/<gameId>/game.json. Throws if it can't be made valid. */
+/**
+ * Generates a game and saves it as server/games/<gameId>/game.json. Throws if it can't be made valid.
+ * A game that failed in repairs picks up from its saved storyboard and draft instead of starting over.
+ */
 export async function generateGame(gameId: string, hooks: GenerateHooks = {}): Promise<GameSpec> {
-  const storyboard = await writeStoryboard(gameId, hooks.meter);
+  const draft = await savedDraft(gameId);
+  if (draft) log(gameId, `picking up from the saved storyboard and ${draft.rooms.size} rooms`);
+  const storyboard = draft?.storyboard ?? (await writeStoryboard(gameId, hooks.meter));
   hooks.onStoryboard?.(storyboard);
   const system = roomSystemPrompt(storyboard);
   // A share of the warning level, not the hard limit, so a few rooms running over still fits.
   const artBudget = Math.floor(LIMITS.artJobsWarning / storyboard.rooms.length);
   const ask = { gameId, system, storyboard, artBudget, meter: hooks.meter };
 
-  const rooms = new Map<string, unknown>();
-  const build = async (room: StoryboardRoom, onStart?: () => void) => {
-    rooms.set(room.id, await buildRoom(ask, room, onStart));
-    hooks.onRoomBuilt?.(rooms.size, storyboard.rooms.length);
-  };
-  // Parallel calls can't read a prompt cache another call is still writing, so the first room goes
-  // alone until its answer starts; the others then read the shared system prompt from the cache.
-  const [first, ...rest] = storyboard.rooms;
-  let started = () => {};
-  const firstStarted = new Promise<void>((resolve) => (started = resolve));
-  const firstBuilt = build(first, started);
-  await Promise.race([firstStarted, firstBuilt]);
-  await Promise.all([firstBuilt, ...rest.map((room) => build(room))]);
+  const rooms = draft?.rooms ?? new Map<string, unknown>();
+  if (!draft) {
+    const build = async (room: StoryboardRoom, onStart?: () => void) => {
+      rooms.set(room.id, await buildRoom(ask, room, onStart));
+      hooks.onRoomBuilt?.(rooms.size, storyboard.rooms.length);
+    };
+    // Parallel calls can't read a prompt cache another call is still writing, so the first room goes
+    // alone until its answer starts; the others then read the shared system prompt from the cache.
+    const [first, ...rest] = storyboard.rooms;
+    let started = () => {};
+    const firstStarted = new Promise<void>((resolve) => (started = resolve));
+    const firstBuilt = build(first, started);
+    await Promise.race([firstStarted, firstBuilt]);
+    await Promise.all([firstBuilt, ...rest.map((room) => build(room))]);
+  }
 
   const doorArt = new Map(storyboard.doors.flatMap((door) => (door.description ? [[door.id, door.description] as const] : [])));
   for (let round = 0; ; round++) {
@@ -91,6 +98,17 @@ export async function generateGame(gameId: string, hooks: GenerateHooks = {}): P
       }),
     );
   }
+}
+
+/** The storyboard and rooms a failed run left on disk (storyboard.json and game.draft.json), if both are there and still fit together. */
+async function savedDraft(gameId: string): Promise<{ storyboard: Storyboard; rooms: Map<string, unknown> } | undefined> {
+  const [storyboardText, draftText] = await Promise.all(["storyboard.json", "game.draft.json"].map((file) => readIfExists(join(gameDir(gameId), file))));
+  if (storyboardText === undefined || draftText === undefined) return undefined;
+  const { storyboard } = checkStoryboard((JSON.parse(storyboardText) as { storyboard?: unknown }).storyboard);
+  // The draft lists its rooms in the storyboard's order (see assemble).
+  const draftRooms = (JSON.parse(draftText) as { rooms?: unknown[] }).rooms;
+  if (!storyboard || draftRooms?.length !== storyboard.rooms.length) return undefined;
+  return { storyboard, rooms: new Map(storyboard.rooms.map((room, i) => [room.id, draftRooms[i]])) };
 }
 
 /** Asks for a storyboard until its map and keys check out, and saves it next to the game. */
@@ -216,7 +234,7 @@ function wishesByRoom(game: unknown): Map<string, string[]> {
   const wishes = new Map<string, string[]>();
   for (const { room } of parseGameSpec(game).rooms) {
     if (!room.props.some((prop) => prop.examine || prop.contains)) {
-      wishes.set(room.id, [`${room.id} has nothing to examine or search. Give 1 to 4 of its story objects "examine" lines (characters don't count).`]);
+      wishes.set(room.id, [`${room.id} has nothing to examine or search. Give 2 to 4 of its story objects "examine" lines (characters don't count).`]);
     }
   }
   return wishes;

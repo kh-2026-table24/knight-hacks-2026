@@ -1,13 +1,21 @@
+import { query } from "@anthropic-ai/claude-agent-sdk";
 import Anthropic from "@anthropic-ai/sdk";
+import type { BetaRawMessageStreamEvent } from "@anthropic-ai/sdk/resources/beta/messages";
 import type { TokenUsage } from "../../src/shared/api";
 import { log } from "../log";
+import { onCloudRun } from "../secrets";
 
-// The Claude API client for game generation. It reads ANTHROPIC_API_KEY from the environment
-// (npm run dev loads .env.local). It's made on first use so the server still starts without a key.
+// Two ways to reach Claude. Locally, calls go through the Claude Code login on this machine (your
+// subscription), via the Agent SDK. Cloud Run has no login, so there they use the API key
+// (ANTHROPIC_API_KEY). CLAUDE_BACKEND=api or CLAUDE_BACKEND=subscription overrides the choice.
+const BACKEND = process.env.CLAUDE_BACKEND === "api" || process.env.CLAUDE_BACKEND === "subscription" ? process.env.CLAUDE_BACKEND : onCloudRun ? "api" : "subscription";
+
+// The API client is made on first use so the server still starts without a key.
 let client: Anthropic | undefined;
 const claude = () => (client ??= new Anthropic());
 
 const MODEL = "claude-opus-5-5";
+const MAX_OUTPUT_TOKENS = 64000;
 
 // Text runs about this many characters per token; only used for the live estimate while a call streams.
 const CHARS_PER_TOKEN = 4;
@@ -95,27 +103,14 @@ export async function askClaude(prompt: string, { system, effort = "high", label
   const live = { input: 0, cached: 0, output: 0 };
   let thinkingTokens = 0;
   let textChars = 0;
-  log(gameId, `claude ${label}: started (effort ${effort})`);
+  log(gameId, `claude ${label}: started (effort ${effort}, ${BACKEND})`);
   const heartbeat = setInterval(() => {
     const phase = textChars > 0 ? "writing the answer" : "thinking";
     log(gameId, `claude ${label}: ${phase}, ${Math.round((Date.now() - started) / 1000)}s, ~${count(live.output)} tokens out so far`);
   }, HEARTBEAT_MS);
 
-  // Streamed because a whole room with thinking can run long, and so the meter can count as it goes.
-  const stream = claude().beta.messages.stream({
-    model: MODEL,
-    max_tokens: 64000,
-    // Nothing reads the thinking, so it isn't sent; the token-count beta still streams a running
-    // estimate of how much there's been.
-    thinking: { type: "adaptive", display: "omitted" },
-    output_config: { effort },
-    // Horror themes can trip a safety classifier; on a refusal the API retries on a fallback model.
-    betas: ["server-side-fallback-2026-07-01", "thinking-token-count-2026-05-13"],
-    fallbacks: "default",
-    ...(system && { system: [{ type: "text", text: system, cache_control: { type: "ephemeral" } }] }),
-    messages: [{ role: "user", content: prompt }],
-  });
-  stream.on("streamEvent", (event) => {
+  // Both backends stream the same API events, so the meter counts as the answer comes in.
+  const onEvent = (event: BetaRawMessageStreamEvent) => {
     if (event.type === "message_start") {
       const usage = event.message.usage;
       live.input = usage.input_tokens + (usage.cache_creation_input_tokens ?? 0);
@@ -130,11 +125,11 @@ export async function askClaude(prompt: string, { system, effort = "high", label
     }
     live.output = thinkingTokens + Math.round(textChars / CHARS_PER_TOKEN);
     report?.(live);
-  });
+  };
 
-  let message;
+  let answer: Answer;
   try {
-    message = await stream.finalMessage();
+    answer = BACKEND === "api" ? await viaApi(prompt, system, effort, onEvent) : await viaSubscription(prompt, system, effort, onEvent);
   } catch (error) {
     // The exact count never came; keep the estimate.
     report?.(live, true, true);
@@ -145,11 +140,77 @@ export async function askClaude(prompt: string, { system, effort = "high", label
   }
 
   const seconds = ((Date.now() - started) / 1000).toFixed(1);
-  const { input_tokens, output_tokens, cache_read_input_tokens, cache_creation_input_tokens } = message.usage;
+  const { input_tokens, output_tokens, cache_read_input_tokens, cache_creation_input_tokens } = answer.usage;
   report?.({ input: input_tokens + (cache_creation_input_tokens ?? 0), cached: cache_read_input_tokens ?? 0, output: output_tokens }, true);
   log(gameId, `claude ${label}: done in ${seconds}s, ${count(input_tokens)} in (${count(cache_read_input_tokens ?? 0)} cached), ${count(output_tokens)} out`);
 
-  if (message.stop_reason === "refusal") throw new Error(`Claude declined ${label}: ${message.stop_details?.explanation ?? "no reason given"}`);
-  if (message.stop_reason === "max_tokens") throw new Error(`Claude ran out of tokens on ${label}`);
-  return message.content.flatMap((block) => (block.type === "text" ? [block.text] : [])).join("");
+  if (answer.stopReason === "refusal") throw new Error(`Claude declined ${label}${answer.refusal ? `: ${answer.refusal}` : ""}`);
+  if (answer.stopReason === "max_tokens") throw new Error(`Claude ran out of tokens on ${label}`);
+  return answer.text;
+}
+
+type Effort = NonNullable<AskOptions["effort"]>;
+
+interface Answer {
+  text: string;
+  usage: { input_tokens: number; output_tokens: number; cache_read_input_tokens?: number | null; cache_creation_input_tokens?: number | null };
+  stopReason: string | null;
+  refusal?: string;
+}
+
+/** Through the Claude API, billed to ANTHROPIC_API_KEY. */
+async function viaApi(prompt: string, system: string | undefined, effort: Effort, onEvent: (event: BetaRawMessageStreamEvent) => void): Promise<Answer> {
+  // Streamed because a whole room with thinking can run long.
+  const stream = claude().beta.messages.stream({
+    model: MODEL,
+    max_tokens: MAX_OUTPUT_TOKENS,
+    // Nothing reads the thinking, so it isn't sent; the token-count beta still streams a running
+    // estimate of how much there's been.
+    thinking: { type: "adaptive", display: "omitted" },
+    output_config: { effort },
+    // Horror themes can trip a safety classifier; on a refusal the API retries on a fallback model.
+    betas: ["server-side-fallback-2026-07-01", "thinking-token-count-2026-05-13"],
+    fallbacks: "default",
+    ...(system && { system: [{ type: "text", text: system, cache_control: { type: "ephemeral" } }] }),
+    messages: [{ role: "user", content: prompt }],
+  });
+  stream.on("streamEvent", onEvent);
+  const message = await stream.finalMessage();
+  return {
+    text: message.content.flatMap((block) => (block.type === "text" ? [block.text] : [])).join(""),
+    usage: message.usage,
+    stopReason: message.stop_reason,
+    refusal: message.stop_details?.explanation ?? undefined,
+  };
+}
+
+// Without the API key in its environment, Claude Code falls back to this machine's login.
+const { ANTHROPIC_API_KEY: _apiKey, ...subscriptionEnv } = process.env;
+
+/** Through Claude Code's login on this machine, counted against your subscription's usage limits. */
+async function viaSubscription(prompt: string, system: string | undefined, effort: Effort, onEvent: (event: BetaRawMessageStreamEvent) => void): Promise<Answer> {
+  for await (const message of query({
+    prompt,
+    options: {
+      model: MODEL,
+      // A plain system prompt replaces Claude Code's own, which is about coding.
+      systemPrompt: system ?? "You are the lead writer and level designer for a horror video game.",
+      thinking: { type: "adaptive", display: "omitted" },
+      effort,
+      // Text in, text out: no tools, one turn, and nothing from this machine's settings or CLAUDE.md files.
+      tools: [],
+      maxTurns: 1,
+      settingSources: [],
+      persistSession: false,
+      includePartialMessages: true,
+      env: { ...subscriptionEnv, CLAUDE_CODE_MAX_OUTPUT_TOKENS: String(MAX_OUTPUT_TOKENS) },
+    },
+  })) {
+    if (message.type === "stream_event") onEvent(message.event);
+    else if (message.type === "result") {
+      if (message.subtype !== "success") throw new Error(`Claude Code stopped: ${message.subtype}`);
+      return { text: message.result, usage: message.usage, stopReason: message.stop_reason };
+    }
+  }
+  throw new Error("Claude Code ended without an answer");
 }

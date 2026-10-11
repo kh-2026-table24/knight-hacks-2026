@@ -1,0 +1,662 @@
+{
+  "research": "**Choice: the Flannan Isles lighthouse keepers who vanished (Eilean Mòr, Outer Hebrides, December 1900).**\n\nI chose it because it suits the engine closely. It is a small, closed place: a landing, a cliff path, a walled compound, a few rooms and a tower. The documented evidence is almost entirely physical: a closed gate, a stopped clock, a cold hearth, one set of oilskins left on its hook, a lamp trimmed and never lit, chalk on a slate, and bent railings on the far side of the island. The player can read the whole mystery from objects, room by room, without a single invented clue. It is also less worn than the famous haunted houses. It has a folklore layer of sheep-men's taboos and the Blue Men of the Minch, which can supply the danger without making a monster out of real men who died doing their job.\n\n**Documented record (as I reliably recall it):**\n- **The station.** The lighthouse on Eilean Mòr, largest of the Flannan Isles (the \"Seven Hunters\", about 20 miles west of Lewis), was built in 1895–1899 for the Northern Lighthouse Board. It was designed by David Alan Stevenson and first lit on 7 December 1899. The tower stands on the island's summit, joined to a single-storey block of keepers' quarters inside a walled yard. Two landings, east and west, were cut into the cliffs with concrete steps and cranes. A tramway hauled stores up from the landings.\n- **The keepers.** The 1900 winter crew were James Ducat (principal keeper), Thomas Marshall (assistant) and Donald MacArthur. MacArthur was an occasional keeper standing in for William Ross, who was off sick. The relief keeper was Joseph Moore.\n- **The unlit light.** On the night of 15 December 1900 the steamer *Archtor* passed and noted that the light was not showing. The report reached the Board only after she docked in Leith.\n- **The relief arrives.** The relief tender *Hesperus* (Captain Harvie) was due around 20 December but was held back by weather until 26 December. No one met the boat. There was no flag on the flagstaff and no empty provision boxes had been left at the landing for refilling. The captain sounded the whistle and fired a rocket, with no answer.\n- **Moore's search.** Moore went up alone. He found the entrance gate closed, then the dwelling door closed. Inside, the kitchen fire had not been lit for some days and the clock had stopped. The beds were empty. He came back down to the boat badly shaken, then searched again with crewmen. The three men were never found.\n- **Superintendent Muirhead's report.** Robert Muirhead examined the station on 29 December and wrote his report in early January 1901. His findings:\n  - The lamp had been trimmed and cleaned and its oil reservoirs filled, ready for lighting.\n  - The station's slate log, from which entries were later copied into the logbook, was written up to 9 a.m. on 15 December.\n  - Ducat and Marshall had gone out in oilskins and sea-boots. MacArthur's oilskins were still in the dwelling, so he had gone out in his shirtsleeves.\n  - At the west landing, a box of mooring ropes and crane gear, kept in a crevice about 110 ft above sea level, had been torn out and its ropes strewn about. Iron railings were bent and displaced. A block of stone weighing around a ton had been moved. Turf was torn away about 200 ft above the sea.\n  - His conclusion: storm damage had occurred on the 14th or 15th. The men had most likely gone down to secure the gear on the afternoon of the 15th and been carried off by an exceptionally large sea.\n  - MacArthur running out without oilskins is often read as a dash to warn or help the others. This is a theory, not a record.\n  - It is often reported that Marshall had once been fined five shillings for losing equipment in a storm, which might explain the urgency to save the gear. I treat this as \"often reported\".\n\n**Legend and later embroidery (marked as such in the game):**\n- Wilfrid Gibson's 1912 poem \"Flannan Isle\" invented an untouched meal and an overturned chair, and has three ugly black birds watching from the rocks. None of this is in the record. The game shows the kitchen tidy and lets one object point out the difference.\n- Decades later, sensational \"log entries\" appeared: a storm \"never seen before\", Ducat \"very quiet\", MacArthur crying, \"God is over all\". They are not in any official document and I do not use them as fact.\n- Popular theories include sea serpents, giant birds, foreign spies, abduction, a murder-suicide and a \"phantom\" boat. None is supported by evidence.\n- Island lore, recorded by Martin Martin around 1700 and repeated since, describes Lewis sheep-men who visited the Flannans for grazing and seabirds. They kept strict customs: uncovering their heads and turning sunwise on landing, praying at the tiny Blessing Chapel, using substitute names for ordinary things, and not lingering after evening prayers.\n- The Blue Men of the Minch are storm spirits of Hebridean folklore that rise from the sea, sink boats and challenge sailors in rhyme. They belong to the Minch, east of Lewis, so moving them west to the Flannans is my own invention.\n- Moore's own sense of dread, and later stories of the station feeling occupied, supply the haunting.\n\n**Physical details I will use:**\n- the bare flagstaff\n- the empty landing with no provision boxes\n- a spent signal rocket\n- the closed compound gate and dwelling door\n- the cold range and the stopped clock\n- the one set of oilskins on its hook\n- the empty beds\n- the chalk slate written up to the morning of the 15th\n- the logbook, last copied up earlier\n- the barometer\n- the trimmed, filled, unlit lamp and the great lens\n- the tramway and its trolley\n- the Blessing Chapel ruin and the stone beehive bothies\n- the west landing: twisted railings, empty rope crevice, strewn ropes and crane handles, the displaced ton-weight stone and the torn turf high on the cliff\n\nThe three keepers appear only as gentle, dutiful echoes still finishing their last tasks. The danger comes from the folklore and the sea.",
+  "storyboard": {
+    "source": {
+      "story": "The Flannan Isles lighthouse keepers who vanished (Outer Hebrides, 1900)",
+      "account": "Documented: The Flannan Isles lighthouse on Eilean Mòr, twenty miles west of Lewis, was first lit on 7 December 1899. In December 1900 it was kept by James Ducat (principal keeper), Thomas Marshall (assistant) and Donald MacArthur (an occasional keeper standing in for a sick colleague). On the night of 15 December the passing steamer Archtor saw no light. Storms delayed the relief tender Hesperus until 26 December. That day no flag flew, no empty provision boxes waited at the landing, and no one answered the ship's whistle or a signal rocket. Relief keeper Joseph Moore went up alone. He found the gate and the dwelling door closed, the kitchen fire long cold, the clock stopped and the beds empty. The three men were never found.\n\nDocumented: Superintendent Robert Muirhead's report found the lamp trimmed, cleaned and filled, ready for a lighting that never came. The slate log was written up to 9 a.m. on 15 December. Ducat and Marshall had gone out in oilskins and sea-boots, but MacArthur's oilskins were still in the house. At the west landing a box of crane ropes kept in a crevice 110 ft above the sea had been torn out and its ropes strewn, iron railings were bent, a stone of about a ton had been moved, and turf was ripped away 200 ft up. Muirhead concluded that the men had gone down to secure the gear on the afternoon of the 15th and were swept away by an unusually large sea. That MacArthur ran out to warn the others is a later inference. That Marshall had once been fined for losing gear in a storm is often reported.\n\nLegend: Wilfrid Gibson's 1912 poem added an uneaten meal, an overturned chair and three black birds on the rocks. Later writers invented dramatic log entries about weeping men and prayers. Neither appears in the record. Older island lore describes Lewis sheep-men who kept strict customs on the Flannans: they uncovered their heads, turned sunwise, prayed at the Blessing Chapel and never stayed the night. The Blue Men of the Minch are Hebridean storm spirits who rise from the sea to drown sailors. Their presence on Eilean Mòr is this game's invention.",
+      "inspirations": [
+        "No flag on the flagstaff: the bare flagstaff in the Lighthouse Yard",
+        "No provision boxes waiting at the landing: the empty mooring rings at the East Landing",
+        "The Hesperus fired a rocket and got no answer: the spent rocket casing at the East Landing, and Joseph Moore's dialogue",
+        "The gate and dwelling door found closed: the locked compound gate between the Brae and the Yard",
+        "Fire unlit for days and the clock stopped: the cold range and the stopped clock in the Keepers' Kitchen",
+        "MacArthur's oilskins left behind: the single ochre oilskin set on its hook in the Kitchen",
+        "Beds found empty as left in the morning: the turned-back blankets in the Keepers' Bedroom",
+        "Slate written up to 9 a.m., 15 December: the chalk slate in the Store and Service Room, and Ducat's dialogue",
+        "Lamp trimmed, filled and ready, never lit: the cold lamp and lens in the Lantern Room",
+        "West landing damage (box torn from its crevice, ropes strewn, railings bent, ton-weight stone moved, turf torn 200 ft up): the four story objects of the West Landing",
+        "Muirhead's freak-wave conclusion, and MacArthur running out in shirtsleeves: MacArthur's echo and the ending",
+        "Marshall's reported fine for losing gear: Marshall's dialogue, marked as hearsay",
+        "Gibson's poem (meal, chair, three black birds): contradicted by the tidy Kitchen table; the birds appear as three cormorants on the West Landing rocks",
+        "Sheep-men's customs and the Blessing Chapel ruin: the Brae and the ghost of a Lewis shepherd",
+        "Blue Men of the Minch folklore: the hostile sea-spirits on the Brae and the West Landing"
+      ]
+    },
+    "title": "The Unlit Light of Eilean Mòr",
+    "summary": "On Boxing Day 1900 the relief boat reaches the lonely Flannan Isles lighthouse and finds no one waiting: no flag, no smoke, no keepers. The light has been dark since the 15th. Inside, the house is tidy and cold, as if three careful men simply stepped out. Their echoes are still at their last tasks, each holding one piece of the last day. Across the island, the west landing shows what the sea did.",
+    "premise": "She is a collector of Hebridean sea-stories who begged passage on the tender Hesperus to hear the keepers' tales of the haunted Flannans. When nobody comes down to meet the boat, the crew have to hold the boat off the rocks. The shaken relief keeper, Joseph Moore, asks her to climb ahead and find out what has happened to the three men.",
+    "ending": "Beyond the west gate, the West Landing shows the evidence the superintendent will later record: twisted railings, an empty rope crevice, ropes strewn across the rock, a ton of stone shifted and turf torn away far above the sea. Blue Men wade up from the surf. At the broken railing stands the echo of Donald MacArthur in his soaked shirtsleeves, still pointing out to sea. He tells her what he saw on the afternoon of 15 December. He ran down without his oilskins to warn Ducat and Marshall, who were lashing the rope box with their backs to the west, and an enormous sea rose over the cliff and took all three. There was no murder, no madness and no monster, only the sea and three men who went down to save the Board's gear. His last wish is that someone light the light. The story closes on Moore climbing to the tower that night as the lamp burns again, and on the old island saying that the Flannans keep what they take.",
+    "beats": [
+      "The relief boat is met by silence: no keepers, no provision boxes, no answer to the whistle or the signal rocket.",
+      "Moore sends her up ahead with the spare gate key from the landing's tool chest.",
+      "On the brae, the ghost of an old Lewis shepherd explains the island's ancient rules (never stay the night) and warns of the Blue Men who climb out of an angry sea.",
+      "The flagstaff in the yard is bare; nobody has signalled for days.",
+      "The kitchen is tidy and cold: the clock has stopped, the fire died days ago, and one set of oilskins still hangs by the door, so one man went out without his.",
+      "In the bedroom, Thomas Marshall's echo, dripping in his oilskins, says that the storm of the 14th threatened the rope box at the west landing and that he will not lose the Board's gear twice.",
+      "In the store room, James Ducat's echo has written the slate up to 9 a.m. on the 15th. He means to light the lamp at dusk and is heading down to lash the rope box.",
+      "In the tower, the lamp is trimmed and full but has never been lit; the keepers never came back to it.",
+      "At the west landing the damage shows the sea came higher than anyone thought possible, and MacArthur's echo tells how all three were taken."
+    ],
+    "artDirection": {
+      "style": "Low-polygon PS1-era 3D with chunky, slightly wobbling geometry and small, crisp, unfiltered textures. The world is a treeless Hebridean rock in midwinter: dark wet gneiss cliffs, wind-flattened turf, and a lighthouse station of whitewashed stone and grey slate built with stern Victorian neatness. Interiors are spare, scrubbed and orderly, with painted wood, black iron and polished brass, and the wrongness is in the stillness: cold hearths, stopped hands, things left ready. Outdoors the sky is a low, bruised ceiling and the sea is a heaving grey-green mass edged with white. Ghostly figures are drawn slightly desaturated and blue-grey, with water always running from them. Ochre oilskins are the one warm color in the scene, and they belong to the dead.",
+      "palette": [
+        "slate grey",
+        "storm green-black",
+        "salt-stained whitewash",
+        "oilskin ochre yellow",
+        "tarnished brass",
+        "dull rust red"
+      ],
+      "materials": [
+        "whitewashed rubble stone yellowed by lamp smoke",
+        "dark wet gneiss rock streaked with white bird lime",
+        "grey Welsh roof slate",
+        "black cast iron (range, railings, bedsteads, crane)",
+        "tongue-and-groove pine boarding painted pale green",
+        "scrubbed bare deal floorboards",
+        "tarnished brass fittings and lamp parts",
+        "tarred hemp rope",
+        "ochre-yellow oilskin cloth",
+        "rough concrete steps cut into the cliff"
+      ],
+      "lighting": "Late afternoon on 26 December, with barely five hours of daylight. Outdoors there is flat, cold, pewter-grey light under low cloud, sea spray hazing the distance and wind dragging at the turf, darkening toward a steel-blue dusk at the west landing, where storm light flickers. Indoors, thin grey daylight comes through small deep-set windows, the hearths are dead, and only a single brass hurricane lantern burns amber where Moore has set one. In the lantern room the great lens catches the last daylight in pale cold prisms. The mood is silent, orderly and abandoned."
+    },
+    "rooms": [
+      {
+        "id": "east-landing",
+        "name": "The East Landing, Where No One Came Down",
+        "outdoor": true,
+        "grid": [
+          1,
+          4
+        ],
+        "size": "wide outdoor shelf of rock and concrete at the cliff foot, 24 x 8 x 18 m",
+        "purpose": "Opening scene. It establishes the silence that greeted the relief boat. Moore explains what is wrong and points to the gate key in the tool chest.",
+        "description": "A concrete jetty clings to the foot of a sheer black cliff, and grey-green swell slaps against its lowest steps. The Hesperus's wooden gig bumps at its mooring rope while the tender itself rolls somewhere out in the spray. Along the north edge the cliff climbs out of sight, with a zigzag of concrete stairs and the iron rails of the tramway running steeply up its face. A black iron crane leans over the platform with nothing on its hook. The stone platform where the keepers always set out their empty provision boxes for the relief is bare and wet. Nobody is waiting. Joseph Moore stands with a lit lantern in broad daylight, staring up the steps.",
+        "walls": "sheer dark gneiss cliff, wet and streaked with white bird lime, with tufts of sea-pink in the cracks",
+        "floor": "rough grey concrete jetty, green with weed at the edges, puddled with seawater",
+        "lighting": "flat cold grey daylight under low cloud; spray haze softens the distance; the amber glow of Moore's lantern",
+        "focalPoint": "The black iron landing crane against the cliff on the north side, its empty hook swinging over the bare provision platform, with the concrete stair zigzagging up the cliff behind it.",
+        "storyObjects": [
+          {
+            "name": "bare stone provision platform with three empty iron mooring rings",
+            "where": "centre of the jetty, beneath the crane",
+            "reveals": "The keepers always left their empty provision boxes here for the relief to refill. Today there are none, so nobody has come down to this landing for days."
+          },
+          {
+            "name": "spent signal rocket, blackened cardboard tube on a long scorched wooden stick",
+            "where": "lying on the jetty steps near the moored gig",
+            "reveals": "Captain Harvie fired a rocket and blew the ship's whistle to rouse the station. No one answered."
+          },
+          {
+            "name": "rusted iron tool chest, domed lid, padlock hasp hanging open, paint flaking dull red",
+            "where": "against the cliff foot at the west end of the jetty, beside the crane base",
+            "reveals": "Crane handles, grease tins and spare shackles, and under them the spare key to the lighthouse yard gate."
+          }
+        ],
+        "dressing": [
+          "small wooden ship's gig painted white with a black gunwale, bumping at the bottom step",
+          "black cast-iron mooring bollards, two along the jetty edge",
+          "coils of tarred hemp rope on the concrete",
+          "steep iron tramway rails running up the cliff face on wooden sleepers",
+          "flat iron tramway trolley chocked at the foot of the rails",
+          "zigzag concrete stair with an iron handrail climbing the cliff",
+          "heaps of brown kelp and bladderwrack washed onto the lower steps",
+          "cork fenders hanging from the jetty edge on short ropes",
+          "white fulmar seabirds perched on narrow cliff ledges",
+          "rock pools with green weed in the bare rock beside the jetty",
+          "rusted iron ladder bolted into the jetty face, going down into the water",
+          "wooden oars laid across the gig's thwarts",
+          "canvas kitbag and a small wooden sea chest set down on the steps",
+          "iron ring bolts set in the cliff with frayed rope ends",
+          "tufts of pink sea-thrift growing from cliff cracks",
+          "broken lobster creel of wicker and netting jammed between rocks"
+        ],
+        "characters": [
+          {
+            "name": "Joseph Moore, the relief keeper",
+            "appearance": "Lean man of about thirty, clean-shaven pale face, damp dark hair under a navy wool keeper's cap with a tarnished brass badge. He wears a navy double-breasted pea jacket with brass buttons, a thick grey knitted scarf, dark wool trousers and black rubber sea-boots. He holds a lit brass hurricane lantern out in front of him in daylight, his knuckles white on the handle.",
+            "role": "witness, the living man who found the station empty",
+            "personality": "Steady sailor's voice going thin with fear. He talks fast to keep the silence away. Sample: 'A lighthouse is never quiet, miss. There's always somebody awake in it.' Also: 'Captain Harvie's fired a rocket. Not a soul came.'",
+            "knows": "Something is badly wrong. No flag flies, no boxes were left at the landing, and nobody answered the whistle or the rocket. The light was reported dark from the 15th. The crew must hold the boat off the rocks, so she must go up ahead of him. The yard gate at the top of the brae will be shut, and the spare key is in the rusted red tool chest at the foot of the cliff beside the crane.",
+            "behavior": "stands still at the foot of the stairs, staring up the cliff",
+            "hostile": false
+          }
+        ]
+      },
+      {
+        "id": "brae-blessing-chapel",
+        "name": "The Brae by the Blessing Chapel",
+        "outdoor": true,
+        "grid": [
+          1,
+          3
+        ],
+        "size": "broad, sloping outdoor hillside of turf and rock, 26 x 6 x 22 m",
+        "purpose": "Sets up the island's folklore and its danger. The shepherd's ghost tells the old rules and warns of the Blue Men. The first hostile shows the sea's anger has come ashore. The locked yard gate waits at the top.",
+        "description": "The cliff stair gives out onto a wind-flattened slope of coarse turf, with sheep huddled in hollows and the tramway rails cutting straight up the middle. Along the north edge stands the tiny ruined Blessing Chapel, a drystone box barely taller than a man with a black doorway and no roof. Beside it squat the tumbled stone beehive huts where Lewis sheep-men once sheltered by day. Beyond them the lighthouse yard's whitewashed wall runs across the hilltop with its iron gate shut, and the white tower rises behind it. Near the cliff edge to the east, something blue and dripping walks the path where no sheep will graze.",
+        "walls": "open sky; the north edge shows the drystone chapel and the whitewashed rubble wall of the lighthouse yard with its iron gate",
+        "floor": "coarse wind-flattened turf over black rock, with sheep tracks and puddles",
+        "lighting": "grey overcast daylight, colder toward the cliff edge; low cloud dragging over the hilltop",
+        "focalPoint": "The small roofless drystone Blessing Chapel on the north edge, its low black doorway facing the player, with the white lighthouse tower rising behind the yard wall.",
+        "storyObjects": [
+          {
+            "name": "tiny roofless drystone chapel, flat stone lintel over a low black doorway, flat stone altar inside heaped with limpet shells and bent pins",
+            "where": "north edge, left of centre",
+            "reveals": "The old Blessing Chapel. Generations of sheep-men left small offerings here and walked sunwise around it before they dared touch the island's grass."
+          },
+          {
+            "name": "collapsed beehive hut of corbelled grey stones, half its dome fallen in, sheep droppings in the doorway",
+            "where": "north edge, beside the chapel",
+            "reveals": "The sheep-men sheltered here by day. Island custom said no one should spend a night on the Flannans, and they never did."
+          },
+          {
+            "name": "torn black sheep's fleece snagged on a rock at the cliff edge, wet and matted with salt",
+            "where": "east side, by the cliff path where the Blue Man walks",
+            "reveals": "Something dragged a sheep off this edge. The sheep now keep well back from the sea side of the island."
+          }
+        ],
+        "dressing": [
+          "steep iron tramway rails on wooden sleepers running up the slope",
+          "flat iron tramway trolley stopped halfway up the rails, chocked with a stone",
+          "small grey-white blackface sheep huddled in turf hollows",
+          "lichen-spotted boulders scattered across the slope",
+          "low drystone dyke, half tumbled",
+          "sheep skull bleached white in the grass",
+          "patches of pink sea-thrift and white sea campion",
+          "rusted iron stake with a frayed rope tether",
+          "puddles of rainwater in rock hollows",
+          "seabird feathers scattered on the turf",
+          "whitewashed rubble wall of the lighthouse yard with flat coping stones",
+          "white cylindrical lighthouse tower with a black lantern cap beyond the wall",
+          "iron cliff-edge marker post leaning toward the sea",
+          "broken wooden fish box washed up in the turf",
+          "concrete path edging leading from the stair head to the yard gate"
+        ],
+        "characters": [
+          {
+            "name": "The Old Shepherd of Lewis",
+            "appearance": "Tall stooped old man, long white beard, deeply weathered brown face, dark blue knitted bonnet. He wears a long coat of undyed brown homespun wool belted with a rope, bare shins and rawhide shoes, and leans on a tall knotted wooden crook. He is pale and faintly see-through, the chapel stones showing through his chest.",
+            "role": "folklore ghost, a sheep-man from centuries before the lighthouse",
+            "personality": "Slow, courteous, gently scolding, with an old Gaelic lilt. Sample: 'You came up without uncovering your head. Nobody teaches the young now.' Also: 'The lighthouse men stayed every night. Every single night.'",
+            "knows": "The old rules of the Flannans: uncover your head, walk sunwise round the chapel, call nothing by its true name, and never stay the night. The keepers laughed at those rules. When the sea is hungry the Blue Men climb out of it, blue as slate and dripping. They are slow on dry ground, so keep moving and they cannot catch you. The yard gate at the top of the slope is shut; the boatman's key will open it.",
+            "behavior": "stands still by the chapel doorway",
+            "hostile": false
+          },
+          {
+            "name": "A Blue Man of the Minch",
+            "appearance": "Tall, thin man-shaped figure with smooth slate-blue skin. Long grey-green hair hangs in wet ropes like kelp. He is bare-chested, with sodden blue-grey sailcloth wrapped around him from the waist down, long webbed fingers and pale milky eyes. Seawater streams from him constantly and leaves a dark wet trail.",
+            "role": "threat, a storm spirit of island folklore",
+            "personality": "Speaks only in a low, gurgling rhyme. Sample: 'Three men warm and three men cold; the sea keeps all the sea is told.'",
+            "knows": "Nothing useful; it only warns that the sea has taken men from this island before.",
+            "behavior": "patrols the cliff-edge path on the east side of the slope and turns to follow the player slowly if she comes near",
+            "hostile": true
+          }
+        ]
+      },
+      {
+        "id": "lighthouse-yard",
+        "name": "The Lighthouse Yard",
+        "outdoor": true,
+        "grid": [
+          1,
+          2
+        ],
+        "size": "walled outdoor courtyard on the hilltop, 24 x 8 x 18 m",
+        "purpose": "Hub of the station. The bare flagstaff confirms days of silence. Doors lead to the dwelling and, through a locked iron gate in the west wall, to the West Landing, the final door.",
+        "description": "Inside the gate the yard is neat and dead quiet. Along the north side runs the keepers' dwelling, a long single-storey block of whitewashed stone with a grey slate roof, squat chimneys and small deep-set windows. The round white tower rises from its eastern end to a black iron lantern. No smoke comes from any chimney. In the middle of the yard stands the flagstaff with its halyard slapping against the pole and no flag on it. In the west wall a second iron gate leads to the path down to the west landing. It is locked, and the gravel in front of it is strewn with salt-burnt turf blown up from the cliffs.",
+        "walls": "open sky; the north edge shows the whitewashed keepers' dwelling with grey slate roof and the attached white tower; whitewashed rubble walls enclose the east and west sides",
+        "floor": "packed grey gravel with flagstone paths to the dwelling door, scattered clods of torn turf",
+        "lighting": "pewter daylight beginning to fade; the whitewash glows faintly against the darkening sky",
+        "focalPoint": "The tall white-painted flagstaff in the centre of the yard with no flag, its rope halyard slapping in the wind, framed against the dwelling and tower.",
+        "storyObjects": [
+          {
+            "name": "tall white-painted wooden flagstaff, no flag, loose rope halyard slapping against the pole",
+            "where": "centre of the yard",
+            "reveals": "The keepers would have run up a flag to signal the relief boat. It has flown no flag for days."
+          },
+          {
+            "name": "washing line between two iron posts with one grey knitted wool sock pegged to it, frozen stiff with salt",
+            "where": "east side of the yard, beside the dwelling",
+            "reveals": "Someone hung out washing on a calm morning and never came back to take it in."
+          },
+          {
+            "name": "clods of torn turf and grass scattered across the gravel by the west gate",
+            "where": "west side of the yard, in front of the locked west gate",
+            "reveals": "This turf was ripped from the cliffs and thrown up here by wind and sea. Whatever happened, it came from the west."
+          }
+        ],
+        "dressing": [
+          "long single-storey whitewashed stone dwelling with grey slate roof and squat chimneys",
+          "white cylindrical lighthouse tower with a black iron lantern and gallery rail",
+          "small deep-set sash windows with white frames, dark inside",
+          "black iron coal bunker with a hinged lid",
+          "wooden wheelbarrow tipped on its side",
+          "stack of empty wooden paraffin cases",
+          "iron rain-water butt under a downpipe",
+          "brass weather vane on the dwelling roof",
+          "flagstone path leading to a green-painted dwelling door",
+          "iron foot-scraper set beside the doorstep",
+          "small stone outhouse with a slate roof",
+          "neat stack of slate offcuts against the wall",
+          "white-painted wooden instrument box on legs, louvred sides",
+          "iron gate in the west wall, black paint blistered by salt",
+          "coil of rope hung on a peg on the outhouse wall",
+          "rusted iron bucket by the water butt"
+        ],
+        "characters": []
+      },
+      {
+        "id": "keepers-kitchen",
+        "name": "The Keepers' Kitchen, Where the Clock Stopped",
+        "outdoor": false,
+        "grid": [
+          1,
+          1
+        ],
+        "size": "modest low room, 9 x 3.5 x 7 m",
+        "purpose": "The heart of the documented discovery: the cold fire, the stopped clock and the oilskins left behind. It also quietly corrects the legend of an abandoned meal. It connects to the bedroom and to the locked store room.",
+        "description": "The kitchen is the warm centre of any lighthouse, and this one is freezing. A black iron range fills the middle of the north wall, its firebox full of pale dead ash. Above it on the mantel a wooden clock shows a time that means nothing; its pendulum hangs still. The table is scrubbed white, with clean plates stacked, cutlery in its drawer and the chairs pushed in neatly. By the outer door a row of iron hooks holds one complete set of ochre oilskins and a black sou'wester, with sea-boots standing beneath. There were three men, and one set of oilskins is still here.",
+        "walls": "whitewashed plaster yellowed by lamp smoke above a dado of pale green tongue-and-groove pine boarding",
+        "floor": "scrubbed bare deal floorboards, worn pale in a path from door to range",
+        "lighting": "dim grey daylight from one small deep-set window; the black range gives no glow; deep shadow in the corners",
+        "focalPoint": "The black cast-iron range in the centre of the north wall, firebox full of grey ash, with the stopped wooden mantel clock directly above it.",
+        "storyObjects": [
+          {
+            "name": "wooden mantel clock with a round white face and still brass pendulum behind a glass door",
+            "where": "on the mantelshelf above the range, north wall",
+            "reveals": "The clock has run down and stopped. Nobody has wound it in days, though a keeper winds the clocks as surely as he lights the lamp."
+          },
+          {
+            "name": "black cast-iron kitchen range, firebox door open, full of pale grey ash, iron kettle cold on the hob",
+            "where": "centre of the north wall",
+            "reveals": "The fire has not been lit for days. The ash is fine, cold and undisturbed."
+          },
+          {
+            "name": "ochre-yellow oilskin coat and trousers with a black sou'wester on iron wall hooks, black sea-boots standing beneath",
+            "where": "east wall beside the outer door, at the end of a row of three hooks, two of them empty",
+            "reveals": "Two sets of oilskins are gone; this one stayed. One of the three keepers went out into a December storm in his shirtsleeves, in a hurry."
+          },
+          {
+            "name": "scrubbed white deal kitchen table with clean plates stacked and chairs pushed neatly under",
+            "where": "centre of the room",
+            "reveals": "Everything is washed and put away. There is no half-eaten meal and no overturned chair, whatever the poets will later write. These men left in good order, expecting to come back."
+          }
+        ],
+        "dressing": [
+          "iron kettle and black cooking pot on the cold hob",
+          "brass oil lamp hanging on a chain from a ceiling hook, unlit",
+          "painted pine dresser with blue-and-white plates on its shelves",
+          "row of iron hooks by the door, two of them empty",
+          "tin bread bin with a hinged lid",
+          "stone sink with a brass hand pump",
+          "wooden plate rack on the wall with plates drying",
+          "small framed coloured print of a sailing ship on the wall",
+          "Moore's lit brass hurricane lantern set on the table edge, glowing amber",
+          "wooden ceiling beams painted white, with drying hooks",
+          "coal scuttle of black iron with a short shovel",
+          "rag rug of faded red and grey strips by the range",
+          "three wooden Windsor chairs pushed under the table",
+          "shelf of tins and stoneware jars",
+          "deep-set window with a white sill and a dead potted geranium"
+        ],
+        "characters": []
+      },
+      {
+        "id": "keepers-bedroom",
+        "name": "The Keepers' Bedroom",
+        "outdoor": false,
+        "grid": [
+          0,
+          1
+        ],
+        "size": "narrow low room, 8 x 3.5 x 6 m",
+        "purpose": "Marshall's echo explains the storm and the threatened rope box at the west landing. The principal keeper's sea chest holds the store-room key.",
+        "description": "Three black iron bedsteads stand in a row under the sloping ceiling, their grey blankets thrown back exactly as the men left them in the early morning. Sea chests sit at their feet. A small window looks west over the island toward the cliffs where the sea is pounding. In the middle of the room, as if he had only just come in, stands Thomas Marshall in streaming oilskins. Seawater pools around his boots and never spreads.",
+        "walls": "pale green tongue-and-groove pine boarding to shoulder height, whitewashed plaster above, stained brown under the window",
+        "floor": "bare deal floorboards with a narrow strip of brown linoleum between the beds",
+        "lighting": "thin cold daylight from a single west window; dim blue-grey shadow; a faint wet sheen around Marshall",
+        "focalPoint": "The three black iron bedsteads in a row against the north wall, blankets thrown back, with the small west window above the first bed.",
+        "storyObjects": [
+          {
+            "name": "three black iron bedsteads with grey wool blankets thrown back and dented pillows",
+            "where": "in a row along the north wall",
+            "reveals": "The beds were left as men leave them on getting up. Nobody slept in them again."
+          },
+          {
+            "name": "dark oak sea chest with brass corners and a rope handle, lid slightly open",
+            "where": "at the foot of the first bed, by the window",
+            "reveals": "The principal keeper's chest: a spare uniform tunic, a Bible, folded letters, and the brass key to the store and service room."
+          },
+          {
+            "name": "half-written letter on the windowsill, faded handwriting, a dip pen laid across it, ink dried in the well",
+            "where": "on the west windowsill",
+            "reveals": "A letter home, started and set down mid-line. Whoever wrote it meant to finish it after the work was done."
+          }
+        ],
+        "dressing": [
+          "two more wooden sea chests at the feet of the other beds",
+          "small wooden washstand with a white enamel basin and jug",
+          "shaving mirror hanging on a nail",
+          "row of wall pegs with a wool jersey and a flat cap",
+          "pair of worn leather boots under a bed",
+          "tin candlestick with a burnt-down candle on a stool",
+          "small wooden bookshelf with a few dark cloth-bound books",
+          "folded grey blanket on a chair",
+          "chamber pot under the last bed",
+          "framed sampler with stitched flowers on the wall",
+          "white-painted ceiling with a dark water stain",
+          "brass hook with a hanging canvas bag",
+          "rag rug of faded blue and brown strips",
+          "wooden chair with a wool sock draped over the back"
+        ],
+        "characters": [
+          {
+            "name": "The echo of Thomas Marshall, assistant keeper",
+            "appearance": "Lean man around thirty with a sandy moustache and a pale freckled face. He wears an ochre-yellow oilskin coat and trousers streaming with seawater, a black sou'wester tied under the chin and black rubber sea-boots, and holds a coil of tarred rope over one shoulder. Water pours endlessly from his hem into a pool at his feet. His whole figure is tinted a faint grey-blue.",
+            "role": "ghost, a dutiful man repeating his last errand",
+            "personality": "Brisk, practical, slightly embarrassed, unaware he is dead. Sample: 'Is that the relief? You're early, or I'm late.' Also: 'I'll not pay for the Board's gear twice.'",
+            "knows": "The storm of the 14th threw spray clean over the west cliff, and Ducat has fretted ever since about the wooden box of crane ropes kept in a crack in the rock above the west landing. Marshall once lost gear to a gale and was fined five shillings for it, so he will not let it happen again; he only came in for his boots. If she needs the store room, the principal keeps his spare key in the brass-cornered sea chest at the foot of the first bed, by the window.",
+            "behavior": "stands still in the middle of the room, dripping",
+            "hostile": false
+          }
+        ]
+      },
+      {
+        "id": "store-service-room",
+        "name": "The Store and Service Room",
+        "outdoor": false,
+        "grid": [
+          2,
+          1
+        ],
+        "size": "compact working room at the foot of the tower, 8 x 4 x 6 m",
+        "purpose": "Shows the last written record, the slate up to 9 a.m. on 15 December. Ducat's echo gives the tower key and says where the west gate key hangs.",
+        "description": "This is the station's working room, all oil and order. Shelves of brass oil cans and spare wicks line the walls. A heavy desk holds the station logbook, and above it hangs the slate on which the day's weather was chalked before being copied into the book. A barometer on the wall has its needle sunk low. In the north wall a narrow iron-bound door opens onto the spiral stair of the tower. James Ducat, the principal keeper, stands at the desk with a stick of chalk, salt crusted white on his beard.",
+        "walls": "whitewashed rubble stone yellowed by lamp smoke, with the curved white base of the tower breaking through the north wall",
+        "floor": "grey flagstones with dark oil stains and a worn coir mat",
+        "lighting": "dim grey light from one small window; the brass cans gleam dully; the tower door is a black rectangle",
+        "focalPoint": "The large black writing slate in a wooden frame hanging above the principal keeper's desk on the north wall, covered in rows of faded chalk marks, with the narrow iron-bound tower door beside it.",
+        "storyObjects": [
+          {
+            "name": "large black writing slate in a pine frame, rows of faded white chalk lines, chalk stub on its ledge",
+            "where": "north wall, above the desk",
+            "reveals": "The day's weather notes, written up to 9 a.m. on 15 December, a morning of wind easing and sea still heavy. Nothing was ever written after that."
+          },
+          {
+            "name": "thick leather-bound logbook open on the desk, columns of faded ink handwriting, steel pen resting in the gutter",
+            "where": "on the principal keeper's desk",
+            "reveals": "The fair copy is a little behind the slate. The keepers meant to bring it up to date that evening."
+          },
+          {
+            "name": "round brass barometer on a wooden mount, needle sunk far to the left, glass fogged",
+            "where": "east wall beside the window",
+            "reveals": "The pressure fell hard in mid-December. These men knew a storm had come and might come again."
+          }
+        ],
+        "dressing": [
+          "shelves of tall brass oil cans with long spouts",
+          "tin boxes of spare lamp wicks",
+          "heavy pine desk with brass drawer handles",
+          "wooden office chair pushed back from the desk",
+          "rack of brass and copper lamp-cleaning tools",
+          "stack of folded white lens cloths on a shelf",
+          "row of empty pegs where oilskins once hung",
+          "iron oil tank with a brass tap on a wooden stand",
+          "framed printed notice of rules on the wall, too faded to read",
+          "brass speaking tube running up the wall toward the tower",
+          "glass-fronted cabinet of spare lamp chimneys",
+          "wooden crate of candles",
+          "narrow iron-bound tower door with heavy black hinges",
+          "tin funnel and drip tray on the oil tank"
+        ],
+        "characters": [
+          {
+            "name": "The echo of James Ducat, principal keeper",
+            "appearance": "Stocky man in his forties with a full dark beard flecked grey, crusted white with salt, and a ruddy weathered face. An open ochre-yellow oilskin coat hangs over a navy keeper's tunic with brass buttons; a black sou'wester is pushed back on his head and he wears black sea-boots. He holds a stick of white chalk in one hand and a small brass key in the other. His figure is tinted faint grey-blue, and seawater drips from his cuffs.",
+            "role": "ghost, the principal keeper still running his station",
+            "personality": "Calm, firm, the voice of a man who has kept lights for twenty years. Sample: 'Lamp's trimmed, oil's in, lens is clean. I'll light her at dusk, same as always.' Ominous line: 'On the fourteenth the sea came up that cliff like a man climbing stairs.'",
+            "knows": "He wrote the slate up at nine this morning (he believes it is still 15 December), and the fair copy can wait until tonight. The lamp is ready, so she should go up and see. He hands over the tower key. He and Marshall are going down to the west landing to lash the rope box before the next sea takes it. The key to the west gate in the yard hangs in the small wooden cupboard in the lamp room, in the tin of lens cloths. She should shut the gate behind her, because the sheep get in.",
+            "behavior": "stands at the desk, turning now and then to look at the window",
+            "hostile": false
+          }
+        ]
+      },
+      {
+        "id": "lantern-room",
+        "name": "The Lantern Room, Trimmed and Never Lit",
+        "outdoor": false,
+        "grid": [
+          2,
+          0
+        ],
+        "size": "tall round chamber at the top of the tower, 8 x 8 x 8 m",
+        "purpose": "Reveals the lamp left ready for a lighting that never came, the clearest sign the keepers meant to return. Holds the key to the west gate.",
+        "description": "At the top of the spiral stair the lantern room opens in a ring of iron-framed glass, with the whole grey sea outside. In the centre, on a cast-iron pedestal, stands the great lens, a beehive of glass prisms in brass hoops taller than a man. The lamp at its heart is trimmed, its wicks cut even and its oil fountains brimming. It is cold. It has been cold since the 15th. A brass telescope on the gallery rail points west toward the far landing. Against the curved wall, a small cupboard holds the keepers' cleaning things.",
+        "walls": "curved iron-framed glass panes streaked with dried salt, with a waist-high band of white-painted iron below; black iron roof ribs overhead",
+        "floor": "circular cast-iron floor plates with a pierced pattern, and a brass-edged hatch where the spiral stair arrives",
+        "lighting": "pale cold daylight pouring in through glass on every side, split into faint prism glints by the lens; brighter than any room below but colourless",
+        "focalPoint": "The great glass lens on its cast-iron pedestal in the centre of the room: tiers of glass prisms in brass hoops forming a tall beehive shape, catching pale prism light.",
+        "storyObjects": [
+          {
+            "name": "brass paraffin lamp inside the lens, wicks neatly trimmed, glass chimney polished, brass oil fountains full to the brim",
+            "where": "at the heart of the lens on the central pedestal",
+            "reveals": "Everything is ready for lighting. The keepers did every part of their duty except the last, because they never came back up the stair at dusk."
+          },
+          {
+            "name": "small wooden wall cupboard painted white, inside a dented tin box of folded lens cloths",
+            "where": "against the curved wall to the east, beside the stair hatch",
+            "reveals": "Folded linen cloths for polishing the prisms, and under them the iron key to the west gate of the yard."
+          },
+          {
+            "name": "long brass telescope on a swivel mount fixed to the rail, pointing west",
+            "where": "west side of the room, by the glass",
+            "reveals": "Through the scratched lens: far across the island the railings at the west landing are bent like wire, and pale gashes of torn turf scar the cliff top high above the sea."
+          }
+        ],
+        "dressing": [
+          "black cast-iron lens pedestal with clockwork housing and brass winding handle",
+          "hanging brass clockwork weight chains running down into the tower",
+          "spiral iron stair rail rising through the floor hatch",
+          "iron gallery door with a brass latch leading out to the balcony",
+          "black iron roof ribs meeting at a central ventilator cap",
+          "brass oil can with a long spout set beside the pedestal",
+          "linen lens cover folded over the rail",
+          "small wooden stool for the keeper on watch",
+          "brass wick-trimming scissors hung on a hook",
+          "spare glass lamp chimney in a wire cradle",
+          "brass-framed wall clock, stopped",
+          "leather-bound watch log on a small shelf",
+          "iron bucket of sand for fire",
+          "canvas curtain bunched at one side for shading the lens by day"
+        ],
+        "characters": []
+      },
+      {
+        "id": "west-landing",
+        "name": "The West Landing",
+        "outdoor": true,
+        "grid": [
+          0,
+          2
+        ],
+        "size": "large, steep outdoor cliff landing open to the Atlantic, 28 x 10 x 22 m",
+        "purpose": "The final room and the truth. The physical evidence of the great sea, MacArthur's echo telling how the three were taken, and the Blue Men as the sea given a body.",
+        "description": "Past the west gate the path drops down the island's exposed side to a landing cut into the rock above the open Atlantic. The north edge is a towering wall of black, spray-soaked cliff. A concrete stair zigzags down it to a small crane platform, and a dark crevice gapes 110 feet above the sea where the rope box was always wedged. The box is gone. Ropes and iron crane handles lie flung across the rocks like spilled entrails. The iron railings around the crane are twisted flat. A block of stone the size of a cart has been rolled across the path, and far above, raw scars show where the turf was torn off the cliff top. Three black cormorants stand on a rock. Out of the surf, slate-blue figures are wading up the steps. At the broken railing stands a young man in soaked shirtsleeves, one arm still raised toward the sea.",
+        "walls": "open sky and sea; the north edge is a towering cliff of black wet gneiss with a zigzag concrete stair, an empty crevice and raw brown scars of torn turf at the top",
+        "floor": "wet black rock and broken concrete landing, slick with weed, littered with rope and fallen stone",
+        "lighting": "steel-blue storm dusk, spray haze blowing across the landing, white flicker of breaking surf below, the darkest outdoor light in the game; a faint pale glow on MacArthur",
+        "focalPoint": "The twisted black iron railings around the crane platform at the centre of the landing, bent flat toward the land, with the empty crevice gaping in the cliff above them.",
+        "storyObjects": [
+          {
+            "name": "black iron railings around the crane platform, uprights wrenched sideways and rails bent flat like wire, a white cork lifebuoy still lashed to one post",
+            "where": "centre of the landing, around the crane",
+            "reveals": "Iron bent toward the land, high above any ordinary sea. Something enormous broke over this platform."
+          },
+          {
+            "name": "empty dark crevice in the cliff face with ropes and iron crane handles strewn across the rocks below it",
+            "where": "north cliff wall, above and left of the crane",
+            "reveals": "The rope box was kept wedged in this crack, 110 feet above the sea. It has been torn out and its contents flung down. This is what Ducat and Marshall came down to save."
+          },
+          {
+            "name": "huge block of black stone lying across the stair path, pale fresh rock showing where it was torn loose",
+            "where": "east side of the landing, blocking part of the old path",
+            "reveals": "A stone weighing about a ton has been shifted from its bed. No storm of the ordinary kind could do this."
+          },
+          {
+            "name": "raw brown scars of torn-away turf along the very top of the cliff, loose sods hanging over the edge",
+            "where": "high on the north cliff, near the top of the frame",
+            "reveals": "Turf torn away 200 feet above the waterline. The sea climbed all the way up here."
+          }
+        ],
+        "dressing": [
+          "black iron landing crane with its jib swung askew",
+          "zigzag concrete stair with sections of handrail missing",
+          "heaps of brown kelp thrown far up the rocks",
+          "three black cormorants standing on a jagged rock",
+          "shattered wooden planks from the lost rope box",
+          "loops of tarred rope tangled around rocks",
+          "iron mooring bollard cracked at its base",
+          "rusted iron ring bolts in the rock with snapped rope ends",
+          "loose boulders and broken concrete slabs",
+          "deep rock pools brimming with white foam",
+          "iron ladder hanging twisted from the landing edge",
+          "torn sods of turf lying upside down on the rocks",
+          "jagged black sea stacks rising offshore",
+          "white fulmars clinging to high ledges",
+          "a single black sea-boot wedged between two rocks",
+          "broken iron handrail stanchion lying across the steps",
+          "gull feathers and white bird lime on the rocks"
+        ],
+        "characters": [
+          {
+            "name": "The echo of Donald MacArthur",
+            "appearance": "Broad-shouldered young man, black hair plastered flat with seawater, strong Hebridean face, mouth open as if shouting. He wears a collarless white linen shirt soaked through with the sleeves rolled to the elbow, a dark wool waistcoat, braces, grey wool trousers and black boots, and no coat or oilskins. One arm is raised, pointing out to sea. His figure is pale grey-blue and seawater runs off him constantly.",
+            "role": "ghost, the man who ran out without his oilskins",
+            "personality": "Urgent, breathless, a Lewis man's soft Gaelic cadence. He grows quieter as he speaks. Sample: 'I had no time for my oilskins.' Ominous line: 'Then it was cold, and dark, and quiet, the way it has been ever since.'",
+            "knows": "From the top of the stair he saw a sea stand up out of the west, higher than the cliff. Ducat and Marshall were down at the crane lashing the rope box with their backs to it. He ran down without his oilskins, shouting, and the wind tore the words away. They turned just as it came, and all three were taken. He grew up on the old stories of the Blue Men and laughed at them, but these are what the sea looks like when it comes for you. He asks whether the light is lit: someone must light the light.",
+            "behavior": "stands still at the broken railing, arm raised toward the sea",
+            "hostile": false
+          },
+          {
+            "name": "A Blue Man of the Minch",
+            "appearance": "Tall, thin man-shaped figure with smooth slate-blue skin. Long grey-green hair hangs in wet ropes like kelp. He is bare-chested, with sodden blue-grey sailcloth wrapped around him from the waist down, long webbed fingers, pale milky eyes and strands of bladderwrack caught on his shoulders. Seawater pours from him in sheets.",
+            "role": "threat, the storm sea given a body",
+            "personality": "Gurgling rhyme, low and patient. Sample: 'Up the stair and over the stone; the sea came calling, the sea went home.'",
+            "knows": "Nothing; it only claims the landing as the sea's.",
+            "behavior": "wades up from the lower steps and slowly hunts the player across the landing",
+            "hostile": true
+          },
+          {
+            "name": "A second Blue Man of the Minch",
+            "appearance": "Shorter, hunched man-shaped figure with mottled slate-blue skin. A tangle of dark green kelp-like hair hangs over his face. He wears a ragged grey-blue sailcloth wrap with a frayed rope belt and has long webbed hands with black nails. Barnacles crust his shoulders and water streams from his fingers.",
+            "role": "threat, the storm sea given a body",
+            "personality": "Mutters the end of the other's rhymes. Sample: 'Three went down where the cold ropes lie.'",
+            "knows": "Nothing; it only guards the place where the men were taken.",
+            "behavior": "patrols back and forth along the foot of the cliff between the crane and the fallen stone",
+            "hostile": true
+          }
+        ]
+      }
+    ],
+    "doors": [
+      {
+        "id": "landing-to-brae",
+        "rooms": [
+          "east-landing",
+          "brae-blessing-chapel"
+        ],
+        "locked": false,
+        "description": "Low black iron wicket gate at the head of the concrete cliff stair, set between two whitewashed stone pillars, paint blistered by salt, latch hanging loose, seen straight on."
+      },
+      {
+        "id": "yard-gate",
+        "rooms": [
+          "brae-blessing-chapel",
+          "lighthouse-yard"
+        ],
+        "locked": true,
+        "description": "Tall double iron gate in the whitewashed rubble wall of the lighthouse yard, black-painted bars with spear-point tops, a heavy iron lock box at the centre and orange rust weeping from the hinges, shut fast, seen front-on between square stone pillars with flat coping stones."
+      },
+      {
+        "id": "dwelling-door",
+        "rooms": [
+          "lighthouse-yard",
+          "keepers-kitchen"
+        ],
+        "locked": false,
+        "description": "Solid four-panel wooden door painted dark green, brass knob dulled by salt, iron foot-scraper beside the step, set deep in a thick whitewashed stone wall under a small slate canopy, closed but unlatched."
+      },
+      {
+        "id": "kitchen-to-bedroom",
+        "rooms": [
+          "keepers-kitchen",
+          "keepers-bedroom"
+        ],
+        "locked": false,
+        "description": "Plain pine ledge-and-brace door painted pale green, black iron thumb latch, standing ajar in a whitewashed plaster wall."
+      },
+      {
+        "id": "store-room-door",
+        "rooms": [
+          "keepers-kitchen",
+          "store-service-room"
+        ],
+        "locked": true,
+        "description": "Heavy four-panel pine door painted dark brown, brass lock plate with a keyhole and a brass handle, faint oily fingerprints around the lock, closed tight in a whitewashed wall."
+      },
+      {
+        "id": "tower-door",
+        "rooms": [
+          "store-service-room",
+          "lantern-room"
+        ],
+        "locked": true,
+        "description": "Narrow arched oak door bound with black iron straps and studs, massive black strap hinges, large iron keyhole escutcheon, set into the curved white base of the tower, with the bottom step of an iron spiral stair just visible through the crack beneath."
+      },
+      {
+        "id": "west-gate",
+        "rooms": [
+          "lighthouse-yard",
+          "west-landing"
+        ],
+        "locked": true,
+        "description": "Single black iron gate in the whitewashed west wall of the yard, vertical bars thick with salt crust, iron lock box at waist height, torn clods of turf heaped against its foot, seen straight on with grey sky and open sea beyond the bars."
+      }
+    ],
+    "keys": [
+      {
+        "name": "Spare Yard Gate Key",
+        "appearance": "Large black iron key with a plain oval bow, a long shank and a heavy square bit, spotted orange with rust, with a loop of frayed tarred twine tied through the bow.",
+        "unlocks": "yard-gate",
+        "room": "east-landing",
+        "howFound": "Hidden in the rusted red iron tool chest at the foot of the cliff beside the crane. It drops out from under the crane handles and grease tins when the player searches the chest.",
+        "hint": "Joseph Moore tells her the yard gate will be shut and that the spare key is in the red tool chest beside the crane."
+      },
+      {
+        "name": "Store Room Key",
+        "appearance": "Small brass key with a round pierced bow and a short toothed bit, polished bright on one side and tarnished brown on the other, with a tiny brass tag hanging from the bow.",
+        "unlocks": "store-room-door",
+        "room": "keepers-bedroom",
+        "howFound": "Inside the principal keeper's brass-cornered oak sea chest at the foot of the first bed, folded into a spare uniform tunic. It drops out when the player searches the chest.",
+        "hint": "Thomas Marshall's echo says the principal keeps his spare store-room key in the brass-cornered sea chest at the foot of the first bed, by the window."
+      },
+      {
+        "name": "Tower Key",
+        "appearance": "Long heavy iron key with a trefoil-shaped bow and an elaborate stepped bit, blackened with lamp soot, with a smear of white chalk dust on the shank.",
+        "unlocks": "tower-door",
+        "room": "store-service-room",
+        "howFound": "James Ducat's echo hands it over at the end of his conversation so she can see the lamp is ready.",
+        "hint": "Ducat offers it himself."
+      },
+      {
+        "name": "West Gate Key",
+        "appearance": "Plain black iron key with a ring-shaped bow and a simple two-step bit, crusted with white salt, wrapped once in a scrap of folded linen cloth.",
+        "unlocks": "west-gate",
+        "room": "lantern-room",
+        "howFound": "Under the folded linen cloths in a dented tin box inside the small white wall cupboard beside the stair hatch. It drops out when the player searches the cupboard.",
+        "hint": "James Ducat's echo says the west gate key hangs in the lamp-room cupboard, in the tin of lens cloths."
+      }
+    ]
+  }
+}
