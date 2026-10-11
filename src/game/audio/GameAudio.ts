@@ -1,9 +1,10 @@
 import { SCREAM_VOICES, type ScreamJob, type ScreamVoice } from "../../shared/screams";
 import type { Ambience, Footsteps } from "../../shared/spec";
+import { NOISES, noiseUrl, type NoiseName } from "./noises";
 import { SOUND_VARIATIONS, soundUrls, type SoundName } from "./sounds";
-import { bats, drip, eerieMusic, heartbeat, rain, roomTone, staticBurst, wind } from "./synth";
+import { bats, drip, eerieMusic, fire, heartbeat, hum, night, rain, roomTone, sea, staticBurst, storm, wind } from "./synth";
 
-const AMBIENCE_LOOPS: Record<Ambience, typeof wind> = { wind, rain, room: roomTone, drip };
+const AMBIENCE_LOOPS: Record<Ambience, typeof wind> = { wind, rain, storm, sea, room: roomTone, drip, fire, hum, night };
 
 export interface PlayOptions {
   /** 0 to 1. */
@@ -44,6 +45,7 @@ export class GameAudio {
 
   private readonly buffers = new Map<SoundName, AudioBuffer[]>();
   private readonly voices = new Map<ScreamVoice | "sting", AudioBuffer>();
+  private readonly noises = new Map<NoiseName, AudioBuffer>();
   /** Generated screams by id; a pending decode counts, so each is fetched once. */
   private readonly screams = new Map<string, Promise<AudioBuffer | undefined>>();
   private readonly decoded = new Map<string, AudioBuffer>();
@@ -77,6 +79,13 @@ export class GameAudio {
     const names = Object.keys(SOUND_VARIATIONS) as SoundName[];
     const voices = [...SCREAM_VOICES, "sting"] as const;
     await Promise.all([
+      ...(Object.keys(NOISES) as NoiseName[]).map(async (name) => {
+        try {
+          this.noises.set(name, await this.context.decodeAudioData(await (await fetch(noiseUrl(name))).arrayBuffer()));
+        } catch {
+          console.warn(`[audio] the ${name} noise failed to load`);
+        }
+      }),
       ...voices.map(async (name) => {
         try {
           this.voices.set(name, await this.context.decodeAudioData(await (await fetch(voiceUrl(name))).arrayBuffer()));
@@ -218,22 +227,47 @@ export class GameAudio {
     this.stopMusicLoop = undefined;
   }
 
-  /** Every so often, a creak, a distant door, static, or (rarely) bats, so a quiet house never feels empty. */
-  startHouseNoises() {
-    if (this.houseNoiseTimer) return;
+  /**
+   * Every so often, something in the distance, so a quiet room never feels empty. Indoors: a creak, a
+   * door, static, bats, or one of the recorded noises (whispers, knocking, scratching in the walls...).
+   * Outdoors: crows, an owl, a far-off dog or a church bell. Calling it again switches between the two.
+   */
+  startHouseNoises(outdoor = false) {
+    this.stopHouseNoises();
+    const recorded = (Object.keys(NOISES) as NoiseName[]).filter((name) => NOISES[name].outdoor === outdoor);
     const next = () => {
       const [min, max] = HOUSE_NOISE_GAP;
       this.houseNoiseTimer = setTimeout(() => {
         const roll = Math.random();
-        if (roll < 0.5) this.play("creak", { volume: 0.35, pitchJitter: 0.2 });
-        else if (roll < 0.7) this.play("door-close", { volume: 0.12, pitchJitter: 0.15 });
-        else if (roll < 0.85) this.play("thud", { volume: 0.1, pitchJitter: 0.2 });
-        else if (roll < 0.95) this.static();
+        // Outdoors there's only the recorded noises; indoors they're half of what's heard.
+        if (outdoor || roll < 0.5) this.distant(recorded[Math.floor(Math.random() * recorded.length)]);
+        else if (roll < 0.75) this.play("creak", { volume: 0.35, pitchJitter: 0.2 });
+        else if (roll < 0.85) this.play("door-close", { volume: 0.12, pitchJitter: 0.15 });
+        else if (roll < 0.92) this.play("thud", { volume: 0.1, pitchJitter: 0.2 });
+        else if (roll < 0.97) this.static();
         else this.bats();
         next();
       }, (min + Math.random() * (max - min)) * 1000);
     };
     next();
+  }
+
+  /** A recorded noise from somewhere off to one side, quiet and a little muffled, as if from another room. */
+  distant(name: NoiseName | undefined) {
+    const buffer = name && this.noises.get(name);
+    if (!this.running || !buffer) return;
+    const source = this.context.createBufferSource();
+    source.buffer = buffer;
+    source.playbackRate.value = 1 + (Math.random() * 2 - 1) * 0.04;
+    const muffle = this.context.createBiquadFilter();
+    muffle.type = "lowpass";
+    muffle.frequency.value = 2500 + Math.random() * 4000;
+    const gain = this.context.createGain();
+    gain.gain.value = 0.2 + Math.random() * 0.2;
+    const panner = this.context.createStereoPanner();
+    panner.pan.value = (Math.random() < 0.5 ? -1 : 1) * (0.3 + Math.random() * 0.6);
+    source.connect(muffle).connect(gain).connect(panner).connect(this.ambience);
+    source.start();
   }
 
   stopHouseNoises() {
