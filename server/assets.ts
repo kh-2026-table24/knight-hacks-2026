@@ -30,6 +30,7 @@ const isKeyColor = (r: number, g: number, b: number) => g >= 180 && r <= 120 && 
 const CUTOUT_LONG_SIDE = 128; // pixels along a cutout's longer side
 const SURFACE_SIZE = 64; // surfaces are square tiles
 const PICTURE_WIDTH = 320; // the intro's picture, scaled up on screen with hard pixel edges
+const SCARE_LONG_SIDE = 192; // jumpscare faces fill the screen, so they get more pixels than sprites
 
 type Kind = "cutout" | "surface" | "picture";
 
@@ -146,7 +147,7 @@ function make(gameId: string, game: GameSpec, job: ArtJob, priority: number): Pr
     const existing = await readIfExists(file);
     if (existing) return existing;
     const kind: Kind = job.kind === "surface" || job.kind === "picture" ? job.kind : "cutout";
-    const png = await processImage(await original(gameId, game, job, priority), kind);
+    const png = await processImage(await original(gameId, game, job, priority), kind, job.kind === "scare" ? SCARE_LONG_SIDE : CUTOUT_LONG_SIDE);
     await writeFile(file, png);
     return png;
   });
@@ -189,6 +190,7 @@ function original(gameId: string, game: GameSpec, job: ArtJob, priority: number)
 function promptFor(job: ArtJob) {
   if (job.kind === "surface") return surfacePrompt(job.prompt);
   if (job.kind === "picture") return picturePrompt(job.prompt);
+  if (job.kind === "scare") return scarePrompt(job.prompt);
   if (job.kind === "character") return characterPrompt(job.subject ?? job.prompt, job.prompt);
   return cutoutPrompt(job.subject ? `${job.subject}, ${job.prompt}` : job.prompt);
 }
@@ -314,6 +316,20 @@ function picturePrompt(prompt: string) {
     `A wide establishing scene for the opening of the game: ${prompt}.`,
     "A complete illustration filling the entire image edge to edge, with its setting and sky or background, moody and atmospheric.",
     "No text, no title, no border, no frame, no interface.",
+  ].join(" ");
+}
+
+// A jumpscare face: it lunges at the screen for a second, so it has to be the worst thing in the game.
+function scarePrompt(subject: string) {
+  return [
+    STYLE,
+    `A horror game jumpscare: the face of ${subject}, lunging straight at the viewer in an extreme close-up, staring right into the camera.`,
+    "Make it horrifying and grotesquely exaggerated: huge bulging bloodshot eyes with pinprick pupils, a mouth stretched impossibly wide and crammed with too many long, crooked, needle-sharp teeth,",
+    "and small sickening details that fit what it is and make it worse (split and peeling skin, black veins, rot, weeping sores, crude stitches, filth-matted hair, something crawling in a wound).",
+    "Head and shoulders only, face centered and filling the image.",
+    FILL_FRAME,
+    `Solid flat ${KEY_COLOR} background everywhere around it, and no bright green on the face itself.`,
+    "No text, no border, no scenery.",
   ].join(" ");
 }
 

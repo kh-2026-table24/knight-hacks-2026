@@ -45,7 +45,10 @@ export class Room {
   /** Brightness before any lights, 0 to 1. */
   readonly baseLight: number;
   readonly props: Prop[];
+  /** The characters present. The antagonist waits outside this list until it's summoned. */
   readonly characters: Character[];
+  /** The antagonist, before the player summons it (see Character.finale). */
+  private readonly waiting: Character[];
   readonly doors: Door[];
   private readonly walls: Prop[];
   /** Placed pickups not yet taken, plus dropped ones. Dropped ones stay while the room is unloaded. */
@@ -71,7 +74,9 @@ export class Room {
     this.baseLight = spec.baseLight;
     this.walls = roomWalls(spec).map((wall) => new Prop(wall, textures));
     this.props = spec.props.map((prop) => new Prop(prop, textures));
-    this.characters = spec.characters.map((character) => new Character(character, textures));
+    const characters = spec.characters.map((character) => new Character(character, textures));
+    this.characters = characters.filter((character) => !character.finale);
+    this.waiting = characters.filter((character) => character.finale);
     this.doors = spec.doors.flatMap((door) => {
       const side = sides.get(door.connection);
       if (side) return [new Door(door, spec, side, textures)];
@@ -193,6 +198,25 @@ export class Room {
     if (i < 0) return;
     this.pickups.splice(i, 1);
     if (this.mounted) pickup.removeFrom(this.mounted.scene, this.mounted.world);
+  }
+
+  /** The antagonist waiting for the player to finish with `id` (a prop or character here), if any. */
+  finaleAfter(id: string): Character | undefined {
+    return this.waiting.find((character) => character.finale?.after === id);
+  }
+
+  /** Brings a waiting antagonist into the room and sets it on the player. */
+  summon(character: Character) {
+    const i = this.waiting.indexOf(character);
+    if (i < 0) return;
+    this.waiting.splice(i, 1);
+    this.characters.push(character);
+    if (this.mounted) {
+      character.addTo(this.mounted.scene, this.mounted.world);
+      character.setRoomLight(this.baseLight);
+      this.register(character, character);
+    }
+    character.rush();
   }
 
   /** Drops an item out of a prop or character: it pops up in front of it and lands nearby. */

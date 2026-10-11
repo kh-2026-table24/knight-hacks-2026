@@ -39,6 +39,16 @@ export interface StoryboardObjective {
   trigger?: string;
 }
 
+/** The main antagonist's appearance in the last room, which ends the game. */
+export interface StoryboardFinale {
+  antagonist: string;
+  room: string;
+  trigger: string;
+  appearance?: string;
+  jumpscare?: string;
+  scream?: string;
+}
+
 /** The checked parts of a storyboard, plus the whole thing as Claude wrote it. */
 export interface Storyboard {
   title: string;
@@ -48,6 +58,7 @@ export interface Storyboard {
   keys: StoryboardKey[];
   objectives: StoryboardObjective[];
   intro: IntroSpec;
+  finale: StoryboardFinale;
   raw: Record<string, unknown>;
 }
 
@@ -147,10 +158,26 @@ export function checkStoryboard(value: unknown): { storyboard?: Storyboard; prob
     const art = str(value.intro.art);
     const text = Array.isArray(value.intro.text) ? value.intro.text.map(str).filter((line): line is string => !!line) : [];
     if (!art) problems.push(`intro.art is missing: what the opening picture shows`);
+    else if (art.length > LIMITS.introArtLength) problems.push(`intro.art is ${art.length} characters; keep it under ${LIMITS.introArtLength}`);
     if (text.length === 0 || text.length > LIMITS.introParagraphs) problems.push(`intro.text must be a list of 1 to ${LIMITS.introParagraphs} paragraphs`);
     const long = text.filter((line) => line.length > LIMITS.introParagraphLength).length;
     if (long) problems.push(`intro.text has ${long} paragraph${long === 1 ? "" : "s"} over ${LIMITS.introParagraphLength} characters; shorten or split them`);
     if (art && text.length > 0) intro = { art, text };
+  }
+
+  let finale: StoryboardFinale | undefined;
+  if (!isFields(value.finale)) problems.push(`"finale" must be an object: the antagonist whose jumpscare ends the game, and where and how it appears`);
+  else {
+    const antagonist = str(value.finale.antagonist);
+    const room = str(value.finale.room);
+    const trigger = str(value.finale.trigger);
+    if (!antagonist) problems.push(`finale.antagonist is missing`);
+    if (!room || !roomById.has(room)) problems.push(`finale.room must be the id of a room (the last one), got ${JSON.stringify(value.finale.room)}`);
+    if (!trigger) problems.push(`finale.trigger is missing: the story object in the last room that summons the antagonist`);
+    if (antagonist && room && roomById.has(room) && trigger) {
+      const { appearance, jumpscare, scream } = value.finale;
+      finale = { antagonist, room, trigger, appearance: str(appearance), jumpscare: str(jumpscare), scream: str(scream) };
+    }
   }
 
   // Walk the map the way a player would, opening each locked door once its key's room is reached.
@@ -165,6 +192,6 @@ export function checkStoryboard(value: unknown): { storyboard?: Storyboard; prob
     for (const room of rooms) if (!reached.has(room.id)) problems.push(`Room "${room.id}" can't be reached from the first room, "${rooms[0].id}"`);
   }
 
-  if (problems.length > 0 || !title || !summary || !intro) return { problems };
-  return { storyboard: { title, summary, rooms, doors, keys, objectives, intro, raw: value }, problems };
+  if (problems.length > 0 || !title || !summary || !intro || !finale) return { problems };
+  return { storyboard: { title, summary, rooms, doors, keys, objectives, intro, finale, raw: value }, problems };
 }

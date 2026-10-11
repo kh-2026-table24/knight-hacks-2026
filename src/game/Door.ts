@@ -6,8 +6,9 @@ import type { DoorSpec, RoomSpec } from "../shared/spec";
 import { Part, PLANE_COLLIDER_DEPTH } from "./Part";
 import type { TextureLibrary } from "./TextureLibrary";
 
-// How far the player's center may be from where a standing door stops her and still be walking into it.
-const PRESS_MARGIN = 0.05;
+// How far the player's center may be from where a standing door stops her and still be walking into it:
+// enough that a sill or trim sticking out a little in front of the door doesn't keep her from it.
+const PRESS_MARGIN = 0.12;
 
 /** One side of a connection. Walking into it goes through, or reports that it's locked. Placement comes from shared/geometry. */
 export class Door extends Part {

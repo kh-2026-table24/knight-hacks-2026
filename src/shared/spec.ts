@@ -203,8 +203,26 @@ export interface CharacterSpec {
    * chittering squeal"). Left out, it's made from its art description.
    */
   scream?: string;
+  /**
+   * Hostile characters only: its face in the jumpscare, a close-up that fills the screen when it catches
+   * the player. It's always drawn horrifying and exaggerated, so describe what makes this one's face its
+   * own ("the drowned keeper's bloated grey face, kelp caught in his teeth, eyes gone milky"). Left out,
+   * it's drawn from its art description.
+   */
+  jumpscare?: string;
+  /**
+   * The main antagonist only: one per game, in the last room. It isn't there when the player arrives. It
+   * appears when she finishes interacting with `after` (the id of a prop to examine or search, or a
+   * character to talk to, in this room), rushes her far faster than she can run, and its jumpscare ends
+   * the game. The doors won't open from the moment it appears.
+   */
+  finale?: FinaleSpec;
   /** Without a light of its own, a character carries the standard soft glow. */
   light?: LightSpec;
+}
+
+export interface FinaleSpec {
+  after: string;
 }
 
 export interface CharacterArt {
@@ -280,6 +298,8 @@ export const LIMITS = {
   objectives: 20,
   objectiveLength: 80,
   introParagraphs: 5,
+  /** The intro's picture describes a whole scene, so it gets more room than other descriptions. */
+  introArtLength: 600,
   introParagraphLength: 400,
   roomSide: [6, 30],
   roomHeight: [3, 10],

@@ -134,6 +134,10 @@ What the player can interact with
 - Every character is someone the player can talk to, unless it's hostile; one with no "dialogue" is removed.
   Its "dialogue" is one conversation that ends in an outcome: it "gives" a key, sets an "objective", or both.
   Its "afterwards" is the same short, unhelpful brush-off on every later talk; it never repeats the help.
+- Hostile characters are rare: only where the storyboard has one. Each jumpscares the player when it
+  catches her, so give it a "scream" that fits who or what it was in the story, and a "jumpscare" that
+  says what makes its face its own up close. Keep threats away from the start and the doorways, and leave
+  a way around them.
 - Objectives: the user prompt lists the objectives this room sets and what sets each one. Put "objective"
   with that id on that prop, character or pickup, and set no others.
 
@@ -215,6 +219,19 @@ export function roomPrompt(storyboard: Storyboard, room: StoryboardRoom, artBudg
     .filter((objective) => objective.room === room.id)
     .map((objective) => `- "objective": "${objective.id}" ("${objective.text}"), set by ${objective.trigger ?? "one of this room's story objects or characters"}.`);
 
+  const { finale } = storyboard;
+  const finaleNote =
+    finale.room === room.id
+      ? `- The game ends here. The main antagonist, ${finale.antagonist}, is in "characters" but hidden until the player
+  finishes with ${finale.trigger}: make that a story object with "examine" (the final reveal), and give the
+  antagonist "hostile": { "damage": ${PLAYER.maxHearts} }, "finale": { "after": "<that prop's id>" }, a "jumpscare" and a "scream", and
+  no movement or dialogue (it rushes the player on its own). Stand it on open floor across the room from the
+  trigger.${finale.appearance ? `
+  Its look: ${finale.appearance}.` : ""}${finale.jumpscare ? `
+  Its jumpscare face: ${finale.jumpscare}.` : ""}${finale.scream ? `
+  Its scream: ${finale.scream}.` : ""}`
+      : `- The main antagonist doesn't belong in this room; it appears only in the last one.`;
+
   return `Build the room "${room.id}" (${room.name}) from the storyboard.
 
 Fixed by the map, so other rooms line up with yours:
@@ -225,6 +242,7 @@ Fixed by the map, so other rooms line up with yours:
 ${doors.join("\n") || "- (none)"}
 ${keys.length === 0 ? "- Keys: none belong in this room." : `- Keys: put exactly these keys in this room, as written, and no others.\n${keys.join("\n")}`}
 ${objectives.length === 0 ? "- Objectives: none are set in this room." : `- Objectives: put exactly these on what sets them, and no others.\n${objectives.join("\n")}`}
+${finaleNote}
 - 1 to 5 things to interact with in all, props to examine or search and characters together: this room's
   story objects and characters from the storyboard.
 

@@ -24,11 +24,13 @@ export interface InteractionHost {
   swapRooms(next: Room, arrivalConnectionId?: string): void;
 }
 
-// A hostile character that catches the player jumpscares them (its face and its scream), then vanishes
-// back to where it started and waits this long before hunting again. Catches by the same character
-// within the cooldown are ordinary hits, so the scare doesn't wear out.
+// Jumpscares are kept rare so they land: a hostile character scares the player (its face and its
+// scream) the first time it catches her and on the killing blow; other catches are ordinary hits. After a
+// scare it vanishes back to where it started and waits this long before hunting again.
 const VANISH_SECONDS = 4;
-const SCARE_COOLDOWN_SECONDS = 20;
+// The finale: once the antagonist appears it catches the player within this long, even if something
+// blocks its way.
+const FINALE_CATCH_SECONDS = 4;
 
 // The last heartbeats under the death screen: [seconds in, volume].
 const HEARTBEAT_FADING: [number, number][] = [
@@ -49,8 +51,12 @@ const NOTHING_MORE = { character: "I've told you all I know.", prop: "There's no
 export class Interactions {
   /** The door the player was walking into last step, so walking into one only uses it once. */
   private atDoor: Door | null = null;
-  /** When each character last jumpscared the player (performance.now()). */
-  private lastScare = new WeakMap<Character, number>();
+  /** Characters that have already jumpscared the player. */
+  private readonly scared = new WeakSet<Character>();
+  /** The antagonist once it's been summoned, and when (performance.now()). */
+  private finale: { character: Character; since: number } | null = null;
+  /** The game has ended. */
+  private ended = false;
 
   constructor(private readonly host: InteractionHost) {
     window.addEventListener("keydown", (e) => {
@@ -100,21 +106,31 @@ export class Interactions {
     const target = room.interactTarget(player.position);
     hud.setHint(target ? `[E] ${verb(target)}` : null);
 
+    if (this.finale) {
+      // Nobody leaves once the antagonist is here.
+      if (enteredDoor) this.host.audio?.play("door-locked");
+      if (performance.now() - this.finale.since > FINALE_CATCH_SECONDS * 1000) void this.end(game);
+      return;
+    }
     if (enteredDoor) void this.useDoor(enteredDoor);
   }
 
   /** Takes hearts unless the player is still blinking from the last hit. Returns whether it landed. */
   private hurt(game: Game, damage: number, by: Character | Prop) {
     const { player, hud } = this.host;
+    // The antagonist doesn't wound; it ends the game.
+    if (this.finale && by === this.finale.character) {
+      void this.end(game);
+      return true;
+    }
     if (!player.vulnerable || game.state.hearts === 0) return false;
     game.state.hearts = Math.max(0, game.state.hearts - damage);
     player.startInvulnerability(PLAYER.invulnerableSeconds);
     hud.setHearts(game.state.hearts, PLAYER.maxHearts);
     const dead = game.state.hearts === 0;
     const character = by instanceof Character ? by : undefined;
-    const last = character && this.lastScare.get(character);
-    // The killing blow always scares, cooldown or not.
-    const scares = character?.scream && (dead || last === undefined || performance.now() - last > SCARE_COOLDOWN_SECONDS * 1000);
+    // Once per character, and always on the killing blow.
+    const scares = character?.scream && (dead || !this.scared.has(character));
     if (character?.scream && scares) {
       void this.scare(character, character.scream).then(() => {
         if (dead) void this.die(game, by);
@@ -129,12 +145,12 @@ export class Interactions {
   /** The character's face fills the screen as it screams; then it's gone. */
   private async scare(character: Character, scream: ScreamJob) {
     const { player, hud } = this.host;
-    this.lastScare.set(character, performance.now());
+    this.scared.add(character);
     player.frozen = true;
     hud.setHint(null);
     this.host.audio?.scream(scream);
     try {
-      await hud.jumpscare.play(character.portrait);
+      await hud.jumpscare.play(character.scareFace);
     } finally {
       player.frozen = false;
     }
@@ -173,6 +189,39 @@ export class Interactions {
       this.host.audio?.play("drop");
     }
     this.setObjective(game, target.objective);
+    const antagonist = this.host.room() === room ? room.finaleAfter(target.id) : undefined;
+    if (antagonist) this.summon(room, antagonist);
+  }
+
+  /** The finale begins: the antagonist bursts into the room and comes for the player, and the doors hold. */
+  private summon(room: Room, antagonist: Character) {
+    room.summon(antagonist);
+    this.finale = { character: antagonist, since: performance.now() };
+    this.host.hud.setHint(null);
+    this.host.audio?.play("thud");
+    this.host.audio?.heartbeat(1);
+  }
+
+  /** The antagonist's jumpscare, and the end of the game. */
+  private async end(game: Game) {
+    if (this.ended || !this.finale) return;
+    this.ended = true;
+    const { character } = this.finale;
+    const { player, hud, audio } = this.host;
+    const room = this.host.room();
+    player.frozen = true;
+    hud.setHint(null);
+    audio?.stopMusic();
+    if (character.scream) audio?.scream(character.scream);
+    await hud.jumpscare.play(character.scareFace, { style: "zoom", holdBlack: true });
+    for (const [at, volume] of HEARTBEAT_FADING) setTimeout(() => audio?.heartbeat(volume), at * 1000);
+    await hud.death.show({
+      by: character.name,
+      room: game.spec.rooms.find((spec) => spec.id === room?.id)?.name ?? "dark",
+      portrait: character.portrait,
+      ending: true,
+    });
+    location.assign("/");
   }
 
   /** Makes `id` the objective on screen, unless the player is already past it. */

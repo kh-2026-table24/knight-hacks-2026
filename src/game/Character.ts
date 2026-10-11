@@ -1,9 +1,9 @@
 import { Vector3, type Object3D, type Texture } from "three";
 import { QueryFilterFlags, type KinematicCharacterController, type World } from "@dimforge/rapier3d-compat";
 import { artFor } from "../shared/art";
-import { ART_FRAME_SECONDS } from "../shared/constants";
+import { ART_FRAME_SECONDS, PLAYER } from "../shared/constants";
 import { screamFor, type ScreamJob } from "../shared/screams";
-import { DEFAULTS, type CharacterSpec, type Damage, type ItemSpec, type Movement } from "../shared/spec";
+import { DEFAULTS, type CharacterSpec, type Damage, type FinaleSpec, type ItemSpec, type Movement } from "../shared/spec";
 import { CHARACTER_STRETCH, characterBrightness, createCharacterGlow } from "./characters";
 import { Part, PLAYER_GROUP } from "./Part";
 import type { TextureLibrary } from "./TextureLibrary";
@@ -21,6 +21,17 @@ const CHASE_GIVE_UP = 1.5;
 // (as a share of the step), so walking mostly north or south doesn't make them flicker.
 const TURN_SHARE = 0.3;
 const NPC_QUERY_GROUPS = (0xffff << 16) | (0xffff & ~PLAYER_GROUP);
+// The antagonist in the finale runs this fast: far faster than the player, so there's no getting away.
+const RUSH_SPEED = 2.5 * PLAYER.speed;
+
+/** Where a step toward the target left the character. */
+type Step = "moving" | "arrived" | "stuck";
+
+/** A loaded picture, or undefined while the texture still holds its 1-pixel placeholder. */
+const loaded = (texture: Texture | undefined): CanvasImageSource | undefined => {
+  const image = texture?.image as CanvasImageSource | undefined;
+  return image && "width" in image && Number(image.width) > 1 ? image : undefined;
+};
 
 /**
  * Someone (or something) in a room: drawn as a flat 2D figure, it may wander, patrol or chase, talk
@@ -39,7 +50,13 @@ export class Character extends Part {
   readonly movement: Movement | undefined;
   /** Hostile characters: the scream of their jumpscare. */
   readonly scream: ScreamJob | undefined;
+  /** The antagonist: hidden until the player finishes with `finale.after`, then it rushes her. */
+  readonly finale: FinaleSpec | undefined;
   private readonly animations: Partial<Record<AnimationState, Texture[]>> = {};
+  /** Hostile characters: their generated jumpscare face. */
+  private readonly scareTexture: Texture | undefined;
+  /** Running straight at the player (the finale). */
+  private rushing = false;
 
   private readonly home: Vector3;
   private readonly target = new Vector3();
@@ -65,6 +82,8 @@ export class Character extends Part {
     this.hostile = spec.hostile;
     this.movement = spec.movement;
     this.scream = screamFor(spec);
+    this.finale = spec.finale;
+    this.scareTexture = spec.hostile ? textures.get(artFor.scare(spec).id) : undefined;
     const frames = artFor.character(spec.art, spec.size);
     for (const state of ANIMATION_STATES) {
       const list = frames[state].flatMap((art) => textures.get(art.id) ?? []);
@@ -83,7 +102,7 @@ export class Character extends Part {
     this.mesh.geometry.scale(1, CHARACTER_STRETCH, 1);
     // A glow like the player's, unless it already gives off a light of its own.
     if (!this.lightSpec) this.mesh.add(createCharacterGlow(h));
-    if (this.movement) this.makeKinematic();
+    if (this.movement || this.finale) this.makeKinematic();
     this.setTexture(this.animations.idle?.[0]);
   }
 
@@ -97,11 +116,20 @@ export class Character extends Part {
     this.mesh.material.emissiveIntensity = characterBrightness(lightLevel);
   }
 
-  /** Its reference picture (the first idle frame), for the jumpscare. Undefined until the image has loaded. */
+  /** Its reference picture (the first idle frame), for the death screen. Undefined until the image has loaded. */
   get portrait(): CanvasImageSource | undefined {
-    const image = this.animations.idle?.[0].image as CanvasImageSource | undefined;
-    // Before it's painted, the texture holds a 1-pixel placeholder.
-    return image && "width" in image && Number(image.width) > 1 ? image : undefined;
+    return loaded(this.animations.idle?.[0]);
+  }
+
+  /** Its jumpscare face, or its portrait until that's painted. */
+  get scareFace(): CanvasImageSource | undefined {
+    return loaded(this.scareTexture) ?? this.portrait;
+  }
+
+  /** The finale: from now on it runs straight at the player. */
+  rush() {
+    this.rushing = true;
+    this.pauseFor = 0;
   }
 
   /** After a jumpscare: it vanishes and is back where it started, and waits a moment before it hunts again. */
@@ -117,7 +145,10 @@ export class Character extends Part {
 
   /** Advances movement and animation. `paused` holds movement (e.g. while a dialogue is open). */
   update(dt: number, paused: boolean, player: Vector3) {
-    if (this.movement && !paused) this.move(dt, this.movement, player);
+    if (this.rushing && !paused) {
+      this.target.set(player.x, 0, player.z);
+      this.stepToward(dt, RUSH_SPEED);
+    } else if (this.movement && !paused) this.move(dt, this.movement, player);
     else this.moving = false;
     this.animate(dt);
   }
@@ -132,7 +163,7 @@ export class Character extends Part {
 
   override addTo(parent: Object3D, world: World) {
     super.addTo(parent, world);
-    if (this.movement && this.collider && !this.controller) this.controller = world.createCharacterController(0.02);
+    if ((this.movement || this.finale) && this.collider && !this.controller) this.controller = world.createCharacterController(0.02);
   }
 
   override removeFrom(parent: Object3D, world: World) {
@@ -143,7 +174,7 @@ export class Character extends Part {
     }
   }
 
-  // Moves toward the current target, sliding along whatever it bumps into.
+  // Heads for its movement's next target, pausing between them.
   private move(dt: number, movement: Movement, player: Vector3) {
     if (movement.type === "chase") this.aimChase(movement.detectRadius, player);
     if (this.pauseFor > 0) {
@@ -152,14 +183,21 @@ export class Character extends Part {
       return;
     }
     if (!this.hasTarget && !this.pickTarget(movement)) return;
+    if (this.stepToward(dt, movement.speed) !== "moving") this.arrive(movement);
+  }
 
+  // One step toward the target, sliding along whatever it bumps into.
+  private stepToward(dt: number, speed: number): Step {
     const position = this.mesh.position;
     const dx = this.target.x - position.x;
     const dz = this.target.z - position.z;
     const distance = Math.hypot(dx, dz);
-    if (distance < ARRIVE_DISTANCE) return this.arrive(movement);
+    if (distance < ARRIVE_DISTANCE) {
+      this.moving = false;
+      return "arrived";
+    }
 
-    const step = Math.min(movement.speed * dt, distance);
+    const step = Math.min(speed * dt, distance);
     let mx = (dx / distance) * step;
     let mz = (dz / distance) * step;
     if (this.controller && this.collider) {
@@ -175,13 +213,18 @@ export class Character extends Part {
     }
 
     this.stuckFor = Math.hypot(mx, mz) < step * 0.25 ? this.stuckFor + dt : 0;
-    if (this.stuckFor > STUCK_SECONDS) return this.arrive(movement);
+    if (this.stuckFor > STUCK_SECONDS) {
+      this.stuckFor = 0;
+      this.moving = false;
+      return "stuck";
+    }
 
     if (Math.abs(mx) >= step * TURN_SHARE) this.mesh.scale.x = mx < 0 ? -1 : 1;
     position.x += mx;
     position.z += mz;
     this.body?.setNextKinematicTranslation(position);
     this.moving = true;
+    return "moving";
   }
 
   // Locks on when the player comes within detectRadius and heads for them; well beyond it, heads home.

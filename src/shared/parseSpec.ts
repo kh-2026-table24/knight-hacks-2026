@@ -139,7 +139,7 @@ function parseObjective(r: Reader, value: unknown, path: string): ObjectiveSpec 
 function parseIntro(r: Reader, value: unknown, path: string): IntroSpec | undefined {
   const o = r.object(value, path, ["art", "text"]);
   if (!o) return undefined;
-  const art = o.text("art");
+  const art = o.text("art", { max: LIMITS.introArtLength });
   const text = o.strings("text", { min: 1, max: LIMITS.introParagraphs, maxLength: LIMITS.introParagraphLength });
   if (o.failed || !art || !text) return undefined;
   return { art, text };

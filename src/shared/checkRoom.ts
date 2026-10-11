@@ -1,6 +1,6 @@
 import { Box3, Vector3 } from "three";
 import { DOOR, INTERACT, PICKUP, PLAYER, REACH, WALL_THICKNESS } from "./constants";
-import { arrivalPoint, boundsOf, distanceXZ, placeProp, roomWalls, wallLength, type PlacedPart, type Side } from "./geometry";
+import { arrivalPoint, boundsOf, distanceXZ, placeDoor, placeProp, roomWalls, wallLength, type PlacedPart, type Side } from "./geometry";
 import type { Issue } from "./issues";
 import { LIMITS, type DoorSpec, type RoomSpec, type Vec2 } from "./spec";
 import { buildWalkGrid, type WalkGrid } from "./walkGrid";
@@ -22,6 +22,9 @@ const STAIR_MIN_HEIGHT = 1;
 // Narrower than this, a part is a rail or a board, not something to step on.
 const MIN_TREAD = 0.25;
 const GRID_STEP = 0.25;
+// The player opens a door by walking into it, so nothing solid may stick out more than this in front of it
+// where she'd stand (the middle of the doorway, her width across).
+const DOOR_CLEARANCE = 0.2;
 
 export interface RoomContext {
   /** Where the room sits in the game, e.g. rooms[2](study). Every message starts with it. */
@@ -146,6 +149,18 @@ export function checkRoom(room: RoomSpec, ctx: RoomContext): Issue[] {
     if (!ctx.sides.has(door.connection)) error(at(`doors[${i}]`), `${at(`doors[${i}]`)} uses connection "${door.connection}", which doesn't join this room; remove it`);
   });
 
+  // The antagonist appears when the player finishes with something here, so that has to be something she uses.
+  room.characters.forEach((c, i) => {
+    if (!c.finale) return;
+    const label = at(`characters[${i}](${c.id})`);
+    const { after } = c.finale;
+    const prop = room.props.find((p) => p.id === after);
+    const talker = room.characters.find((other) => other.id === after && other !== c);
+    if (!(prop?.examine || prop?.contains) && !talker?.dialogue) {
+      error(`${label}.finale.after`, `${label}.finale.after is "${after}", but it must be the id of a prop with "examine" or "contains", or a character with "dialogue", in this room: the antagonist appears when the player finishes with it`);
+    }
+  });
+
   const grid = buildWalkGrid([...walls, ...props.flatMap((p) => p.solids)], w, d);
   const [sx, sz] = room.start;
   if (sz < d / 2) warn(at("start"), `${at("start")} is in the north half of the room; the south (camera) side is better`);
@@ -190,6 +205,23 @@ export function checkRoom(room: RoomSpec, ctx: RoomContext): Issue[] {
           `If it isn't meant to be climbed, make its lowest part taller than ${MAX_STEP} m so it doesn't read as steps.`,
         true,
       );
+    }
+  }
+
+  for (const { door, side, label } of doors) {
+    if (side === "south") continue;
+    const [px, , pz] = placeDoor(room, door, side).position;
+    const center = side === "north" ? px : pz;
+    // How far a box reaches into the room from the door's face.
+    const reach = (box: Box3) => (side === "north" ? box.max.z - pz : side === "west" ? box.max.x - px : px - box.min.x);
+    const blocker = props.find((p) =>
+      p.solids.some(({ box }) => {
+        const [lo, hi] = side === "north" ? [box.min.x, box.max.x] : [box.min.z, box.max.z];
+        return hi > center - PLAYER.radius && lo < center + PLAYER.radius && box.max.y > MAX_STEP && box.min.y < PLAYER.height && reach(box) > DOOR_CLEARANCE && reach(box) < 1;
+      }),
+    );
+    if (blocker) {
+      warn(label, `${label} (the ${side} door, connection "${door.connection}", offset ${fmt(door.offset)}) has ${blocker.label} standing in front of it, so the player can't walk up to it. Move the door along its wall to a clear stretch, or move what's in the way.`, true);
     }
   }
 
@@ -247,7 +279,8 @@ export function checkRoom(room: RoomSpec, ctx: RoomContext): Issue[] {
     ...doors.map(({ door, side }) => ({ name: `the ${side} door's arrival spot`, at: arrivalPoint(room, door, side) })),
   ];
   room.characters.forEach((c, i) => {
-    if (!c.hostile) return;
+    // The antagonist only appears once the player is well into the room.
+    if (!c.hostile || c.finale) return;
     const radius = c.movement?.type === "chase" ? c.movement.detectRadius : HOSTILE_MARGIN;
     for (const spot of arrivals) {
       if (Math.hypot(c.position[0] - spot.at[0], c.position[2] - spot.at[1]) < radius) {

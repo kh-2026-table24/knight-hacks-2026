@@ -43,11 +43,12 @@ export interface GenerateHooks {
 /**
  * Generates a game and saves it as server/games/<gameId>/game.json. Throws if it can't be made valid.
  * A game that failed in repairs picks up from its saved storyboard and draft instead of starting over.
+ * `story` is what to build it from; without one, a story is picked at random.
  */
-export async function generateGame(gameId: string, hooks: GenerateHooks = {}): Promise<GameSpec> {
+export async function generateGame(gameId: string, hooks: GenerateHooks = {}, story?: string): Promise<GameSpec> {
   const draft = await savedDraft(gameId);
   if (draft) log(gameId, `picking up from the saved storyboard and ${draft.rooms.size} rooms`);
-  const storyboard = draft?.storyboard ?? (await writeStoryboard(gameId, hooks.meter));
+  const storyboard = draft?.storyboard ?? (await writeStoryboard(gameId, hooks.meter, story));
   hooks.onStoryboard?.(storyboard);
   const system = roomSystemPrompt(storyboard);
   // Each room's share of what generation aims for (the warning level), well under the hard limit.
@@ -113,13 +114,13 @@ async function savedDraft(gameId: string): Promise<{ storyboard: Storyboard; roo
 }
 
 /** Asks for a storyboard until its map and keys check out, and saves it next to the game. */
-async function writeStoryboard(gameId: string, meter: TokenMeter | undefined): Promise<Storyboard> {
+async function writeStoryboard(gameId: string, meter: TokenMeter | undefined, given?: string): Promise<Storyboard> {
   // Picked once, so a storyboard sent back for fixes keeps its story.
-  const story = randomStory();
+  const story = given ?? randomStory();
   log(gameId, `story: ${story}`);
   let repair: RepairContext | undefined;
   for (let attempt = 0; ; attempt++) {
-    const prompt = storyboardPrompt(story) + (repair ? repairSection(repair, "storyboard", "fix the rooms, doors, keys, objectives and intro so the map works, and keep the story") : "");
+    const prompt = storyboardPrompt(story) + (repair ? repairSection(repair, "storyboard", "fix the rooms, doors, keys, objectives, intro and finale so the map works, and keep the story") : "");
     const text = await askClaude(prompt, { label: `storyboard${attempt ? ` (fix ${attempt})` : ""}`, gameId, effort: STORYBOARD_EFFORT, meter });
 
     let json: unknown;
@@ -189,10 +190,9 @@ async function repairRoom({ gameId, system, storyboard, artBudget, meter }: Room
 /** Fixes in code what it can in every room that parses, logging each change. Fixed rooms are stored parsed. */
 function autofix(gameId: string, storyboard: Storyboard, rooms: Map<string, unknown>, doorArt: Map<string, string>) {
   const parsed = parseGameSpec(assemble(storyboard, rooms));
-  const sides = doorSides(
-    parsed.rooms.map(({ room }) => room),
-    parsed.connections,
-  );
+  // From the storyboard's map, not the rooms that parsed: a neighbor that didn't parse this round still
+  // has its door here, and taking it out would lose where Claude put it.
+  const sides = doorSides(storyboard.rooms, storyboard.doors);
   for (const { room } of parsed.rooms) {
     const fixes = autofixRoom(room, sides.get(room.id) ?? new Map(), doorArt);
     if (fixes.length === 0) continue;
@@ -265,6 +265,10 @@ function wishesByRoom(game: unknown, storyboard: Storyboard, artBudget: number, 
       }
     });
 
+    if (room.id === storyboard.finale.room && !room.characters.some((character) => character.finale)) {
+      add(room.id, `The game must end here: add the main antagonist, ${storyboard.finale.antagonist}, as a hostile character with "finale": { "after": "<id>" } naming the story object the player examines to summon it (${storyboard.finale.trigger}).`);
+    }
+
     const set = new Set(objectivesSetIn(room).map(({ objective }) => objective));
     for (const objective of storyboard.objectives.filter((o) => o.room === room.id && !set.has(o.id))) {
       add(room.id, `Nothing sets the objective "${objective.id}". Put "objective": "${objective.id}" on ${objective.trigger ?? "the story object or character that leads to it"}.`);
@@ -283,17 +287,17 @@ async function writeJson(gameId: string, file: string, value: unknown) {
   await writeFile(join(gameDir(gameId), file), JSON.stringify(value, null, 2));
 }
 
-// npx tsx --env-file=.env.local server/generation/generate.ts <game-id>
+// npx tsx --env-file=.env.local server/generation/generate.ts <game-id> ["the story to build from"]
 // (Skipped when imported by the server.)
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const gameId = process.argv[2];
+  const [gameId, story] = process.argv.slice(2);
   if (!gameId || !isSafeId(gameId)) {
-    console.error("Usage: npx tsx --env-file=.env.local server/generation/generate.ts <game-id>");
+    console.error(`Usage: npx tsx --env-file=.env.local server/generation/generate.ts <game-id> ["the story to build from"]`);
     process.exit(1);
   }
   const meter = new TokenMeter(() => {});
   try {
-    await generateGame(gameId, { meter });
+    await generateGame(gameId, { meter }, story);
   } catch (error) {
     console.error(message(error));
     process.exitCode = 1;

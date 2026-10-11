@@ -1,6 +1,6 @@
 import { doorSides, playOrder } from "./checkGame";
 import { DOOR } from "./constants";
-import type { CharacterArt, DoorSpec, GameSpec, IntroSpec, ItemSpec, PartSpec, PropSpec, RoomSpec, AmbientSpec, Vec2 } from "./spec";
+import type { CharacterArt, CharacterSpec, DoorSpec, GameSpec, IntroSpec, ItemSpec, PartSpec, PropSpec, RoomSpec, AmbientSpec, Vec2 } from "./spec";
 
 // Art is described inline in a GameSpec ("material": "dark oak planks"), so there's no texture table to
 // keep in sync. These functions derive every image a game needs and a stable id for each. The server
@@ -9,9 +9,10 @@ import type { CharacterArt, DoorSpec, GameSpec, IntroSpec, ItemSpec, PartSpec, P
 
 /**
  * surface: a seamless tile. cutout: a picture on a transparent background. character: a cutout of a
- * figure facing right. picture: a whole scene, edge to edge (the intro's).
+ * figure facing right. picture: a whole scene, edge to edge (the intro's). scare: a hostile character's
+ * face as a cutout, for its jumpscare.
  */
-export type ArtKind = "surface" | "cutout" | "character" | "picture";
+export type ArtKind = "surface" | "cutout" | "character" | "picture" | "scare";
 
 export interface ArtJob {
   id: string;
@@ -91,6 +92,9 @@ export const artFor = {
   ambient: (ambient: Pick<AmbientSpec, "art" | "size">) => job("cutout", ambient.art, ambient.size[0] / ambient.size[1]),
 
   intro: (intro: IntroSpec) => job("picture", intro.art, 16 / 9),
+
+  /** A hostile character's jumpscare face: who it is, and what its face is like up close if the spec says. */
+  scare: ({ art, jumpscare }: Pick<CharacterSpec, "jumpscare" | "art">) => job("scare", jumpscare ? `${art.description}; up close, ${jumpscare}` : art.description, 3 / 4),
 };
 
 /** Every image one room needs, in the order worth loading them: surfaces, then the rest. */
@@ -113,6 +117,7 @@ export function roomArt(spec: Pick<GameSpec, "rooms" | "connections">, room: Roo
   for (const character of room.characters) {
     const frames = artFor.character(character.art, character.size);
     out.push(...frames.idle, ...frames.moving);
+    if (character.hostile) out.push(artFor.scare(character));
     if (character.gives) out.push(artFor.item(character.gives));
   }
   for (const pickup of room.pickups) out.push(artFor.item(pickup.item));

@@ -11,6 +11,7 @@ import {
   type CharacterArt,
   type CharacterSpec,
   type Damage,
+  type FinaleSpec,
   type ItemSpec,
   type LightSpec,
   type Movement,
@@ -25,7 +26,7 @@ export function nested<T>(o: Obj, key: string, parse: (r: Reader, value: unknown
   return o.has(key) ? parse(r, o.raw(key), o.at(key)) : undefined;
 }
 
-const CHARACTER_FIELDS = ["id", "name", "position", "size", "art", "solid", "movement", "dialogue", "afterwards", "gives", "objective", "hostile", "scream", "light"];
+const CHARACTER_FIELDS = ["id", "name", "position", "size", "art", "solid", "movement", "dialogue", "afterwards", "gives", "objective", "hostile", "scream", "jumpscare", "finale", "light"];
 
 export function parseCharacter(r: Reader, value: unknown, path: string): CharacterSpec | undefined {
   const o = r.object(value, path, CHARACTER_FIELDS);
@@ -53,14 +54,24 @@ export function parseCharacter(r: Reader, value: unknown, path: string): Charact
   const hostile = nested(o, "hostile", parseDamage, r);
   // Only hostile characters scream; on anyone else it's ignored. Left out, screamFor makes one from the art.
   const chosenScream = o.text("scream", { optional: true });
+  const jumpscare = o.text("jumpscare", { optional: true });
+  if (jumpscare && !hostile) o.error("jumpscare", `is only for hostile characters: it's the face they scare the player with`);
+  const finale = nested(o, "finale", parseFinale, r);
+  if (finale && !hostile) o.error("finale", `is only for a hostile character: the antagonist whose jumpscare ends the game`);
   const light = nested(o, "light", parseLight, r);
   if (o.failed || !id || !name || !position || !size || !art) return undefined;
   const scream = hostile && chosenScream;
   return {
     id, name, position, size, art, solid,
     ...(movement && { movement }), ...(dialogue && { dialogue }), ...(afterwards && { afterwards }), ...(gives && { gives }), ...(objective && { objective }),
-    ...(hostile && { hostile }), ...(scream && { scream }), ...(light && { light }),
+    ...(hostile && { hostile }), ...(scream && { scream }),
+    ...(jumpscare && { jumpscare }), ...(finale && { finale }), ...(light && { light }),
   };
+}
+
+function parseFinale(r: Reader, value: unknown, path: string): FinaleSpec | undefined {
+  const after = r.object(value, path, ["after"])?.slug("after");
+  return after ? { after } : undefined;
 }
 
 function parseCharacterArt(r: Reader, value: unknown, path: string): CharacterArt | undefined {

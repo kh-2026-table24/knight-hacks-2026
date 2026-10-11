@@ -20,6 +20,8 @@ export interface Death {
   room: string;
   /** Its picture, for the background; without one the background is grain. */
   portrait?: CanvasImageSource;
+  /** The game's end, after the antagonist's jumpscare: nothing to try again, and it shows over the scare's black. */
+  ending?: boolean;
 }
 
 const element = <K extends keyof HTMLElementTagNameMap>(tag: K, className: string, parent?: HTMLElement, text?: string) => {
@@ -34,6 +36,7 @@ export class DeathScreen {
   private readonly root: HTMLElement;
   private readonly canvas = document.createElement("canvas");
   private readonly ctx = this.canvas.getContext("2d", { willReadFrequently: true })!;
+  private readonly title: HTMLElement;
   private readonly by: HTMLElement;
   private readonly where: HTMLElement;
   private readonly menu: HTMLElement;
@@ -48,7 +51,7 @@ export class DeathScreen {
     this.canvas.className = "title-art";
     this.root.append(this.canvas);
     const column = element("div", "death-column", this.root);
-    element("h1", "death-title", column, "You did not wake");
+    this.title = element("h1", "death-title", column);
     const epitaph = element("p", "death-epitaph", column);
     element("span", "death-epitaph-small", epitaph, "Taken by");
     this.by = element("span", "death-epitaph-name", epitaph);
@@ -63,6 +66,8 @@ export class DeathScreen {
 
   /** Shows the screen and resolves with what the player picks; it's hidden again by then. */
   show(death: Death): Promise<DeathChoice> {
+    this.title.textContent = death.ending ? "The end" : "You did not wake";
+    this.root.classList.toggle("death-screen-ending", !!death.ending);
     this.by.textContent = death.by;
     this.where.textContent = death.room;
     this.portrait = death.portrait;
@@ -82,11 +87,9 @@ export class DeathScreen {
         this.root.hidden = true;
         resolve(choice);
       };
-      this.items = [
-        // Room names often bring their own article ("The Cliff Path").
-        this.menuItem("Try again", `Wake in the ${death.room.replace(/^the\s+/i, "")}, whole again`, () => choose("retry")),
-        this.menuItem("New dream", "Another haunting, from the title screen", () => choose("new")),
-      ];
+      // Room names often bring their own article ("The Cliff Path").
+      const retry = this.menuItem("Try again", `Wake in the ${death.room.replace(/^the\s+/i, "")}, whole again`, () => choose("retry"));
+      this.items = [...(death.ending ? [] : [retry]), this.menuItem("New dream", "Another haunting, from the title screen", () => choose("new"))];
       this.menu.replaceChildren(...this.items);
       this.select(this.items[0]);
     });

@@ -183,6 +183,13 @@ These are facts about the engine. A storyboard that ignores them can't be built.
 - A room is ${LIMITS.roomSide[0]} to ${GENERATED_ROOM.maxSide} m wide and deep and ${LIMITS.roomHeight[0]} to ${GENERATED_ROOM.maxHeight} m tall. A room holds at most 4 characters.
 - The whole game is drawn from at most ${LIMITS.artJobsWarning} generated images: every distinct material, object
   picture and character pose is one, and a description repeated word for word is drawn once.
+- Hostile characters jumpscare the player when they catch her: their face fills the screen with a
+  scream. Use them sparingly so each scare lands: besides the main antagonist, at most one or two in the
+  whole game, and only where the story calls for a threat.
+- The game always ends with the main antagonist's jumpscare. It isn't in the last room when the player
+  arrives. When she examines one particular story object there, it appears, rushes her far faster than
+  she can run and catches her, and she can't leave the room once it appears. Build the last room toward
+  that moment, and put the final reveal in the object that summons it.
 - Before play starts, the game shows the intro: one picture and a few short paragraphs of the story so
   far, in the game's voice. It tells the player who she is, why she has come, and what happened here,
   and it ends where play begins, at the first room. It sets up the mystery; it doesn't give it away.
@@ -232,6 +239,14 @@ physical details you plan to use. Then write the storyboard as one JSON object i
   "premise": "why the player is here and what she's looking for",
   "ending": "what the final room reveals and how the story resolves",
   "beats": ["what the player learns, in the order she learns it"],
+  "finale": {
+    "antagonist": "the main antagonist's name",
+    "appearance": "what the image model should draw for its body",
+    "jumpscare": "its face close up as it lunges at the player: what makes it its own",
+    "scream": "the sound it makes as it catches her: who or what screams, and how",
+    "room": "id of the last room",
+    "trigger": "the story object in that room whose examining summons it"
+  },
   "intro": {
     "art": "what the opening picture shows: one wide scene that sets the mood, e.g. the house from the road at night",
     "text": ["2 to 4 short paragraphs (under ${LIMITS.introParagraphLength} characters each), shown one at a time over the picture"]

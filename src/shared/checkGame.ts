@@ -80,7 +80,7 @@ export function objectivesSetIn(room: RoomSpec): { objective: string; path: stri
 }
 
 /** For each room, the wall each of its connections leaves through. Connections that don't join two neighboring rooms are skipped. */
-export function doorSides(rooms: RoomSpec[], connections: ConnectionSpec[]): Map<string, Map<string, Side>> {
+export function doorSides(rooms: Pick<RoomSpec, "id" | "grid">[], connections: Pick<ConnectionSpec, "id" | "rooms">[]): Map<string, Map<string, Side>> {
   const grid = new Map(rooms.map((r) => [r.id, r.grid]));
   const sides = new Map(rooms.map((r) => [r.id, new Map<string, Side>()]));
   for (const { id, rooms: [a, b] } of connections) {
@@ -140,6 +140,11 @@ export function checkGame(spec: GameSpec): Issue[] {
   spec.objectives.slice(1).forEach((objective, i) => {
     if (!objectivesSet.has(objective.id)) warn(`objectives[${i + 1}]`, `objectives[${i + 1}](${objective.id}) is never set by anything, so the player never sees it`);
   });
+
+  const finales = spec.rooms.flatMap((room, i) => room.characters.flatMap((c, j) => (c.finale ? [{ path: `${roomPath(i)}.characters[${j}](${c.id})`, room: room.id }] : [])));
+  for (const extra of finales.slice(1)) {
+    error(`${extra.path}.finale`, `${extra.path} has a "finale", but ${finales[0].path} already does; the game ends once, with one antagonist`, extra.room);
+  }
 
   const connectionIds = new Set<string>();
   const pairs = new Set<string>();

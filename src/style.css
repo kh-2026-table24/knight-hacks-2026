@@ -667,3 +667,8 @@ body {
     opacity: 0.35;
   }
 }
+
+/* The game's end comes straight out of the antagonist's jumpscare, so it shows over the scare's black. */
+.death-screen-ending {
+  z-index: 21;
+}
