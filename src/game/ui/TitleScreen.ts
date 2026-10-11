@@ -8,6 +8,8 @@ import { TitleArt } from "./TitleArt";
 // dialogue box's frame, with how far along its art is. The name is a placeholder.
 export const GAME_NAME = "Dream Catcher";
 const MENU_THEME = "/audio/menu-theme.mp3";
+// Where this browser remembers the passcode for making games, once it has worked.
+const PASSCODE_KEY = "dream-catcher-passcode";
 // While browsing, the list refreshes this often so games being painted count up.
 const BROWSE_REFRESH_MS = 2000;
 
@@ -44,6 +46,25 @@ const element = <K extends keyof HTMLElementTagNameMap>(tag: K, className: strin
   return el;
 };
 
+// Browser storage can be missing or refuse (private windows), and the passcode is then just asked again.
+const remembered = {
+  get: () => {
+    try {
+      return localStorage.getItem(PASSCODE_KEY) ?? undefined;
+    } catch {
+      return undefined;
+    }
+  },
+  set: (value: string | undefined) => {
+    try {
+      if (value === undefined) localStorage.removeItem(PASSCODE_KEY);
+      else localStorage.setItem(PASSCODE_KEY, value);
+    } catch {
+      // Not remembered; it'll be asked for next time.
+    }
+  },
+};
+
 /** The story's opening sentence. */
 const firstSentence = (text: string) => text.match(/^.*?[.!?](\s|$)/)?.[0].trim() ?? text;
 
@@ -58,6 +79,8 @@ export class TitleScreen {
   private browseTimer: ReturnType<typeof setTimeout> | undefined;
   /** Bumped whenever the menu changes, so a list refresh still in flight from before knows to stop. */
   private menuVersion = 0;
+  /** The passcode field, while it's showing. */
+  private passcodeInput: HTMLInputElement | undefined;
   /** The browse list's cards by game id, so a refresh can update them in place. */
   private cards = new Map<string, { button: HTMLButtonElement; state: HTMLElement }>();
 
@@ -123,16 +146,51 @@ export class TitleScreen {
     ]);
   }
 
-  /** Asks the server for a new game; it starts making it and answers with its id right away. */
-  private async create() {
+  /**
+   * Asks the server for a new game; it starts making it and answers with its id right away. Making one
+   * takes a passcode (server/passcode.ts): this browser's remembered one, else the player is asked.
+   */
+  private async create(passcode = remembered.get()) {
     for (const item of this.items) item.disabled = true;
+    this.passcodeInput?.setAttribute("disabled", "");
     try {
-      const response = await fetch("/api/games", { method: "POST" });
+      const response = await fetch("/api/games", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ passcode }),
+      });
+      if (response.status === 401) {
+        remembered.set(undefined);
+        return this.showPasscode(passcode === undefined ? undefined : "That isn't it.");
+      }
       if (!response.ok) throw new Error(await response.text());
+      if (passcode !== undefined) remembered.set(passcode);
       this.pick?.(((await response.json()) as CreatedGame).id);
     } catch (error) {
       this.showMain(`The house won't answer (${error instanceof Error ? error.message : String(error)})`);
     }
+  }
+
+  /** Asks for the passcode in the menu: a field to type it in, and Back. */
+  private showPasscode(note?: string) {
+    this.menuVersion++;
+    this.menu.classList.remove("title-menu-browse");
+    const form = element("form", "title-passcode");
+    element("label", "title-passcode-label", form, note ?? "The door is locked. Speak the passcode.").setAttribute("for", "title-passcode");
+    const input = element("input", "title-passcode-input", form);
+    input.id = "title-passcode";
+    input.type = "password";
+    input.autocomplete = "off";
+    input.spellcheck = false;
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (input.value.trim()) void this.create(input.value.trim());
+    });
+    this.passcodeInput = input;
+    const back = this.menuItem({ label: "Back", action: () => this.showMain() });
+    this.items = [back];
+    this.menu.replaceChildren(form, back);
+    input.focus();
   }
 
   private async showBrowse() {
@@ -205,6 +263,7 @@ export class TitleScreen {
   }
 
   private setMenu(entries: MenuItem[]) {
+    this.passcodeInput = undefined;
     this.menu.classList.remove("title-menu-browse");
     this.items = entries.map((entry) => this.menuItem(entry));
     this.menu.replaceChildren(...this.items);
@@ -237,6 +296,14 @@ export class TitleScreen {
   }
 
   private onKey = (e: KeyboardEvent) => {
+    if (this.passcodeInput) {
+      // Typing goes to the field (W and S included); Escape goes back.
+      if (e.key === "Escape") {
+        e.preventDefault();
+        this.showMain();
+      }
+      return;
+    }
     const i = this.items.findIndex((item) => item.classList.contains("title-item-selected"));
     const step = e.key === "ArrowDown" || e.key === "s" ? 1 : e.key === "ArrowUp" || e.key === "w" ? -1 : 0;
     if (step && i >= 0) {

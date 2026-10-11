@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { createServer, type ServerResponse } from "node:http";
+import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { extname, join, normalize } from "node:path";
 import type { CreatedGame } from "../src/shared/api";
 import { isScreamId } from "../src/shared/screams";
@@ -7,12 +7,13 @@ import { getAsset } from "./assets";
 import { getGame, InvalidGameError, isSafeId } from "./games";
 import { createGame, gameStatus, resumePainting, summarizeGames } from "./jobs";
 import { log } from "./log";
+import { checkPasscode } from "./passcode";
 import { getScream } from "./screams";
 import { onCloudRun } from "./secrets";
 
 // Game server. Vite proxies /api here (see vite.config.ts); `npm run dev` starts both.
 //   GET  /api/games                        -> every game and how far along it is: GameSummary[]
-//   POST /api/games                        -> starts making a new game (story, rooms, then art): { id }
+//   POST /api/games  { passcode }          -> starts making a new game (story, rooms, then art): { id }; 401 for a wrong passcode
 //   GET  /api/games/:gameId                -> the game's GameSpec JSON, once its rooms are built
 //   GET  /api/games/:gameId/status         -> GameStatus; also starts painting a game whose art isn't all made
 //   GET  /api/games/:gameId/assets/:artId  -> PNG, once it's been made (404 until then); a scream's id gives its MP3
@@ -38,6 +39,30 @@ const CONTENT_TYPES: Record<string, string> = {
   ".svg": "image/svg+xml",
   ".ico": "image/x-icon",
 };
+
+// The passcode is all a request to make a game carries, so its body is small.
+const MAX_BODY_BYTES = 1024;
+
+/** A request's JSON body, or undefined if it's missing, too big or not JSON. */
+async function readJson(req: IncomingMessage): Promise<unknown> {
+  let body = "";
+  for await (const chunk of req) {
+    body += chunk;
+    if (body.length > MAX_BODY_BYTES) return undefined;
+  }
+  try {
+    return JSON.parse(body);
+  } catch {
+    return undefined;
+  }
+}
+
+/** Who sent a request. On Cloud Run, Google's front end appends the caller's address to X-Forwarded-For, so the last entry is the one a caller can't fake. */
+function addressOf(req: IncomingMessage) {
+  const forwarded = req.headers["x-forwarded-for"];
+  const last = (Array.isArray(forwarded) ? forwarded.join(",") : forwarded)?.split(",").pop()?.trim();
+  return last || req.socket.remoteAddress || "unknown";
+}
 
 const send = (res: ServerResponse, status: number, body: string | Buffer, type = "text/plain", cache?: string) => {
   res.writeHead(status, { "Content-Type": type, ...(cache && { "Cache-Control": cache }) }).end(body);
@@ -66,6 +91,16 @@ const server = createServer(async (req, res) => {
     if (api !== "api") return await sendStatic(res, pathname);
     if (creating) {
       if (ALLOWED_GAMES) return send(res, 403, "Making new games is turned off on this server");
+      const body = await readJson(req);
+      const passcode = typeof body === "object" && body !== null ? (body as { passcode?: unknown }).passcode : undefined;
+      switch (await checkPasscode(passcode, addressOf(req))) {
+        case "off":
+          return send(res, 403, "Making new games is turned off on this server");
+        case "locked":
+          return send(res, 429, "Too many wrong passcodes. Try again in a few minutes.");
+        case "wrong":
+          return send(res, 401, "Wrong passcode");
+      }
       const created: CreatedGame = { id: createGame() };
       return send(res, 202, JSON.stringify(created), "application/json");
     }
