@@ -1,19 +1,20 @@
-"""FLUX.2 [klein] 4B image generation on a Modal cloud GPU.
+"""Qwen-Image 20B image generation on a Modal cloud GPU.
 
-Runs the open-weight model from Hugging Face (black-forest-labs/FLUX.2-klein-4B, Apache 2.0) behind
-one HTTPS endpoint, so the game server can call it in place of Gemini. The same model draws from text
-and redraws a reference image, so later animation frames keep their first frame's style.
+Runs open-weight models from Hugging Face (Apache 2.0) behind one HTTPS endpoint for the game server:
+Qwen/Qwen-Image draws from text, and Qwen/Qwen-Image-Edit-2511 redraws a reference image (later
+animation frames), so frames keep their first frame's style. Both use 4-step Lightning LoRAs.
 
 Setup, once:
     pip install modal && modal setup
     modal secret create huggingface-secret HF_TOKEN=hf_...
+    modal run imagegen/qwen_modal.py::download     # ~120 GB into the volume, on a cheap CPU container
 Try it (draws on the cloud GPU, saves the result locally):
-    modal run imagegen/flux_modal.py::main --prompt "a rusty lantern" --aspect-ratio 3:4
-    modal run imagegen/flux_modal.py::main --prompt "the same lantern, flame flickering" --reference /tmp/flux-test.png
+    modal run imagegen/qwen_modal.py::main --prompt "a rusty lantern" --aspect-ratio 3:4
+    modal run imagegen/qwen_modal.py::main --prompt "the same lantern, flame flickering" --reference /tmp/qwen-test.png
 Draw a character and its animation frames the way the game does, with timings:
-    modal run imagegen/flux_modal.py::character_test
+    modal run imagegen/qwen_modal.py::character_test
 Deploy the endpoint (prints its URL):
-    modal deploy imagegen/flux_modal.py
+    modal deploy imagegen/qwen_modal.py
 
 Endpoint: POST JSON {"prompt": str, "aspect_ratio": "9:16", "reference": base64 image (optional),
 "seed": int (optional)} -> image/png. It requires proxy auth: send the Modal-Key and Modal-Secret
@@ -23,55 +24,55 @@ headers from a proxy auth token (Modal dashboard -> Settings -> Proxy Auth Token
 import base64
 import binascii
 import io
+import math
 import re
 import time
 from pathlib import Path
 
 import modal
 
-MODEL_ID = "black-forest-labs/FLUX.2-klein-4B"
+TEXT_MODEL = "Qwen/Qwen-Image"
+EDIT_MODEL = "Qwen/Qwen-Image-Edit-2511"
+# Distilled LoRAs that let each model draw in 4 steps instead of ~40, without classifier-free guidance.
+TEXT_LORA = ("lightx2v/Qwen-Image-Lightning", "Qwen-Image-Lightning-4steps-V2.0-bf16.safetensors")
+EDIT_LORA = ("lightx2v/Qwen-Image-Edit-2511-Lightning", "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors")
+STEPS = 4
 CACHE_DIR = "/cache"
 MINUTES = 60
 
-# klein is distilled to draw in a few steps without classifier-free guidance; these are the model card's values.
-STEPS = 4
-GUIDANCE = 1.0
-
-# Every image is shrunk to 128px or less by the game server, so draw as small as the model stays coherent.
-# FLUX works on a grid 1/16 the image's size, and below ~512px it runs out of room to form a subject.
-# Sides must be multiples of 16; very wide or tall shapes keep their short side at MIN_SIDE.
+# Every image is shrunk to 128px or less by the game server, but Qwen-Image is trained around 1328px and
+# loses coherence well before 512px, so it draws near 1024x1024. Sides must be multiples of 16; very wide
+# or tall shapes keep their short side at MIN_SIDE and their long side at MAX_SIDE.
 TARGET_PIXELS = 1024 * 1024
 MIN_SIDE = 256
+MAX_SIDE = 2048
 
-# Weights are stored in fp8 (half of bf16) and widened to bf16 one layer at a time as they run, so half
-# as many bytes move onto the GPU at startup. Set False if images come out noticeably worse.
-FP8_WEIGHTS = True
-
-# One warm container draws an image in well under a second, while a second container would spend
-# 30+ s starting up. Extra requests queue for the warm one instead of starting more GPUs.
+# One warm container is far faster than starting a second one (the models take a minute or more to
+# load), so extra requests queue for it instead of starting more GPUs.
 MAX_CONTAINERS = 1
 MAX_PROMPT_CHARS = 4000
 MAX_REFERENCE_BYTES = 10 * 1024 * 1024
 ASPECT_RATIO = re.compile(r"^([1-9]|1[0-9]|2[01]):([1-9]|1[0-9]|2[01])$")  # 1:1 up to 21:9, like Gemini's set
 
-# Versions are left unpinned so the build gets a diffusers release with Flux2KleinPipeline;
+# Versions are left unpinned so the build gets a diffusers release with the Qwen-Image pipelines;
 # pin them once a working set is confirmed so a later release can't break the demo.
 image = (
     modal.Image.debian_slim(python_version="3.12")
-    .uv_pip_install("torch", "diffusers", "transformers", "accelerate", "pillow", "fastapi[standard]")
+    .uv_pip_install("torch", "torchvision", "diffusers", "transformers", "accelerate", "peft", "pillow", "fastapi[standard]")
     .env({"HF_HUB_CACHE": CACHE_DIR})
 )
 
-app = modal.App("paradise-flux", image=image)
+app = modal.App("paradise-qwen", image=image)
 
-# The weights (~16 GB) download once into this volume instead of on every cold start.
+# The weights download once into this volume instead of on every cold start. It keeps its name from the
+# FLUX version because renaming it would mean downloading ~100 GB again.
 hf_cache = modal.Volume.from_name("paradise-flux-hf-cache", create_if_missing=True)
 
 with image.imports():
     import torch
-    from diffusers import Flux2KleinPipeline
-    from diffusers.hooks import apply_layerwise_casting
+    from diffusers import FlowMatchEulerDiscreteScheduler, QwenImageEditPlusPipeline, QwenImagePipeline, QwenImageTransformer2DModel
     from fastapi import HTTPException, Response
+    from huggingface_hub import hf_hub_download, snapshot_download
     from PIL import Image
 
 
@@ -82,62 +83,97 @@ def size_for(aspect_ratio: str) -> tuple[int, int]:
         raise ValueError(f'aspect_ratio must look like "9:16" (sides 1 to 21), got {aspect_ratio!r}')
     w, h = int(match[1]), int(match[2])
     scale = max((TARGET_PIXELS / (w * h)) ** 0.5, MIN_SIDE / min(w, h))
+    scale = min(scale, MAX_SIDE / max(w, h))
     return round(w * scale / 16) * 16, round(h * scale / 16) * 16
 
 
-# L40S (48 GB) holds the pipeline with room to spare and is quick; "A10G" (24 GB) also fits and costs
-# less. Containers stay warm for a while after the last request so a game's burst of images doesn't pay
-# a cold start each time. Requests are handled one at a time per container: the pipeline isn't safe to
-# call from two threads, and the GPU is already fully busy with one image.
+def lightning_scheduler():
+    # The Lightning LoRAs were distilled with a fixed shift of 3; these are the values from their model card.
+    return FlowMatchEulerDiscreteScheduler.from_config({
+        "base_image_seq_len": 256, "base_shift": math.log(3), "invert_sigmas": False, "max_image_seq_len": 8192,
+        "max_shift": math.log(3), "num_train_timesteps": 1000, "shift": 1.0, "shift_terminal": None,
+        "stochastic_sampling": False, "time_shift_type": "exponential", "use_beta_sigmas": False,
+        "use_dynamic_shifting": True, "use_exponential_sigmas": False, "use_karras_sigmas": False,
+    })
+
+
+@app.function(volumes={CACHE_DIR: hf_cache}, secrets=[modal.Secret.from_name("huggingface-secret")], timeout=60 * MINUTES)
+def download() -> None:
+    """Fills the volume on a CPU-only container, so a GPU never sits idle billing during the download."""
+    snapshot_download(TEXT_MODEL)
+    # The edit model's text encoder and VAE are the text model's, already downloaded, so only its own parts.
+    snapshot_download(EDIT_MODEL, allow_patterns=["transformer/*", "processor/*", "tokenizer/*", "scheduler/*", "*.json"])
+    for repo, weights in (TEXT_LORA, EDIT_LORA):
+        hf_hub_download(repo, weights)
+    hf_cache.commit()
+
+
+# H100 (80 GB): both 20B transformers in fp8 (~20 GB each) plus the shared bf16 text encoder (~17 GB) stay
+# loaded together, so a game's text images and reference frames never wait for a model swap. Containers
+# stay warm for a while after the last request so a game's burst of images doesn't pay a cold start each
+# time. Requests are handled one at a time per container: the pipelines aren't safe to call from two threads.
 @app.cls(
-    gpu="L40S",
+    gpu="H100",
+    memory=80 * 1024,  # MiB; models pass through RAM on their way to the GPU
     volumes={CACHE_DIR: hf_cache},
     secrets=[modal.Secret.from_name("huggingface-secret")],
     scaledown_window=10 * MINUTES,
-    timeout=10 * MINUTES,
+    timeout=30 * MINUTES,
     max_containers=MAX_CONTAINERS,
-    # Once deployed, Modal saves the container's memory after load() and restores it on later cold
-    # starts, skipping the imports, the disk read and the fp8 conversion. `modal run` doesn't snapshot.
-    enable_memory_snapshot=True,
 )
-class Flux:
-    @modal.enter(snap=True)
+class Qwen:
+    @modal.enter()
     def load(self) -> None:
-        # No GPU work here: the GPU isn't attached while the snapshot is taken.
-        self.pipe = Flux2KleinPipeline.from_pretrained(MODEL_ID, torch_dtype=torch.bfloat16)
-        if FP8_WEIGHTS:
-            # The transformer and text encoder are nearly all of the bytes; the small VAE stays bf16.
-            self.pipe.transformer.enable_layerwise_casting(storage_dtype=torch.float8_e4m3fn, compute_dtype=torch.bfloat16)
-            apply_layerwise_casting(self.pipe.text_encoder, storage_dtype=torch.float8_e4m3fn, compute_dtype=torch.bfloat16)
-        hf_cache.commit()  # keep a first-run download for the next container
-
-    @modal.enter(snap=False)
-    def to_gpu(self) -> None:
+        # Only from the volume (filled by download()): a missing file fails fast instead of downloading
+        # gigabytes while the GPU bills.
         started = time.perf_counter()
-        self.pipe.to("cuda")
-        print(f"moved the model onto the GPU in {time.perf_counter() - started:.1f} s")
+        self.text = QwenImagePipeline.from_pretrained(
+            TEXT_MODEL, scheduler=lightning_scheduler(), torch_dtype=torch.bfloat16, local_files_only=True
+        )
+        self.text.transformer.to("cuda")
+        self.prepare(self.text, TEXT_LORA)
+        print(f"text model ready after {time.perf_counter() - started:.1f} s")
+
+        # Built around the text pipeline's text encoder and VAE, so they're loaded and kept on the GPU once.
+        edit_transformer = QwenImageTransformer2DModel.from_pretrained(
+            EDIT_MODEL, subfolder="transformer", torch_dtype=torch.bfloat16, local_files_only=True
+        )
+        self.edit = QwenImageEditPlusPipeline.from_pretrained(
+            EDIT_MODEL,
+            transformer=edit_transformer.to("cuda"),
+            text_encoder=self.text.text_encoder,
+            vae=self.text.vae,
+            scheduler=lightning_scheduler(),
+            torch_dtype=torch.bfloat16,
+            local_files_only=True,
+        )
+        self.prepare(self.edit, EDIT_LORA)
+        print(f"edit model ready after {time.perf_counter() - started:.1f} s")
+
+        self.text.text_encoder.to("cuda")
+        self.text.vae.to("cuda")
+        print(f"loaded both models onto the GPU in {time.perf_counter() - started:.1f} s")
+
+    @staticmethod
+    def prepare(pipe, lora: tuple[str, str]) -> None:
+        # Bake the Lightning LoRA into the bf16 weights, then store them as fp8 (half the memory) and widen
+        # each layer back to bf16 as it runs. Fusing first keeps the LoRA's precision.
+        pipe.load_lora_weights(lora[0], weight_name=lora[1], local_files_only=True)
+        pipe.fuse_lora()
+        pipe.unload_lora_weights()
+        pipe.transformer.enable_layerwise_casting(storage_dtype=torch.float8_e4m3fn, compute_dtype=torch.bfloat16)
+        torch.cuda.empty_cache()
 
     def draw(self, prompt: str, aspect_ratio: str, reference: bytes | None, seed: int | None) -> bytes:
         width, height = size_for(aspect_ratio)
         started = time.perf_counter()
-        extra = {}
-        if reference is not None:
-            extra["image"] = Image.open(io.BytesIO(reference)).convert("RGB")
+        options = {"prompt": prompt, "width": width, "height": height, "num_inference_steps": STEPS, "true_cfg_scale": 1.0}
         if seed is not None:
-            extra["generator"] = torch.Generator("cuda").manual_seed(seed)
-        # The pipeline gives prompt embeddings its text encoder's weight type, which is fp8 when FP8_WEIGHTS
-        # is on, and the GPU can't draw starting noise in fp8. Encoding here lets us ask for bf16.
-        prompt_embeds = self.pipe._get_qwen3_prompt_embeds(
-            self.pipe.text_encoder, self.pipe.tokenizer, prompt, dtype=torch.bfloat16, device=torch.device("cuda")
-        )
-        result = self.pipe(
-            prompt_embeds=prompt_embeds,
-            width=width,
-            height=height,
-            num_inference_steps=STEPS,
-            guidance_scale=GUIDANCE,
-            **extra,
-        ).images[0]
+            options["generator"] = torch.Generator("cuda").manual_seed(seed)
+        if reference is None:
+            result = self.text(**options).images[0]
+        else:
+            result = self.edit(image=[Image.open(io.BytesIO(reference)).convert("RGB")], guidance_scale=1.0, **options).images[0]
         print(f"drew {width}x{height}{' from a reference' if reference else ''} in {time.perf_counter() - started:.2f} s on the GPU")
         # PNG, not JPEG: compression smears the green screen into the subject's edges.
         out = io.BytesIO()
@@ -176,11 +212,11 @@ class Flux:
 
 
 @app.local_entrypoint()
-def character_test(subject: str = "scruffy brown terrier dog", aspect_ratio: str = "3:2", out_dir: str = "/tmp/flux-dog") -> None:
+def character_test(subject: str = "scruffy brown terrier dog", aspect_ratio: str = "3:2", out_dir: str = "/tmp/qwen-dog") -> None:
     """Draws one character the way the game server does, and times each image.
 
     The first frame is drawn from text; every other frame is drawn from it as a reference, so they
-    match. Run: modal run imagegen/flux_modal.py::character_test
+    match. Run: modal run imagegen/qwen_modal.py::character_test
     """
     import json
 
@@ -234,12 +270,12 @@ def character_test(subject: str = "scruffy brown terrier dog", aspect_ratio: str
 
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
-    flux = Flux()
+    qwen = Qwen()
     timings = {}
 
     def save(name: str, prompt: str, reference: bytes | None) -> bytes:
         started = time.perf_counter()
-        png = flux.generate.remote(prompt, aspect_ratio, reference)
+        png = qwen.generate.remote(prompt, aspect_ratio, reference)
         timings[name] = round(time.perf_counter() - started, 2)
         (out / f"{len(timings) - 1}-{name}.png").write_bytes(png)
         print(f"{name:14} {timings[name]:6.2f} s{'  (includes cold start)' if len(timings) == 1 else ''}")
@@ -254,9 +290,9 @@ def character_test(subject: str = "scruffy brown terrier dog", aspect_ratio: str
 
 
 @app.local_entrypoint()
-def main(prompt: str = "a rusty iron lantern", aspect_ratio: str = "1:1", reference: str = "", out: str = "/tmp/flux-test.png") -> None:
+def main(prompt: str = "a rusty iron lantern", aspect_ratio: str = "1:1", reference: str = "", out: str = "/tmp/qwen-test.png") -> None:
     size_for(aspect_ratio)  # fail here, before a GPU starts, on a bad ratio
     ref = Path(reference).read_bytes() if reference else None
-    png = Flux().generate.remote(prompt, aspect_ratio, ref)
+    png = Qwen().generate.remote(prompt, aspect_ratio, ref)
     Path(out).write_bytes(png)
     print(f"Saved {len(png) // 1024} KB to {out}")
