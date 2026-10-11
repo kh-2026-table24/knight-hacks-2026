@@ -1,6 +1,7 @@
 // The 2D overlay: hearts, the items the player carries, a hint line, the dialogue box and a centered
 // message for loading and errors. It's plain HTML over the canvas, so it stays crisp instead of going
 // through the retro filter. The art in public/ui/ is shared by every game (scripts/gen-ui.ts makes it).
+import { DeathScreen } from "./DeathScreen";
 import { Jumpscare } from "./Jumpscare";
 
 const DEFAULT_ITEM_ICON = "/ui/key.png";
@@ -22,6 +23,7 @@ const element = <K extends keyof HTMLElementTagNameMap>(tag: K, className: strin
 export class Hud {
   readonly dialogue: DialogueBox;
   readonly jumpscare: Jumpscare;
+  readonly death: DeathScreen;
   private readonly hearts: HTMLElement;
   private readonly items: HTMLElement;
   private readonly hint: HTMLElement;
@@ -34,6 +36,7 @@ export class Hud {
     this.hint = element("div", "hud-hint", root);
     this.dialogue = new DialogueBox(root);
     this.message = element("div", "hud-message", root);
+    this.death = new DeathScreen(parent);
     this.jumpscare = new Jumpscare(parent);
     this.setItems([]);
     this.setHint(null);

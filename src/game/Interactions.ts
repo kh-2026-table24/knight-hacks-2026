@@ -30,6 +30,14 @@ export interface InteractionHost {
 const VANISH_SECONDS = 4;
 const SCARE_COOLDOWN_SECONDS = 20;
 
+// The last heartbeats under the death screen: [seconds in, volume].
+const HEARTBEAT_FADING: [number, number][] = [
+  [0.6, 0.9],
+  [1.5, 0.65],
+  [2.8, 0.4],
+  [4.6, 0.2],
+];
+
 const verb = (target: Interactable) => (target instanceof Character ? "Talk" : target.examine ? "Examine" : "Search");
 const describe = (item: ItemSpec) => `the ${item.name}`;
 
@@ -45,7 +53,7 @@ export class Interactions {
   constructor(private readonly host: InteractionHost) {
     window.addEventListener("keydown", (e) => {
       // defaultPrevented: the dialogue box already used this press (e.g. to close the last line).
-      if (e.key.toLowerCase() === "e" && !e.repeat && !e.defaultPrevented && !host.hud.dialogue.isOpen) void this.interact();
+      if (e.key.toLowerCase() === "e" && !e.repeat && !e.defaultPrevented && !host.hud.dialogue.isOpen && !host.hud.death.isOpen) void this.interact();
     });
   }
 
@@ -72,7 +80,7 @@ export class Interactions {
     // Checked every step: something hostile keeps hurting while you stay in contact, once the blinking from the last hit ends.
     for (const owner of now) {
       const damage = owner instanceof Character ? owner.hostile?.damage : owner instanceof Prop ? owner.hazard?.damage : undefined;
-      if (damage && this.hurt(game, damage, owner instanceof Character ? owner : undefined)) break;
+      if (damage && this.hurt(game, damage, owner as Character | Prop)) break;
     }
 
     for (const pickup of room.pickupsInReach(player.position)) {
@@ -95,21 +103,24 @@ export class Interactions {
   }
 
   /** Takes hearts unless the player is still blinking from the last hit. Returns whether it landed. */
-  private hurt(game: Game, damage: number, by?: Character) {
+  private hurt(game: Game, damage: number, by: Character | Prop) {
     const { player, hud } = this.host;
     if (!player.vulnerable || game.state.hearts === 0) return false;
     game.state.hearts = Math.max(0, game.state.hearts - damage);
     player.startInvulnerability(PLAYER.invulnerableSeconds);
     hud.setHearts(game.state.hearts, PLAYER.maxHearts);
     const dead = game.state.hearts === 0;
-    const last = by && this.lastScare.get(by);
-    if (by?.scream && (last === undefined || performance.now() - last > SCARE_COOLDOWN_SECONDS * 1000)) {
-      void this.scare(by, by.scream).then(() => {
-        if (dead) void this.die(game);
+    const character = by instanceof Character ? by : undefined;
+    const last = character && this.lastScare.get(character);
+    // The killing blow always scares, cooldown or not.
+    const scares = character?.scream && (dead || last === undefined || performance.now() - last > SCARE_COOLDOWN_SECONDS * 1000);
+    if (character?.scream && scares) {
+      void this.scare(character, character.scream).then(() => {
+        if (dead) void this.die(game, by);
       });
     } else {
       this.host.audio?.play("hurt");
-      if (dead) void this.die(game);
+      if (dead) void this.die(game, by);
     }
     return true;
   }
@@ -201,14 +212,30 @@ export class Interactions {
     }
   }
 
-  // Placeholder until the game's states are designed: back to the room's start with full hearts.
-  private async die(game: Game) {
-    this.host.audio?.play("thud");
-    await this.show(["Everything goes dark..."]);
-    game.state.hearts = PLAYER.maxHearts;
-    this.host.player.clearInvulnerability();
-    this.host.hud.setHearts(game.state.hearts, PLAYER.maxHearts);
+  /** The death screen, over a heartbeat that slows and stops. Trying again starts the room over with full hearts; a new dream goes back to the title screen. */
+  private async die(game: Game, by: Character | Prop) {
+    const { player, hud, audio } = this.host;
     const room = this.host.room();
+    player.frozen = true;
+    hud.setHint(null);
+    audio?.stopMusic();
+    audio?.play("thud");
+    for (const [at, volume] of HEARTBEAT_FADING) setTimeout(() => audio?.heartbeat(volume), at * 1000);
+
+    const choice = await hud.death.show({
+      by: by.name,
+      room: game.spec.rooms.find((spec) => spec.id === room?.id)?.name ?? "dark",
+      portrait: by instanceof Character ? by.portrait : undefined,
+    });
+    if (choice === "new") {
+      location.assign("/");
+      return;
+    }
+    game.state.hearts = PLAYER.maxHearts;
+    player.clearInvulnerability();
+    hud.setHearts(game.state.hearts, PLAYER.maxHearts);
+    player.frozen = false;
+    audio?.startMusic();
     if (room) this.host.swapRooms(room);
   }
 }

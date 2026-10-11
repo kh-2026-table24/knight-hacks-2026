@@ -99,8 +99,8 @@ export class GameComposer {
       this.player.update(dt);
       this.world.timestep = dt;
       this.world.step();
-      // Nothing happens to the player, and characters stand still, while they're reading or being scared.
-      const reading = this.hud.dialogue.isOpen || this.hud.jumpscare.isPlaying;
+      // Nothing happens to the player, and characters stand still, while they're reading, being scared or dead.
+      const reading = this.hud.dialogue.isOpen || this.hud.jumpscare.isPlaying || this.hud.death.isOpen;
       this.room?.update(dt, reading, this.player.position);
       if (!reading) {
         this.interactions.step();
