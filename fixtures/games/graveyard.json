@@ -1,0 +1,234 @@
+{
+  "version": 1,
+  "title": "The Marrow Grave",
+  "summary": "Elias Marrow was buried in the family graveyard a month ago, and nobody has been inside his house since. The gravedigger kept the key he found in the old man's coat. Inside, a letter warns never to open the back door, and the ghost of his wife begs the same. Whatever Elias buried in the back yard the night he died is still trying to get out of the well.",
+  "rooms": [
+    {
+      "id": "graveyard",
+      "name": "Family Graveyard",
+      "outdoor": true,
+      "grid": [0, 0],
+      "size": [18, 6, 14],
+      "start": [9, 12.5],
+      "baseLight": 0.3,
+      "walls": "weathered grey clapboard siding of an old farmhouse",
+      "floor": "patchy dead grass over black soil",
+      "doors": [{ "connection": "front-door", "offset": 9, "art": "warped wooden front door with a cracked oval window" }],
+      "props": [
+        {
+          "id": "mausoleum", "name": "small stone mausoleum with a rusted iron gate", "material": "black-streaked limestone blocks", "position": [3, 0, 1.65],
+          "parts": [{ "shape": "box", "position": [0, 0, 0], "size": [3, 3, 2.2] }]
+        },
+        {
+          "id": "headstone-1", "name": "crooked granite headstone, name worn away", "material": "lichen-spotted grey granite", "position": [4.5, 0, 5.2], "rotationY": 0.12,
+          "parts": [{ "shape": "box", "position": [0, 0, 0], "size": [0.8, 1.1, 0.25] }]
+        },
+        {
+          "id": "headstone-2", "name": "cracked granite headstone", "material": "lichen-spotted grey granite", "position": [6.3, 0, 4.8], "rotationY": -0.08,
+          "parts": [{ "shape": "box", "position": [0, 0, 0], "size": [0.8, 1.1, 0.25] }]
+        },
+        {
+          "id": "elias-headstone", "name": "tall granite headstone carved with the name ELIAS MARROW", "material": "pale polished granite", "position": [12, 0, 4.9],
+          "parts": [{ "shape": "box", "position": [0, 0, 0], "size": [0.9, 1.4, 0.3] }],
+          "examine": [{ "lines": ["ELIAS MARROW, 1841-1889. BELOVED FATHER.", "Someone has scratched a single word beneath it: LIAR."] }]
+        },
+        {
+          "id": "headstone-3", "name": "leaning granite headstone", "material": "lichen-spotted grey granite", "position": [14, 0, 5.3], "rotationY": 0.2,
+          "parts": [{ "shape": "box", "position": [0, 0, 0], "size": [0.8, 1.1, 0.25] }]
+        },
+        {
+          "id": "headstone-4", "name": "small granite headstone for a child", "material": "lichen-spotted grey granite", "position": [15.8, 0, 4.7], "rotationY": -0.15,
+          "parts": [{ "shape": "box", "position": [0, 0, 0], "size": [0.6, 0.8, 0.2] }]
+        },
+        {
+          "id": "grave-candles", "name": "cluster of melted black candles", "position": [4.5, 0, 5.6],
+          "light": { "type": "glow", "color": "#ffb060", "intensity": 1.5, "range": 3, "effect": "flicker" },
+          "parts": [{ "shape": "panel", "position": [0, 0, 0], "size": [0.6, 0.4, 0], "frames": ["the same candles with their flames bent low"] }]
+        },
+        {
+          "id": "lantern-post", "name": "wrought-iron lantern post", "material": "black wrought iron", "position": [10.6, 0, 7],
+          "light": { "type": "glow", "color": "#ffc070", "intensity": 2.5, "range": 5, "effect": "flicker" },
+          "parts": [
+            { "shape": "box", "position": [0, 0, 0], "size": [0.15, 1.7, 0.15] },
+            { "shape": "panel", "position": [0, 1.7, 0], "size": [0.45, 0.55, 0], "art": "old iron lantern with a dim yellow flame" }
+          ]
+        },
+        {
+          "id": "open-grave", "name": "freshly dug open grave, a black pit", "position": [13, 0.01, 9.6],
+          "parts": [{ "shape": "panel", "position": [0, 0, 0], "rotation": [-1.5708, 0, 0], "size": [1.2, 2.2, 0] }]
+        },
+        {
+          "id": "grave-mound", "name": "mound of fresh grave dirt", "material": "loose black grave dirt", "position": [14.5, 0, 8.5],
+          "parts": [{ "shape": "box", "position": [0, 0, 0], "size": [1.2, 0.6, 1.8] }]
+        },
+        {
+          "id": "dead-tree", "name": "gnarled dead oak tree with grasping bare branches", "position": [2.5, 0, 9],
+          "parts": [{ "shape": "panel", "position": [0, 0, 0], "size": [3.2, 4.6, 0], "solid": true }]
+        },
+        {
+          "id": "path", "name": "cracked flagstone path", "position": [9, 0.01, 13.5],
+          "parts": [{ "shape": "panel", "position": [0, 0, 0], "rotation": [-1.5708, 0, 0], "size": [1.6, 12, 0] }]
+        }
+      ],
+      "characters": [
+        {
+          "id": "gravedigger", "name": "Gravedigger", "position": [11.6, 0, 8.6], "size": [1, 1.9],
+          "art": { "description": "stooped old gravedigger in a muddy coat, holding a shovel", "idle": ["leaning on his shovel"] },
+          "light": { "type": "glow", "color": "#ffbe6b", "intensity": 2, "range": 4, "effect": "flicker" },
+          "dialogue": [
+            { "lines": ["Evening. Didn't expect anyone out here at this hour.", "That's the Marrow place. Nobody's set foot inside since the old man went in the ground."] },
+            { "lines": ["You want in? Fine.", "This was in his coat pocket when we buried him. I'd rather not keep it."] }
+          ],
+          "gives": { "kind": "key", "name": "Tarnished House Key", "art": "tarnished iron house key with a bone-white tag", "unlocks": "front-door" }
+        }
+      ]
+    },
+    {
+      "id": "house",
+      "name": "Marrow House",
+      "grid": [0, -1],
+      "size": [16, 5, 12],
+      "start": [8, 9.5],
+      "baseLight": 0.15,
+      "walls": "peeling sage-green floral wallpaper",
+      "floor": "scuffed dark walnut floorboards",
+      "doors": [
+        { "connection": "front-door", "offset": 8 },
+        { "connection": "back-door", "offset": 12, "art": "narrow back door with a boarded-up window" }
+      ],
+      "props": [
+        {
+          "id": "fireplace", "name": "brick fireplace with a dying fire", "material": "soot-stained red brick", "position": [4, 0, 0.75],
+          "light": { "type": "glow", "color": "#ff7a2e", "intensity": 4, "range": 6, "effect": "flicker" },
+          "parts": [{ "shape": "box", "position": [0, 0, 0], "size": [2.4, 1.3, 0.8] }]
+        },
+        {
+          "id": "chimney-breast", "name": "brick chimney breast", "material": "soot-stained red brick", "position": [4, 1.3, 0.55],
+          "parts": [{ "shape": "box", "position": [0, 0, 0], "size": [1.6, 3.7, 0.5] }]
+        },
+        {
+          "id": "portrait", "name": "oil portrait of a gaunt old man with the eyes scratched out", "position": [8, 1.8, 0.32],
+          "parts": [{ "shape": "panel", "position": [0, 0, 0], "size": [1, 1.3, 0] }],
+          "examine": [{ "lines": ["Elias Marrow, painted in better years.", "Someone has scratched out the eyes."] }]
+        },
+        {
+          "id": "window", "name": "rain-streaked window looking out on darkness", "position": [14.3, 1.4, 0.32],
+          "parts": [{ "shape": "panel", "position": [0, 0, 0], "size": [1, 1.4, 0] }]
+        },
+        {
+          "id": "armchair", "name": "threadbare wingback armchair", "material": "faded mustard velvet upholstery", "position": [6, 0, 3.2],
+          "parts": [
+            { "shape": "box", "position": [0, 0, 0], "size": [1, 0.5, 0.9] },
+            { "shape": "box", "position": [0, 0, -0.35], "size": [1, 1.1, 0.2] }
+          ]
+        },
+        {
+          "id": "writing-desk", "name": "writing desk with an unfinished letter", "material": "dark walnut wood grain", "position": [12.5, 0, 4],
+          "parts": [{ "shape": "box", "position": [0, 0, 0], "size": [1.6, 0.85, 0.8] }],
+          "examine": [{ "lines": ["An unfinished letter, the ink smeared:", "'If you are reading this, do not open the back door. What I buried out there is not resting.'"] }]
+        },
+        {
+          "id": "desk-candle", "name": "a single guttering candle in a brass holder", "position": [12, 0.85, 4.1],
+          "light": { "type": "glow", "color": "#ffb060", "intensity": 1.2, "range": 3, "effect": "flicker" },
+          "parts": [{ "shape": "panel", "position": [0, 0, 0], "size": [0.2, 0.35, 0] }]
+        },
+        {
+          "id": "side-table", "name": "small side table", "material": "chipped white-painted pine", "position": [2, 0, 9],
+          "parts": [{ "shape": "box", "position": [0, 0, 0], "size": [0.8, 0.8, 0.6] }]
+        },
+        {
+          "id": "cracked-doll", "name": "cracked porcelain doll with one glass eye missing", "position": [2, 0.8, 9],
+          "parts": [{ "shape": "panel", "position": [0, 0, 0], "size": [0.4, 0.5, 0] }],
+          "contains": { "kind": "key", "name": "Small Brass Key", "art": "small brass key tied with a faded blue ribbon", "unlocks": "back-door" }
+        },
+        {
+          "id": "bookshelf", "name": "tall bookshelf of water-damaged books", "material": "dark walnut wood grain", "position": [15.25, 0, 7],
+          "parts": [{ "shape": "box", "position": [0, 0, 0], "size": [0.7, 2.4, 2.4] }]
+        },
+        {
+          "id": "rug", "name": "worn crimson rug with a dark stain", "position": [8, 0.01, 8.5],
+          "parts": [{ "shape": "panel", "position": [0, 0, 0], "rotation": [-1.5708, 0, 0], "size": [4, 3, 0] }]
+        }
+      ],
+      "characters": [
+        {
+          "id": "margaret", "name": "Margaret", "position": [9, 0, 6.8], "size": [1, 1.9],
+          "art": { "description": "translucent ghost of an old woman in a black mourning dress", "idle": ["hands clasped", "hands clasped, head bowed"] },
+          "light": { "type": "glow", "color": "#9fd8ff", "intensity": 1.2, "range": 3, "effect": "pulse" },
+          "movement": { "type": "wander", "speed": 0.6, "radius": 1.5 },
+          "dialogue": [
+            { "lines": ["He buried something in the yard the night he died.", "Please. Don't let it out."] },
+            { "lines": ["The doll was hers. He hid the key inside it."] }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "backyard",
+      "name": "Back Yard",
+      "outdoor": true,
+      "grid": [0, -2],
+      "size": [16, 6, 12],
+      "start": [8, 9.5],
+      "baseLight": 0.22,
+      "walls": "tall crumbling fieldstone garden wall",
+      "floor": "overgrown wet weeds and black mud",
+      "doors": [{ "connection": "back-door", "offset": 8 }],
+      "props": [
+        {
+          "id": "well", "name": "old stone well, sealed with fresh boards", "material": "mossy grey fieldstone", "position": [8, 0, 4],
+          "light": { "type": "spot", "color": "#a8c0ff", "intensity": 2, "range": 2.5 },
+          "parts": [
+            { "shape": "box", "position": [0, 0, 0], "size": [1.6, 0.9, 1.6] },
+            { "shape": "panel", "position": [0, 0.9, 0], "size": [1.8, 1.6, 0], "art": "rotten wooden well frame with a frayed rope" }
+          ],
+          "examine": [
+            { "lines": ["The well is sealed with fresh boards and iron nails.", "From far below, something is scratching at them."] },
+            { "lines": ["The scratching stops when you lean closer.", "Then something knocks. Three times."] }
+          ]
+        },
+        {
+          "id": "shed", "name": "leaning garden shed", "material": "warped grey barn boards", "position": [2.5, 0, 1.65],
+          "parts": [{ "shape": "box", "position": [0, 0, 0], "size": [3, 2.6, 2.2] }]
+        },
+        {
+          "id": "fresh-mound", "name": "fresh mound of dirt with a shovel stuck in it", "material": "loose black grave dirt", "position": [11, 0, 2.4],
+          "parts": [
+            { "shape": "box", "position": [0, 0, 0], "size": [1.4, 0.4, 1.2] },
+            { "shape": "panel", "position": [0.3, 0.4, 0], "size": [0.4, 1.3, 0], "art": "a rusty shovel stuck upright" }
+          ]
+        },
+        {
+          "id": "wheelbarrow", "name": "rusted wheelbarrow full of wet dirt", "position": [13.5, 0, 6.5],
+          "parts": [{ "shape": "panel", "position": [0, 0, 0], "size": [1.4, 0.8, 0], "solid": true }]
+        },
+        {
+          "id": "thornbush", "name": "tangled black thornbush", "position": [14, 0, 9.5],
+          "parts": [{ "shape": "panel", "position": [0, 0, 0], "size": [1.6, 1.2, 0], "solid": true }],
+          "ambient": { "art": "a tiny glowing yellow-green firefly", "size": [0.06, 0.06], "everySeconds": 1.5, "lifetimeSeconds": 3, "velocity": [0, 0.25, 0.1], "gravity": false }
+        },
+        {
+          "id": "bear-trap", "name": "rusted bear trap half hidden in the weeds", "position": [5, 0, 7],
+          "parts": [{ "shape": "panel", "position": [0, 0, 0], "size": [0.7, 0.35, 0] }],
+          "hazard": { "damage": 1 }
+        }
+      ],
+      "characters": [
+        {
+          "id": "crawler", "name": "Something", "position": [4.5, 0, 4.5], "size": [1.2, 0.8],
+          "art": {
+            "description": "pale emaciated figure on all fours, long black hair hanging over its face",
+            "idle": ["crouched low, head tilted"],
+            "moving": ["crawling, left hand forward", "crawling, right hand forward"]
+          },
+          "movement": { "type": "chase", "speed": 1.8, "detectRadius": 4 },
+          "hostile": { "damage": 1 }
+        }
+      ]
+    }
+  ],
+  "connections": [
+    { "id": "front-door", "rooms": ["graveyard", "house"], "locked": true },
+    { "id": "back-door", "rooms": ["house", "backyard"], "locked": true }
+  ]
+}
