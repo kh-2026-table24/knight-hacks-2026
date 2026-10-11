@@ -19,7 +19,9 @@
     "sprite": "tsx --env-file=.env.local scripts/gemini.ts",
     "gemini-text": "tsx --env-file=.env.local scripts/gemini-text.ts",
     "start": "tsx server/index.ts",
-    "music": "tsx --env-file=.env.local scripts/gen-music.ts"
+    "music": "tsx --env-file=.env.local scripts/gen-music.ts",
+    "generate": "tsx --env-file=.env.local server/generation/generate.ts",
+    "publish-game": "tsx scripts/publish-game.ts"
   },
   "devDependencies": {
     "@types/node": "^26.6.5",
@@ -30,6 +32,7 @@
   },
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.3.296",
+    "@anthropic-ai/sdk": "^0.133.0",
     "@dimforge/rapier3d-compat": "^0.21.0",
     "@google-cloud/secret-manager": "^7.1.1",
     "@google/genai": "^2.28.0",

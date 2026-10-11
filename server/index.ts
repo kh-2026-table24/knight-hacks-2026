@@ -24,6 +24,7 @@ const CONTENT_TYPES: Record<string, string> = {
   ".json": "application/json",
   ".wasm": "application/wasm",
   ".ogg": "audio/ogg",
+  ".mp3": "audio/mpeg",
   ".png": "image/png",
   ".jpg": "image/jpeg",
   ".svg": "image/svg+xml",
