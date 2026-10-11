@@ -699,6 +699,16 @@ body {
   box-shadow: 3px 3px 0 #000;
 }
 
+/* Why there's a passcode at all. */
+.title-passcode-why {
+  max-width: 420px;
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.2;
+  color: var(--dim);
+  text-shadow: 2px 2px 0 #000;
+}
+
 .title-passcode-input:focus {
   outline: none;
   border-color: var(--candle);

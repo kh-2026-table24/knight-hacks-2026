@@ -182,6 +182,7 @@ export class TitleScreen {
     input.type = "password";
     input.autocomplete = "off";
     input.spellcheck = false;
+    element("p", "title-passcode-why", form, "We've locked game generation so we don't overspend our budget :( Contact us if you want to see it in action.");
     form.addEventListener("submit", (e) => {
       e.preventDefault();
       if (input.value.trim()) void this.create(input.value.trim());
